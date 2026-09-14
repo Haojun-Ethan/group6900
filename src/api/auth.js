@@ -1,6 +1,7 @@
 // src/api/auth.js
-import { mockLogin } from './mock/auth.mock';
+import { mockLogin, mockFetchMe, mockLogout } from './mock/auth.mock';
 import axios from 'axios';
+import { getToken } from '../utils/storage';
 
 // Read mock flag from env / 从环境变量读取 mock 开关
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
@@ -21,4 +22,14 @@ export async function login(credentials) {
   const res = await axios.post('/api/auth/login', credentials);
     return res.data; 
   */
+}
+
+export async function fetchMe() {
+  if (USE_MOCK)  return mockFetchMe(getToken());
+  throw new Error('Real API not configured yet');
+}
+
+export async function logout() {
+  if (USE_MOCK) return mockLogout();
+  throw new Error('Real API not configured yet');
 }

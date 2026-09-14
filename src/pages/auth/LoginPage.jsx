@@ -59,11 +59,11 @@ function LoginPage() {
     console.log('Password:', password);
 
     try {
-        const result = login({ email, password });
+        login({ email, password });
         console.log('Login successful:', result);
 
     } catch (error) {
-        setServerError(err.message || 'An error occurred during login'); // Set server error / 设置服务器错误
+        setServerError(error.message || 'An error occurred during login'); // Set server error / 设置服务器错误
         console.error('Login failed:', error);
     } finally {
         setIsLoading(false); //stop Loading / 停止加载

@@ -30,3 +30,25 @@ export async function mockLogin({ email, password }) {
     token: generateToken(user),
   };
 }
+
+export async function mockFetchMe(token) {
+  await delay(300);
+
+  // Parse user id from token / 从 token 解析用户 id
+  const userId = token?.split('_')[2];
+  const user = mockUsers.find((u) => u.id === userId);
+
+  if (!user) {
+    throw { code: 'UNAUTHORIZED', message: 'Session expired' };
+  }
+
+  return {
+    user: { id: user.id, name: user.name, email: user.email, roles: user.roles },
+  };
+}
+
+// Mock logout / 模拟登出
+export async function mockLogout() {
+  await delay(200);
+  return { success: true };
+}
