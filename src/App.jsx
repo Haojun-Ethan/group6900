@@ -5,10 +5,44 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Store validation erros
+  const [errors, setErrors] = useState({});
+
+  //validation form, return errors object
+  const validate = ( ) => { 
+    const newErrors = {}
+  
+
+    if (!email.trim()) {
+      newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        newErrors.email = 'Email is invalid';
+    }
+
+
+    //Password validation
+    if (!password) {
+      newErrors.password = 'Password is required';
+
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    return newErrors;
+  }
+
+
   // Handle form submit / 处理表单提交
   const handleSubmit = (e) => {
     // Prevent page reload / 阻止页面刷新（浏览器默认行为）
     e.preventDefault();
+
+    const newErrors = validate();
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     // Log form data / 打印表单数据
     console.log('Email:', email);
@@ -28,6 +62,8 @@ function App() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {/* Show email error if exists / 如果有邮箱错误则显示 */}
+        {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
       </div>
 
       <div>
@@ -38,9 +74,9 @@ function App() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
       </div>
 
-      {/* type="submit" triggers form onSubmit / type="submit" 触发 form 的 onSubmit */}
       <button type="submit">Login</button>
     </form>
   );
