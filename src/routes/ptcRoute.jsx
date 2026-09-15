@@ -2,13 +2,13 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 function PtcRoute({ children }) {
-  const { user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Loading...</div>; // checking session /检查状态
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" />; // not logged in -> redirect  / 未登录
   }
 

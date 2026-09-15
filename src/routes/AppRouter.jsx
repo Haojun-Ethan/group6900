@@ -5,9 +5,10 @@ import { useAuth } from "../hooks/useAuth";
 import LoginPage from "../pages/auth/LoginPage";
 import Homepage from "../pages/common/Homepage";
 import NotFoundPage from "../pages/common/NotFoundPage";
+import PtcRoute from "./ptcRoute";
 
 
-function publicOnlyRoute({children}){
+function PublicOnlyRoute({children}){
 
     const{isAuthenticated, isLoading} = useAuth();
     if (isLoading) return <p>loading...</p>
@@ -19,8 +20,8 @@ function AppRouter(){
     return(
         <BrowserRouter>
             <Routes>
-                <Route path="/login" element={<publicOnlyRoute> <LoginPage /></publicOnlyRoute>} />
-                <Route path="/" element={<publicOnlyRoute> <Homepage /></publicOnlyRoute> } />
+                <Route path="/login" element={<PublicOnlyRoute> <LoginPage /></PublicOnlyRoute>} />
+                <Route path="/" element={<PtcRoute> <Homepage /></PtcRoute> } />
                 <Route path="*" element={ <NotFoundPage />} />
             </Routes>   
         </BrowserRouter>

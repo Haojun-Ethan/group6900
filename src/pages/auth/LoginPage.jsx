@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { getActiveRules, validatePassword,} from '../../utils/passwordRules'
 
 /* ---- Router 2-02 add strong password---- */
 const LOGIN_FIELDS = [
@@ -9,34 +10,10 @@ const LOGIN_FIELDS = [
   { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password' },
 ];
 
-const PASSWORD_REQUIRE_SPECIAL = false; // if require special character
 
-/**
- * 
- * @typedef {Object} PasswordRule
- * @property {String} key
- * @property {String} label
- * @property {(V: String) => boolean} test
- * @property {boolean} enabled
- */
-
-/**
- * 
- * @type {PasswordRule[]}
- */
-
-
-//https://blog.logrocket.com/react-hook-form-vs-react-19/
-//
-const PASSWORD_RULES =[
-    { key: 'length',  label: 'At least 8 characters',        test: (v) => v.length >= 8,          enabled: true },
-    { key: 'upper',   label: 'Contains an uppercase letter', test: (v) => /[A-Z]/.test(v),        enabled: true },
-    { key: 'lower',   label: 'Contains a lowercase letter',  test: (v) => /[a-z]/.test(v),        enabled: true },
-    { key: 'digit',   label: 'Contains a number',            test: (v) => /\d/.test(v),           enabled: true },
-    { key: 'special', label: 'Contains a special character', test: (v) => /[^A-Za-z0-9]/.test(v), enabled: PASSWORD_REQUIRE_SPECIAL },
-];
 //https://zod.dev/api?id=strings    https://react-hook-form.com/get-started
 //https://blog.logrocket.com/build-a-password-generator-app-in-react-with-reusable-components/
+
 const RULES = {
     email: [ 
         {test: (v) => !!v.trim(), message:'Email is required'},
@@ -45,14 +22,6 @@ const RULES = {
     ],
 };
 
-/**
- * The failed password rules 
- * @param {string} value 
- * @returns {PasswordRule[]}
- */
-
-const getFailedPswRules= (value) => PASSWORD_RULES.filter((rr) => rr.enabled && !rr.test(value));
-
 
 function LoginPage() {
     //---router 2-02  rewrite, delete -> const [email, setEmail] = useState('');
@@ -60,7 +29,8 @@ function LoginPage() {
     //---router 2-02  rewrite, delete ->const [errors, setErrors] = useState({});
      const {login} = useAuth(); /* ---Router 2-02 add---- */
      const navigate = useNavigate();/* ---Router 2-02 add---- */
-     const [ from, setFrom] = useState({email: '', password: ''});
+
+     const [from, setForm] = useState({email: '', password: ''});
      const [errors, setErrors] = useState({});
     // Loading state / 加载状态
     const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +53,12 @@ function LoginPage() {
             }
         }
 
+        const pwdErr = validatePassword(from.password);
+        if (pwdErr) newErrors.passed = pwdErr;
+
+        
+
+        /*-----router 2-03 delete -> Refactoring in paawordRules.js
         if (form.password ==='') {
             newErrors.password = 'Password is required';
             
@@ -92,6 +68,7 @@ function LoginPage() {
                 newErrors.password = failed.map((rr) => rr.label).join('/');
             }
         }
+            */
         /*---router 2-02  rewrite, delete 
         if (!email.trim()) {
         newErrors.email = 'Email is required';
@@ -130,8 +107,8 @@ function LoginPage() {
         setErrors({}); 
         setIsLoading(true); // Set loading state / 设置加载状态
         // Log form data / 打印表单数据
-        console.log('Email:', email);
-        console.log('Password:', password);
+        //console.log('Email:', email);
+        //console.log('Password:', password);
 
         try {
             login(from);
@@ -161,10 +138,13 @@ function LoginPage() {
 
         {/* pass word rule check */}
         {field.name === 'password' && (
-            <ul> {PASSWORD_RULES.filter((rr)=>return.enabled).map((rule)=>{
-                const passed = rule.test(from.password);
-                return (<li key={rule.key}> {passed ? 'ok' : 'too easy'} {rule.label}</li>);
-            })} 
+            <ul> 
+                {getActiveRules().map((rule) => { 
+                    const passed = rule.test(from.password);
+                    return (
+                        <li key={rule.key}> {passed ? '✓' : '○'}{rule.label}</li>
+                    )
+                 })}
             </ul>
         )}
         </div>
