@@ -1,5 +1,7 @@
 // src/api/mock/auth.mock.js
 
+import { data } from "react-router-dom";
+
 // Mock user database / 模拟用户数据库
 const mockUsers = [
   { id: 'u1', name: 'Alice', email: 'user@example.com', password: '12345678', roles: ['user'] },
@@ -51,4 +53,28 @@ export async function mockFetchMe(token) {
 export async function mockLogout() {
   await delay(200);
   return { success: true };
+}
+
+
+/* register 3-01  */
+export async function mockRegister({name,email,password:string}) {
+  await delay();
+
+  if (mockUsers.some((u)=> u.email ===email)){
+    throw {code:'EMAIL_EXISTS', message:'This email is already registered'}
+  }
+
+  const newUser = {
+    id: 'u${mockUsers.length + 1}',
+    name,
+    email,
+    password,
+    roles:['user'],
+  };
+  mockUsers.push(newUser);
+
+  return{
+    user:{id:newUser, name:newUser.name, email: newUser.email, roles:newUser.roles},
+    token: generateToken(newUser),
+  };
 }

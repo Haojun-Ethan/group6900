@@ -43,20 +43,20 @@ export const AuthProvider = ({ children }) => {
 
   }, []);
 
-  // login function / 登录函数
-  const login = useCallback(async (credentials) => {
-    const result = await authApi.login(credentials);
-    storage.setToken(result.token);
-    storage.setUser(result.user);
-    setUser(result.user);
-    return result.user;
-    }, []);
+     // login function / 登录函数
+    const login = useCallback(async (credentials) => {
+        const result = await authApi.login(credentials);
+        storage.setToken(result.token);
+        storage.setUser(result.user);
+        setUser(result.user);
+        return result.user;
+        }, []);
 
     // logout function / 登出函数
     const logout = useCallback(() => {
         try {
              authApi.logout();
-        } catch {
+        } catch(err) {
             // try display error message / 尝试显示错误信息
             console.error('[Auth] logout API failed'), { code: err?.code, message : err?.message, timestamp: new Date().toISOString(),};
         }
@@ -74,6 +74,14 @@ export const AuthProvider = ({ children }) => {
         return user.roles.includes(role);
     }, [user]);
 
+    /* register 3-01 */
+    const register = useCallback(async(data)=> {
+        const result = await authApi.register(data);
+        storage.setToken(result.token);
+        storage.setUser(result.user);
+        setUser(result.user);
+        return result.user;
+    },[]);
 
     // Provide context value / 提供上下文值
     const value = {
@@ -81,9 +89,12 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         isAuthenticated: !!user,
         login,
+        register,  /* don't forget add it when write register code */
         logout,
         hasRole,
     };
+
+
     
     return <AuthContext.Provider value={value}> {children} </AuthContext.Provider>;
 

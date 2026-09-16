@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getActiveRules, validatePassword,} from '../../utils/passwordRules'
 
 /* ---- Router 2-02 add strong password---- */
@@ -40,6 +40,12 @@ function LoginPage() {
     const updateField = (name, value) => { 
         setForm((prev) => ({ ...prev, [name]:value }));
      };
+    /* 
+     setForm ((prev) => { 
+        const newObj = { ... prev} });
+        newObj[name] = value;
+        return newObj;
+     */
 
   //validation form, return errors object
     const validate = ( ) => { 
@@ -153,6 +159,9 @@ function LoginPage() {
       <button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
       </button>
+      <p>
+        Do not have an account? <Link to="{/register}">Register</Link>
+      </p>
     </form>
     );
 }

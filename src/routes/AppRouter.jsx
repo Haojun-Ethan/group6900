@@ -6,6 +6,8 @@ import LoginPage from "../pages/auth/LoginPage";
 import Homepage from "../pages/common/Homepage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PtcRoute from "./ptcRoute";
+import RegisterPage from "../pages/auth/RegisterPage";
+
 
 
 function PublicOnlyRoute({children}){
@@ -20,6 +22,7 @@ function AppRouter(){
     return(
         <BrowserRouter>
             <Routes>
+                <Route path="/register" element={<PublicOnlyRoute> <RegisterPage /></PublicOnlyRoute>} />
                 <Route path="/login" element={<PublicOnlyRoute> <LoginPage /></PublicOnlyRoute>} />
                 <Route path="/" element={<PtcRoute> <Homepage /></PtcRoute> } />
                 <Route path="*" element={ <NotFoundPage />} />
