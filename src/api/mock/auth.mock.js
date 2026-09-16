@@ -57,7 +57,7 @@ export async function mockLogout() {
 
 
 /* register 3-01  */
-export async function mockRegister({name,email,password:string}) {
+export async function mockRegister({name,email,password}) { /* debug （：string  is typescript grammar） export async function mockRegister({name,email,password:string}) */
   await delay();
 
   if (mockUsers.some((u)=> u.email ===email)){
@@ -65,7 +65,7 @@ export async function mockRegister({name,email,password:string}) {
   }
 
   const newUser = {
-    id: 'u${mockUsers.length + 1}',
+    id: `u${mockUsers.length + 1}`,   /*debug: use` (~ same key) don't use '  */
     name,
     email,
     password,

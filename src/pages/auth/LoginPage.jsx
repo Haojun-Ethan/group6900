@@ -160,7 +160,7 @@ function LoginPage() {
         {isLoading ? 'Logging in...' : 'Login'}
       </button>
       <p>
-        Do not have an account? <Link to="{/register}">Register</Link>
+        Do not have an account? <Link to="/register">Register</Link>
       </p>
     </form>
     );
