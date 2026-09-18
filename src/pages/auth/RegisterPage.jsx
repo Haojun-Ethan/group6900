@@ -82,9 +82,17 @@ function RegisterPage() {
         setIsLoading(true);
         try{
             // clean confirPassword before sending
-            const {confirmPassword: _unused, ...payload} = form;
+            const {confirmPassword: payload} = form;  /* debug   */
             await register(payload);
-            navigate('/',{replace:true});
+         
+              const result = await register(payload);   
+
+                    
+                if (result.requires2FASetup) {   /* 2FA 3-01*/
+                    navigate('/register/setup-2fa', { replace: true });
+                } else {
+                    navigate('/', { replace: true });
+                }    
 
         } catch (err) {
             setServerError(err.message || 'Registration failed!');

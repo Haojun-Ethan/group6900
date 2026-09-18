@@ -46,25 +46,30 @@ export const AuthProvider = ({ children }) => {
      // login function / 登录函数
     const login = useCallback(async (credentials) => {
         const result = await authApi.login(credentials);
+        /* 2FA ----3-01 */
+        if (result.requires2FA) {
+            storage.setTempToken(result.tempToken);   
+            return { requires2FA: true, tempToken: result.tempToken };
+        }
         storage.setToken(result.token);
         storage.setUser(result.user);
         setUser(result.user);
-        return result.user;
+        return { requires2FA: false, user: result.user };
         }, []);
 
-    // logout function / 登出函数
+    // logout function 
     const logout = useCallback(() => {
         try {
              authApi.logout();
         } catch(err) {
-            // try display error message / 尝试显示错误信息
+            // try display error message 
             console.error('[Auth] logout API failed'), { code: err?.code, message : err?.message, timestamp: new Date().toISOString(),};
         }
         storage.clearAll();
         setUser(null);
     }, []);
 
-    // role check function / 角色检查函数
+    // role check function    / 角色检查函数
     const hasRole = useCallback((role) => {
         if (!user) return false;
         if (Array.isArray(user.roles)) 
@@ -77,13 +82,41 @@ export const AuthProvider = ({ children }) => {
     /* register 3-01 */
     const register = useCallback(async(data)=> {
         const result = await authApi.register(data);
+        /* 2FA -----3-01 */
+        if (result.requires2FASetup) {
+            storage.setTempToken(result.tempToken);
+            return { requires2FASetup: true, tempToken: result.tempToken };
+        }
+        storage.setToken(result.token);
+        storage.setUser(result.user);
+        setUser(result.user);
+        return { requires2FASetup: false, user: result.user };
+    },[]);
+
+        /* 2fa -----3-01 */
+    // 2FA verify
+    const verify2FA = useCallback(async (code) => {
+        const tempToken = storage.getTempToken();
+        const result = await authApi.verify2FA({ tempToken, code });
+        storage.removeTempToken();
         storage.setToken(result.token);
         storage.setUser(result.user);
         setUser(result.user);
         return result.user;
-    },[]);
+    }, []);
 
-    // Provide context value / 提供上下文值
+    // 2FA challenge
+    const challenge2FA = useCallback(async (code) => {
+        const tempToken = storage.getTempToken();
+        const result = await authApi.challenge2FA({ tempToken, code });
+        storage.removeTempToken();
+        storage.setToken(result.token);
+        storage.setUser(result.user);
+        setUser(result.user);
+        return result.user;
+    }, []);
+
+    // Provide context value 
     const value = {
         user,
         isLoading,
@@ -92,10 +125,11 @@ export const AuthProvider = ({ children }) => {
         register,  /* don't forget add it when write register code */
         logout,
         hasRole,
+        verify2FA,
+        challenge2FA,
     };
 
-
-    
+        
     return <AuthContext.Provider value={value}> {children} </AuthContext.Provider>;
 
 }

@@ -96,9 +96,9 @@ function LoginPage() {
     }
 
 
-  // Handle form submit / 处理表单提交
+  // Handle form submit   / 处理表单提交
   const handleSubmit = (e) => {
-    // Prevent page reload / 阻止页面刷新（浏览器默认行为）
+    // Prevent page reload / 阻止页面刷新（浏览器默认行为）// importent
     e.preventDefault();
 
     setServerError(''); // Reset server error / 重置服务器错误
@@ -117,15 +117,19 @@ function LoginPage() {
         //console.log('Password:', password);
 
         try {
-            login(from);
+            const result = login(from);
             //console.log('Login successful:', result);
-            navigate('/', {replace: true}); /* ---Router 2-02 add  ---- */
+              if (result.requires2FA) {
+                    navigate('/login/2fa', { replace: true });
+                } else {
+                    navigate('/', { replace: true });
+                }/* ---Router 2-02 add  , 2FA 3-01 ---- */
 
         } catch (error) {
-            setServerError(error.message || 'An error occurred during login'); // Set server error / 设置服务器错误
+            setServerError(error.message || 'An error occurred during login'); // Set server error  
             console.error('Login failed:', error);
         } finally {
-            setIsLoading(false); //stop Loading / 停止加载
+            setIsLoading(false); //stop Loading  
         }
 
      };
