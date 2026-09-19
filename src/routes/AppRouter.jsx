@@ -7,8 +7,7 @@ import Homepage from "../pages/common/Homepage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PtcRoute from "./ptcRoute";
 import RegisterPage from "../pages/auth/RegisterPage";
-
-
+import Challenge2FAPage from "../pages/auth/Challenge2FAPage";
 
 function PublicOnlyRoute({children}){
 
@@ -24,6 +23,7 @@ function AppRouter(){
             <Routes>
                 <Route path="/register" element={<PublicOnlyRoute> <RegisterPage /></PublicOnlyRoute>} />
                 <Route path="/login" element={<PublicOnlyRoute> <LoginPage /></PublicOnlyRoute>} />
+                <Route path="/login/sfa" element={<PublicOnlyRoute> <Challenge2FAPage/></PublicOnlyRoute>}/>
                 <Route path="/" element={<PtcRoute> <Homepage /></PtcRoute> } />
                 <Route path="*" element={ <NotFoundPage />} />
             </Routes>   

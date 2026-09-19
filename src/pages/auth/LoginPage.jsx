@@ -30,7 +30,7 @@ function LoginPage() {
      const {login} = useAuth(); /* ---Router 2-02 add---- */
      const navigate = useNavigate();/* ---Router 2-02 add---- */
 
-     const [from, setForm] = useState({email: '', password: ''});
+     const [form, setForm] = useState({email: '', password: ''});
      const [errors, setErrors] = useState({});
     // Loading state / 加载状态
     const [isLoading, setIsLoading] = useState(false);
@@ -53,14 +53,14 @@ function LoginPage() {
     
         /* ---Router 2-02 add---- */
         for (const rule of RULES.email) {
-            if(!rule.test(from.email)){
+            if(!rule.test(form.email)){
                 newErrors.email = rule.message;
                 break;
             }
         }
 
-        const pwdErr = validatePassword(from.password);
-        if (pwdErr) newErrors.passed = pwdErr;
+        const pwdErr = validatePassword(form.password);
+        if (pwdErr) newErrors.password = pwdErr;
 
         
 
@@ -96,7 +96,7 @@ function LoginPage() {
     }
 
 
-  // Handle form submit   / 处理表单提交
+  // Handle form submit  / 处理表单提交
   const handleSubmit = (e) => {
     // Prevent page reload / 阻止页面刷新（浏览器默认行为）// importent
     e.preventDefault();
@@ -117,7 +117,7 @@ function LoginPage() {
         //console.log('Password:', password);
 
         try {
-            const result = login(from);
+            const result = login(form);
             //console.log('Login successful:', result);
               if (result.requires2FA) {
                     navigate('/login/2fa', { replace: true });
@@ -126,10 +126,10 @@ function LoginPage() {
                 }/* ---Router 2-02 add  , 2FA 3-01 ---- */
 
         } catch (error) {
-            setServerError(error.message || 'An error occurred during login'); // Set server error  
+            setServerError(error.message || 'An error occurred during login'); // Set server error / 设置服务器错误
             console.error('Login failed:', error);
         } finally {
-            setIsLoading(false); //stop Loading  
+            setIsLoading(false); //stop Loading / 停止加载
         }
 
      };
@@ -142,7 +142,7 @@ function LoginPage() {
         {serverError && <p style={{ color: 'red' }}>{serverError}</p>}
 
         {LOGIN_FIELDS.map((field) => (
-            <div key={field.name}> <label> {field.label}</label> <input type={field.type} placeholder={field.placeholder} value={from[field.name]} onChange={(a)=>updateField(field.name, a.target.value)} disabled={isLoading} />
+            <div key={field.name}> <label> {field.label}</label> <input type={field.type} placeholder={field.placeholder} value={form[field.name]} onChange={(a)=>updateField(field.name, a.target.value)} disabled={isLoading} />
             {errors[field.name] && (<p>{errors[field.name]}</p>)
         }
 
@@ -150,7 +150,7 @@ function LoginPage() {
         {field.name === 'password' && (
             <ul> 
                 {getActiveRules().map((rule) => { 
-                    const passed = rule.test(from.password);
+                    const passed = rule.test(form.password);
                     return (
                         <li key={rule.key}> {passed ? '✓' : '○'}{rule.label}</li>
                     )

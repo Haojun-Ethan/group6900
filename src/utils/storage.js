@@ -10,9 +10,6 @@ export const getToken = () => localStorage.getItem(KEYS.TOKEN);
 export const setToken = (token) => localStorage.setItem(KEYS.TOKEN, token);
 export const removeToken = () => localStorage.removeItem(KEYS.TOKEN);
 
-export const getTempToken = () => localStorage.getItem(KEYS.TEMP_TOKEN);
-export const setTempToken = (token) => localStorage.setItem(KEYS.TEMP_TOKEN, token);
-export const removeTempToken = () => localStorage.removeItem(KEYS.TEMP_TOKEN);
 
 // User
 export const getUser = () => { 
@@ -35,9 +32,10 @@ export const setUser = (user) => {
 export const removeUser = () => localStorage.removeItem(KEYS.USER);
 
 //Temp token - 2FA flow    /*  2FA ---- 3-01 */
-export const getTempToken=( ) => localStorage.getItem(KEYS.TEMP_TOKEN);
-export const setTempToken=( ) => localStorage.setItem(KEYS.TEMP_TOKEN,token);
-export const removeTempToken=( ) => localStorage.removeItem(KEYS.TEMP_TOKEN);
+export const getTempToken = () => localStorage.getItem(KEYS.TEMP_TOKEN);
+export const setTempToken = (token) => localStorage.setItem(KEYS.TEMP_TOKEN, token);
+export const removeTempToken = () => localStorage.removeItem(KEYS.TEMP_TOKEN);
+
 
 // Clear all storage 
 export const clearAll = () => {

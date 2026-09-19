@@ -7,9 +7,9 @@ import { data } from "react-router-dom";
 
 // Mock user database / 模拟用户数据库
 const mockUsers = [
-  { id: 'u1', name: 'Alice', email: 'user@example.com', password: '12345678', roles: ['user'] },
-  { id: 'u2', name: 'Bob', email: 'owner@example.com', password: '12345678', roles: ['owner'] },
-    { id: 'u3', name: 'Charlie', email: 'admin@example.com', password: '12345678', roles: ['admin'] }
+  { id: 'u1', name: 'Alice', email: 'user@example.com', password: '123456nN', roles: ['user'] },
+  { id: 'u2', name: 'Bob', email: 'owner@example.com', password: '123456nN', roles: ['owner'] },
+    { id: 'u3', name: 'Charlie', email: 'admin@example.com', password: '123456nN', roles: ['admin'] }
 ];
 
 
@@ -157,7 +157,7 @@ export async function mockVerify2FA({ tempToken, code }) {
   }
 
   // User started 2FA
-  user.twoFactorEnabled = true;
+  user.twoFactorEnabled = false;
 
   return {
     user: { id: user.id, name: user.name, email: user.email, roles: user.roles },

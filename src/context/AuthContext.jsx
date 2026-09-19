@@ -44,6 +44,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
      // login function / 登录函数
+
+     /**
+      * login and handle 2fa requirement
+      * @param {{emal:string, password:string}} credentials
+      * @returns {Promise<{user?: object,requires2FA?: boolean}>}
+      */
     const login = useCallback(async (credentials) => {
         const result = await authApi.login(credentials);
         /* 2FA ----3-01 */
@@ -51,8 +57,9 @@ export const AuthProvider = ({ children }) => {
             storage.setTempToken(result.tempToken);   
             return { requires2FA: true, tempToken: result.tempToken };
         }
-        storage.setToken(result.token);
-        storage.setUser(result.user);
+        storage.setToken(result.token);   
+
+        storage.setUser(result.user);        
         setUser(result.user);
         return { requires2FA: false, user: result.user };
         }, []);
@@ -80,6 +87,11 @@ export const AuthProvider = ({ children }) => {
     }, [user]);
 
     /* register 3-01 */
+    /**
+     * register and handle 2FA setup requirement
+     * @param {{name:string, email: string, password:string}} data
+     * @returns {Promise<{user?: object, requires2FAsetup?: boolean}>}
+     */
     const register = useCallback(async(data)=> {
         const result = await authApi.register(data);
         /* 2FA -----3-01 */
@@ -95,8 +107,15 @@ export const AuthProvider = ({ children }) => {
 
         /* 2fa -----3-01 */
     // 2FA verify
+
+    /**
+     * complate 2fa setup after register
+     * @param {string} code - 6-digit code
+     * @returns {Promise<Object>} -Logged in user
+     */
     const verify2FA = useCallback(async (code) => {
         const tempToken = storage.getTempToken();
+        if(!tempToken){ throw {code:'INVALID_TEMP_TOKEN', message:'Session expired. Plese register again'};}  /* 2FA ----3-02 Add a check */
         const result = await authApi.verify2FA({ tempToken, code });
         storage.removeTempToken();
         storage.setToken(result.token);
@@ -106,8 +125,14 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // 2FA challenge
+    /**
+     * finish 2fa challenge at login
+     * @param {string} code 6-digit code
+     * @returns {Promise<Object>} Loged in user 
+     */
     const challenge2FA = useCallback(async (code) => {
         const tempToken = storage.getTempToken();
+        if(!tempToken){ throw {code:'INVALID_TEMP_TOKEN', message:'Session expired. Plese register again'};}  /* 2FA ----3-02 Add a check  - same verify2fa */
         const result = await authApi.challenge2FA({ tempToken, code });
         storage.removeTempToken();
         storage.setToken(result.token);
@@ -125,7 +150,7 @@ export const AuthProvider = ({ children }) => {
         register,  /* don't forget add it when write register code */
         logout,
         hasRole,
-        verify2FA,
+        verify2FA,  /* don't forget add it when write 2FA code */
         challenge2FA,
     };
 

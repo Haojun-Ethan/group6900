@@ -82,8 +82,8 @@ function RegisterPage() {
         setIsLoading(true);
         try{
             // clean confirPassword before sending
-            const {confirmPassword: payload} = form;  /* debug   */
-            await register(payload);
+            const {confirmPassword,...payload} = form;  /* debug   */
+
          
               const result = await register(payload);   
 
