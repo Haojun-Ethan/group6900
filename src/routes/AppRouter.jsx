@@ -8,6 +8,7 @@ import NotFoundPage from "../pages/common/NotFoundPage";
 import PtcRoute from "./ptcRoute";
 import RegisterPage from "../pages/auth/RegisterPage";
 import Challenge2FAPage from "../pages/auth/Challenge2FAPage";
+import Setup2FAPage from "../pages/auth/Setup2FAPage";
 
 function PublicOnlyRoute({children}){
 
@@ -26,6 +27,7 @@ function AppRouter(){
                 <Route path="/login/sfa" element={<PublicOnlyRoute> <Challenge2FAPage/></PublicOnlyRoute>}/>
                 <Route path="/" element={<PtcRoute> <Homepage /></PtcRoute> } />
                 <Route path="*" element={ <NotFoundPage />} />
+                <Route path="/register/setup-2fa" element={<PublicOnlyRoute><Setup2FAPage/></PublicOnlyRoute>} />  {/* 2FA ----3-03*/}
             </Routes>   
         </BrowserRouter>
     );
