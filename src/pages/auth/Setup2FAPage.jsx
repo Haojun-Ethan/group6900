@@ -1,9 +1,10 @@
-import { useState,useRef,useEffect } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 import { get2FAFlow, getTempToken } from "../../utils/storage";
 import * as authApi from '../../api/auth'
+import CodeInput from "../../components/auth/CodeInput";
 
 function Setup2FAPage() {
     const  {verify2FA} = useAuth();
@@ -14,12 +15,14 @@ function Setup2FAPage() {
     const [setupError, setSetupError] = useState('');
     const [isLoadingSetup, setIsLoadingSetup] = useState(true);
 
+    /* Reconstrution in 3-05, delete it in 3-06
     // Code input 
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const inputRef = useRef(null);
+*/
 
     // Guard + fetch setup data / 守卫 + 拉取设置数据
     useEffect(() => {
@@ -34,8 +37,7 @@ function Setup2FAPage() {
             try {
                 const data = await authApi.setup2FA(tempToken);
                 setSetupData(data);
-                // Focus code input after data is loaded
-                setTimeout(() => inputRef.current?.focus(), 0);
+                
             } catch (err) { setSetupError(err.message || 'Failed to load 2FA setup');
             } finally {
                 setIsLoadingSetup(false);
@@ -45,41 +47,30 @@ function Setup2FAPage() {
     load();
     },[navigate]);
 
-    /**      reconstruction 2FA 3-05
+    /*     reconstruction 2FA 3-05   delete in 2FA 3-06
      * Validate code format (6 digits)
      * @param {string} value
      * @returns {string | null}
-     */
+     
     const validateCode = (value) => {
         if (!value) return 'Code is required';
         if (!/^\d{6}$/.test(value)) return 'Code must be 6 digits';   
         return null;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-
-        const formatError = validateCode(code);
-        if (formatError) { setError(formatError);return;}
-
-        setIsLoading(true);
-        try {
-        await verify2FA(code);
-        navigate('/', { replace: true });
-        } catch (err) {
-            setError(err.message || 'Verification failed');
-            setCode('');
-        inputRef.current?.focus();
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleChange = (e) => {
+       const handleChange = (e) => {
         const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
         setCode(digits);
     };
+*/
+
+
+    const handleSubmit = async (code) => {
+        await verify2FA(code);
+        navigate('/', { replace: true });
+       
+    };
+
 
     // Copy secret to clipboard / 复制密钥到剪贴板
     const handleCopySecret = async () => {
@@ -93,7 +84,7 @@ function Setup2FAPage() {
 
     // ===== Render states  =====
 
-    if (isLoadingSetup) {return <p>Loading 2FA setup...</p>;}
+    if (isLoadingSetup) return <p>Loading 2FA setup...</p>;
 
     if (setupError) {
         return (
@@ -123,35 +114,15 @@ function Setup2FAPage() {
             </div>
         )}
 
-        {/* Manual secret fallback /备用方案*/}
+        {/* Manual secret fallback /备用方案 手动*/}
         <div>
             <p style={{ fontSize: 12, color: '#666' }}>Can't scan? Enter this key manually:</p>
             <code style={{ fontSize: 14, background: '#f4f4f4', padding: '4px 8px' }}> {setupData?.secret}</code>
             <button type="button" onClick={handleCopySecret} style={{ marginLeft: 8 }}> Copy</button>
         </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-
-        <div>
-            <label>Enter the 6-digit code</label>
-                <input
-                ref={inputRef}
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                placeholder="000000"
-                value={code}
-                onChange={handleChange}
-                disabled={isLoading}
-                maxLength={6}
-            />
-        </div>
-
-        <button type="submit" disabled={isLoading || code.length !== 6}>{isLoading ? 'Verifying...' : 'Verify & Finish'}</button>
-
-        <p>
-            Wrong account? <a href="/register">Back to register</a>
-        </p>
+        <CodeInput onSubmit={handleSubmit} submitLabel="Verity Finish" /> {/* reconstruct in 2FA ---3-06  */}
+        <p>Wrong account? <a href="/register">Back to register</a></p>
         </form>
     );
     }

@@ -1,13 +1,16 @@
-import { useEffect, useState, useRef } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { getTempToken, get2FAFlow } from "../../utils/storage";
+import CodeInput from "../../components/auth/CodeInput";
+
 
 
 function Challenge2FAPage (){
     const {challenge2FA} = useAuth();
     const navigate = useNavigate;
 
+    /*  Reconstrution in 3-05, delete it in 3-06
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -17,59 +20,38 @@ function Challenge2FAPage (){
         inputRef.current?.focus();
      },
     []);
-
+*/
     useEffect(( ) => { 
         const tempToken = getTempToken()
         const flow = get2FAFlow();
-        if(!getTempToken || flow !=='login') {
+        if(!tempToken || flow !=='login') {
             navigate('/login',{replace:true});
         }
     },[navigate]);
 
-//  reconstruction
+
+   /*  Reconstrution in 3-05, delete it in 3-06
     const validateCode =(value) => { 
         if(!value) return 'Code is required';
-        if(!/^\d{6}$/.test(value)) return 'Code must be digits';  /* okta/google verity handbook */
+        if(!/^\d{6}$/.test(value)) return 'Code must be digits';  
         return null;
     };
+*/
+    const handleSubmit = async (code) => { 
+       await challenge2FA(code);
+       navigate('/',{replace:true});
+        };
 
-    const handleSubmit = async (e) => { 
-        e.preventDefault();
-        setError('');
-
-        const formatErr = validateCode(code);
-        if(formatErr) {
-            setError(formatErr);
-            return;
-        }
-
-        setIsLoading(true);
-        try{
-            challenge2FA(code);
-            navigate('/',{replace:true});
-        } catch (err){
-            setError(err.message || 'Verification failed');
-            setCode('');
-            inputRef.current?.focus();
-
-        } finally {
-            setIsLoading(false);
-        }
-    
-
-    };
-
-    const handleChange = (e) => { 
-        const digits= e.target.value.replace(/\D/g,'').slice(0,6);   /* Regular Expression, \D -> 0-9; /g-> golbal */
-        setCode(digits);
-     }
 
      return(
-
-        /* restruction*/
+        <div>
+            <h1>Authentication</h1>
+            <p>Please enter the 6-digit code from Okta.</p>
+            <CodeInput onSubmit={handleSubmit} submitLabel="Verify"/>
+            <p>Incorrect account! <a href="/login"/> Return to Login Page</p>
+        </div>
+       
     );
-
-
 
 }
 
