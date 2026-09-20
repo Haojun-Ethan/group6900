@@ -1,5 +1,5 @@
 import { useState,useRef, useEffect } from "react";
-import {validateCode, sanitizeCode} from '../../utils/codeValidation';
+import {validateCode, filterCode} from '../../utils/codeValidation';
 
 
 
@@ -15,7 +15,7 @@ function CodeInput({onSubmit, submitLabel ='Verity', loadingLabel = 'Verifying',
     // auto-focus on mount
     useEffect ( () => { if (autoFocus) inputRef.current?.focus(); },[autoFocus]); /* if inputRef.current is not null/undefined， call on focus. if is return undefined. */
 
-    const handleChange = (e) =>{ setCode(sanitizeCode(e.target.value));};
+    const handleChange = (e) =>{ setCode(filterCode(e.target.value));};
     const handleSubmit = async (e)=> {
         e.preventDefault();
         setError('');

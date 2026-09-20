@@ -1,13 +1,13 @@
 import { useState,useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
-import { get2FAFlow, getTempToken } from "../../utils/storage";
+import { get2FAFlow, getTempToken,remove2FAFlow,removeTempToken } from "../../utils/storage";
 import * as authApi from '../../api/auth'
 import CodeInput from "../../components/auth/CodeInput";
 
 function Setup2FAPage() {
-    const  {verify2FA} = useAuth();
+    const  {verify2FA, user} = useAuth();       /* debuge by 2FA---3-07*/
     const navigate = useNavigate();
 
     // Setup data from backend 
@@ -26,6 +26,9 @@ function Setup2FAPage() {
 
     // Guard + fetch setup data / 守卫 + 拉取设置数据
     useEffect(() => {
+        
+        if (user) { navigate('/',{replace:true});  }    /* debuge by 2FA---3-07*/
+        
         const tempToken = getTempToken();
         const flow = get2FAFlow();
 
@@ -45,7 +48,7 @@ function Setup2FAPage() {
         };
 
     load();
-    },[navigate]);
+    },[navigate, user]); /* debuge by 2FA---3-07*/
 
     /*     reconstruction 2FA 3-05   delete in 2FA 3-06
      * Validate code format (6 digits)
@@ -65,11 +68,19 @@ function Setup2FAPage() {
 */
 
 
-    const handleSubmit = async (code) => {
+
+
+        const handleSubmit = async (code) => { 
+       try {
         await verify2FA(code);
-        navigate('/', { replace: true });
-       
-    };
+       navigate('/',{replace:true});
+        } catch (err) {
+            if (err.code === 'INVALID_TEMP_TOKEN'){
+                navigate('/register',{replace:true});
+                return;
+            }
+            throw err;
+        }
 
 
     // Copy secret to clipboard / 复制密钥到剪贴板
@@ -81,6 +92,11 @@ function Setup2FAPage() {
         // Extend it in future
         }
     };
+
+            const handleSwichAccount=() => {     /* debuge by 2FA---3-07*/
+            removeTempToken();
+            remove2FAFlow();
+         }
 
     // ===== Render states  =====
 
@@ -122,9 +138,9 @@ function Setup2FAPage() {
         </div>
 
         <CodeInput onSubmit={handleSubmit} submitLabel="Verity Finish" /> {/* reconstruct in 2FA ---3-06  */}
-        <p>Wrong account? <a href="/register">Back to register</a></p>
+        <p><Link to="/register" onClick={handleSwichAccount}></Link> Return to register.</p>
         </form>
     );
     }
-
+}
     export default Setup2FAPage;
