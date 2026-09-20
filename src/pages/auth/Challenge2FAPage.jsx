@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import {  useNavigate } from "react-router-dom";
 import { getTempToken } from "../../utils/storage";
 import { useAuth } from "../../hooks/useAuth";
-
+import { getTempToken, get2FAFlow } from "../../utils/storage";
 
 
 function Challenge2FAPage (){
@@ -20,7 +20,9 @@ function Challenge2FAPage (){
     []);
 
     useEffect(( ) => { 
-        if(!getTempToken()) {
+        const tempToken = getTempToken()
+        const flow = get2FAFlow();
+        if(!getTempToken || flow !=='login') {
             navigate('/login',{replace:true});
         }
     },[navigate]);

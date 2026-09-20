@@ -55,7 +55,8 @@ export const AuthProvider = ({ children }) => {
         /* 2FA ----3-01 */
         if (result.requires2FA) {
             storage.setTempToken(result.tempToken);   
-            return { requires2FA: true, tempToken: result.tempToken };
+            storage.set2FAFlow('login')     /* 2FA ----3-04*/
+            return { requires2FA: true };
         }
         storage.setToken(result.token);   
 
@@ -97,7 +98,8 @@ export const AuthProvider = ({ children }) => {
         /* 2FA -----3-01 */
         if (result.requires2FASetup) {
             storage.setTempToken(result.tempToken);
-            return { requires2FASetup: true, tempToken: result.tempToken };
+            storage.set2FAFlow('register')  /* 2FA ---- 3-04 */
+            return { requires2FASetup: true };
         }
         storage.setToken(result.token);
         storage.setUser(result.user);
@@ -118,6 +120,7 @@ export const AuthProvider = ({ children }) => {
         if(!tempToken){ throw {code:'INVALID_TEMP_TOKEN', message:'Session expired. Plese register again'};}  /* 2FA ----3-02 Add a check */
         const result = await authApi.verify2FA({ tempToken, code });
         storage.removeTempToken();
+        storage.remove2FAFlow();  /* 2FA ---- 3-04 */
         storage.setToken(result.token);
         storage.setUser(result.user);
         setUser(result.user);
@@ -135,6 +138,7 @@ export const AuthProvider = ({ children }) => {
         if(!tempToken){ throw {code:'INVALID_TEMP_TOKEN', message:'Session expired. Plese register again'};}  /* 2FA ----3-02 Add a check  - same verify2fa */
         const result = await authApi.challenge2FA({ tempToken, code });
         storage.removeTempToken();
+        storage.remove2FAFlow(); /* 2FA ---- 3-04 */
         storage.setToken(result.token);
         storage.setUser(result.user);
         setUser(result.user);

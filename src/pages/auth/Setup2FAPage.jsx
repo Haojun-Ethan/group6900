@@ -2,7 +2,7 @@ import { useState,useRef,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
-import { getTempToken } from "../../utils/storage";
+import { get2FAFlow, getTempToken } from "../../utils/storage";
 import * as authApi from '../../api/auth'
 
 function Setup2FAPage() {
@@ -24,7 +24,9 @@ function Setup2FAPage() {
     // Guard + fetch setup data / 守卫 + 拉取设置数据
     useEffect(() => {
         const tempToken = getTempToken();
-        if (!tempToken) {
+        const flow = get2FAFlow();
+
+        if (!tempToken || flow !== 'register') {
         navigate('/register', { replace: true });
         return;
         }
@@ -121,7 +123,7 @@ function Setup2FAPage() {
             </div>
         )}
 
-        {/* Manual secret fallback / 手动输入密钥的备用方案 */}
+        {/* Manual secret fallback /备用方案*/}
         <div>
             <p style={{ fontSize: 12, color: '#666' }}>Can't scan? Enter this key manually:</p>
             <code style={{ fontSize: 14, background: '#f4f4f4', padding: '4px 8px' }}> {setupData?.secret}</code>

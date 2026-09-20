@@ -1,7 +1,8 @@
 const KEYS = {
     TOKEN: 'edu_token',
     USER: 'edu_user',
-    TEMP_TOKEN: 'edu_temp_token'  /* 2FA --- 3-01  vri user and 2fa tokenF */
+    TEMP_TOKEN: 'edu_temp_token',  /* 2FA --- 3-01  vri user and 2fa tokenF */
+    TWO_FA_FLOW: 'edu_afa_flow'    /* 2FA --- 3-04  add 2FA flow */
 };
 
 
@@ -9,6 +10,12 @@ const KEYS = {
 export const getToken = () => localStorage.getItem(KEYS.TOKEN);
 export const setToken = (token) => localStorage.setItem(KEYS.TOKEN, token);
 export const removeToken = () => localStorage.removeItem(KEYS.TOKEN);
+
+/* 2FA --- 3-04  add 2FA flow */
+// 2FA flow marker - login & register
+export const get2FAFlow = ( ) => localStorage.getItem(KEYS.TWO_FA_FLOW);
+export const set2FAFlow = (flow) => localStorage.setItem(KEYS.TWO_FA_FLOW,flow);
+export const remove2FAFlow=( ) => localStorage.removeItem(KEYS.TWO_FA_FLOW);
 
 
 // User
@@ -38,8 +45,9 @@ export const removeTempToken = () => localStorage.removeItem(KEYS.TEMP_TOKEN);
 
 
 // Clear all storage 
-export const clearAll = () => {
+export const clearAll = () => {  /* keep all keys are cleard */
     removeToken();
     removeUser();
     removeTempToken();  
+    remove2FAFlow(); 
 };
