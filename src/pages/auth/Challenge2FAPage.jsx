@@ -9,19 +9,8 @@ import CodeInput from "../../components/auth/CodeInput";
 
 function Challenge2FAPage (){
     const {challenge2FA,user} = useAuth();       /* debuge by 2FA---3-07*/
-    const navigate = useNavigate;
+    const navigate = useNavigate();
 
-    /*  Reconstrution in 3-05, delete it in 3-06
-    const [code, setCode] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    const inputRef = useRef(null);
-    useEffect(( ) => { 
-        inputRef.current?.focus();
-     },
-    []);
-*/
     useEffect(( ) => { 
         // already logged, -> return to home/login page 
         if(user) { navigate('/',{repace:true});  return}  /* debuge by 2FA---3-07*/
@@ -33,13 +22,7 @@ function Challenge2FAPage (){
     },[navigate, user]);     /* add user dependency; debuge by 2FA---3-07*/
 
 
-   /*  Reconstrution in 3-05, delete it in 3-06
-    const validateCode =(value) => { 
-        if(!value) return 'Code is required';
-        if(!/^\d{6}$/.test(value)) return 'Code must be digits';  
-        return null;
-    };
-*/
+
     const handleSubmit = async (code) => { 
        try {
         await challenge2FA(code);

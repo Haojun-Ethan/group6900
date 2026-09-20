@@ -79,7 +79,7 @@ export async function mockRegister({name,email,password}) { /* debug （：strin
     email,
     password,
     roles:['user'],
-    twoFactorEnabled:false, //not been enabled . Wait  2FA Settings completed  /* 2FA ---- 4-01 */
+    twoFactorEnabled:true, //not been enabled . Wait  2FA Settings completed  /* 2FA ---- 4-01 */
   };
   mockUsers.push(newUser);
 

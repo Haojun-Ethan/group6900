@@ -14,7 +14,7 @@ function PtcRoute({ children }) {
     const tempToken = getTempToken();
     const flow = get2FAFlow();
 
-    if (tempToken && flow === 'login') {    return <Navigate to='/login/sfa' replace />;    }         //check 2FA then routing
+    if (tempToken && flow === 'login') {    return <Navigate to='/login/2fa' replace />;    }         //check 2FA then routing
     if (tempToken && flow ==='register') {  return <Navigate to='/login/setup-2fa' replace/>;    }    /* 2FA ---- 3-04 */
     return <Navigate to="/login" />; // not logged in -> redirect  / 未登录
   }

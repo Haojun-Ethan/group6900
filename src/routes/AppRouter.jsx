@@ -24,7 +24,7 @@ function AppRouter(){
             <Routes>
                 <Route path="/register" element={<PublicOnlyRoute> <RegisterPage /></PublicOnlyRoute>} />
                 <Route path="/login" element={<PublicOnlyRoute> <LoginPage /></PublicOnlyRoute>} />
-                <Route path="/login/sfa" element={<PublicOnlyRoute> <Challenge2FAPage/></PublicOnlyRoute>}/>
+                <Route path="/login/2fa" element={<PublicOnlyRoute> <Challenge2FAPage/></PublicOnlyRoute>}/>
                 <Route path="/" element={<PtcRoute> <Homepage /></PtcRoute> } />
                 <Route path="*" element={ <NotFoundPage />} />
                 <Route path="/register/setup-2fa" element={<PublicOnlyRoute><Setup2FAPage/></PublicOnlyRoute>} />  {/* 2FA ----3-03*/}

@@ -15,16 +15,7 @@ function Setup2FAPage() {
     const [setupError, setSetupError] = useState('');
     const [isLoadingSetup, setIsLoadingSetup] = useState(true);
 
-    /* Reconstrution in 3-05, delete it in 3-06
-    // Code input 
-    const [code, setCode] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    const inputRef = useRef(null);
-*/
-
-    // Guard + fetch setup data / 守卫 + 拉取设置数据
+       // Guard + fetch setup data / 守卫 + 拉取设置数据
     useEffect(() => {
         
         if (user) { navigate('/',{replace:true});  }    /* debuge by 2FA---3-07*/
@@ -50,27 +41,9 @@ function Setup2FAPage() {
     load();
     },[navigate, user]); /* debuge by 2FA---3-07*/
 
-    /*     reconstruction 2FA 3-05   delete in 2FA 3-06
-     * Validate code format (6 digits)
-     * @param {string} value
-     * @returns {string | null}
-     
-    const validateCode = (value) => {
-        if (!value) return 'Code is required';
-        if (!/^\d{6}$/.test(value)) return 'Code must be 6 digits';   
-        return null;
-    };
+  
 
-       const handleChange = (e) => {
-        const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
-        setCode(digits);
-    };
-*/
-
-
-
-
-        const handleSubmit = async (code) => { 
+    const handleSubmit = async (code) => { 
        try {
         await verify2FA(code);
        navigate('/',{replace:true});
@@ -82,7 +55,7 @@ function Setup2FAPage() {
             throw err;
         }
 
-
+    }
     // Copy secret to clipboard / 复制密钥到剪贴板
     const handleCopySecret = async () => {
         if (!setupData?.secret) return;
@@ -113,34 +86,34 @@ function Setup2FAPage() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-        <h1>Set Up Two-Factor Authentication</h1>
+        <div onSubmit={handleSubmit}>
+            <h1>Set Up Two-Factor Authentication</h1>
 
-        <p>Scan the QR code with your Okta Verify app.</p>
+            <p>Scan the QR code with your Okta Verify app.</p>
 
-        {/* QR code rendered via external service / 用外部服务渲染二维码  2FA ----3-03*/}
-        {setupData?.qrCodeUri && (
+            {/* QR code rendered via external service / 用外部服务渲染二维码  2FA ----3-03*/}
+            {setupData?.qrCodeUri && (
+                <div>
+                <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(setupData.qrCodeUri)}`}   /* change it when change api */
+                    alt="2FA QR Code"
+                    width={200}
+                    height={200}
+                />
+                </div>
+            )}
+
+            {/* Manual secret fallback /备用方案 手动*/}
             <div>
-            <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(setupData.qrCodeUri)}`}   /* change it when change api */
-                alt="2FA QR Code"
-                width={200}
-                height={200}
-            />
+                <p style={{ fontSize: 12, color: '#666' }}>Can't scan? Enter this key manually:</p>
+                <code style={{ fontSize: 14, background: '#f4f4f4', padding: '4px 8px' }}> {setupData?.secret}</code>
+                <button type="button" onClick={handleCopySecret} style={{ marginLeft: 8 }}> Copy</button>
             </div>
-        )}
 
-        {/* Manual secret fallback /备用方案 手动*/}
-        <div>
-            <p style={{ fontSize: 12, color: '#666' }}>Can't scan? Enter this key manually:</p>
-            <code style={{ fontSize: 14, background: '#f4f4f4', padding: '4px 8px' }}> {setupData?.secret}</code>
-            <button type="button" onClick={handleCopySecret} style={{ marginLeft: 8 }}> Copy</button>
-        </div>
-
-        <CodeInput onSubmit={handleSubmit} submitLabel="Verity Finish" /> {/* reconstruct in 2FA ---3-06  */}
-        <p><Link to="/register" onClick={handleSwichAccount}></Link> Return to register.</p>
-        </form>
+            <CodeInput onSubmit={handleSubmit} submitLabel="Verity Finish" /> {/* reconstruct in 2FA ---3-06  */}
+            <p><Link to="/register" onClick={handleSwichAccount}></Link> Return to register.</p>
+        </div>   /* <from> chang to <div> due to CodeInput including a from */
     );
-    }
+    
 }
     export default Setup2FAPage;

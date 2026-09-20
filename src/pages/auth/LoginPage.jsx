@@ -40,12 +40,6 @@ function LoginPage() {
     const updateField = (name, value) => { 
         setForm((prev) => ({ ...prev, [name]:value }));
      };
-    /* 
-     setForm ((prev) => { 
-        const newObj = { ... prev} });
-        newObj[name] = value;
-        return newObj;
-     */
 
   //validation form, return errors object
     const validate = ( ) => { 
@@ -62,42 +56,12 @@ function LoginPage() {
         const pwdErr = validatePassword(form.password);
         if (pwdErr) newErrors.password = pwdErr;
 
-        
-
-        /*-----router 2-03 delete -> Refactoring in paawordRules.js
-        if (form.password ==='') {
-            newErrors.password = 'Password is required';
-            
-        } else {
-            const failed = getFailedPswRules(from.password);
-            if(failed.length > 0){
-                newErrors.password = failed.map((rr) => rr.label).join('/');
-            }
-        }
-            */
-        /*---router 2-02  rewrite, delete 
-        if (!email.trim()) {
-        newErrors.email = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            newErrors.email = 'Email is invalid';
-        }
-
-
-        //Password validation
-        if (!password) {
-        newErrors.password = 'Password is required';
-
-        } else if (password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters';
-        }
-        */
-
-        return newErrors;
+         return newErrors;
     }
 
 
   // Handle form submit  / 处理表单提交
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {       /* must use async */
     // Prevent page reload / 阻止页面刷新（浏览器默认行为）// importent
     e.preventDefault();
 
@@ -117,7 +81,7 @@ function LoginPage() {
         //console.log('Password:', password);
 
         try {
-            const result = login(form);
+            const result = await login(form);    /* login is an async function, return Promise.  MUST USE await */
             //console.log('Login successful:', result);
               if (result.requires2FA) {
                     navigate('/login/2fa', { replace: true });

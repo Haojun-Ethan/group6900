@@ -2,7 +2,7 @@ const KEYS = {
     TOKEN: 'edu_token',
     USER: 'edu_user',
     TEMP_TOKEN: 'edu_temp_token',  /* 2FA --- 3-01  vri user and 2fa tokenF */
-    TWO_FA_FLOW: 'edu_afa_flow'    /* 2FA --- 3-04  add 2FA flow */
+    TWO_FA_FLOW: 'edu_2fa_flow'    /* 2FA --- 3-04  add 2FA flow */
 };
 
 

@@ -66,9 +66,9 @@ export const AuthProvider = ({ children }) => {
         }, []);
 
     // logout function 
-    const logout = useCallback(() => {
+    const logout = useCallback(async() => {
         try {
-             authApi.logout();
+            await authApi.logout();
         } catch(err) {
             // try display error message 
             console.error('[Auth] logout API failed'), { code: err?.code, message : err?.message, timestamp: new Date().toISOString(),};
@@ -80,8 +80,9 @@ export const AuthProvider = ({ children }) => {
     // role check function    / 角色检查函数
     const hasRole = useCallback((role) => {
         if (!user) return false;
-        if (Array.isArray(user.roles)) 
-            return role.some((r) => user.roles.includes(r));
+        const roles = user.roles ||[];
+        if (Array.isArray(role)) 
+            return role.some((r) => roles.includes(r));
         
         //return user.roles === role;
         return user.roles.includes(role);
