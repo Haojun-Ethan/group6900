@@ -45,7 +45,7 @@ function Setup2FAPage() {
     load();
     },[navigate]);
 
-    /**
+    /**      reconstruction 2FA 3-05
      * Validate code format (6 digits)
      * @param {string} value
      * @returns {string | null}

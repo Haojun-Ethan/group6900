@@ -26,7 +26,7 @@ function Challenge2FAPage (){
         }
     },[navigate]);
 
-
+//  reconstruction
     const validateCode =(value) => { 
         if(!value) return 'Code is required';
         if(!/^\d{6}$/.test(value)) return 'Code must be digits';  /* okta/google verity handbook */
@@ -66,36 +66,7 @@ function Challenge2FAPage (){
 
      return(
 
-        <form onSubmit={handleSubmit}>
-            <h1>Two-Factor Authentication</h1>
-
-            <p>Enter the 6-digit code from your Okta Verify app.</p>
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-
-            <div>
-                <label>Verification Code</label>
-                <input
-                ref={inputRef}
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                placeholder="000000"
-                value={code}
-                onChange={handleChange}
-                disabled={isLoading}
-                maxLength={6}
-                />
-            </div>
-
-            <button type="submit" disabled={isLoading || code.length !== 6}>
-                {isLoading ? 'Verifying...' : 'Verify'}
-            </button>
-
-            <p>
-                Wrong account? <a href="/login">Back to login</a>
-            </p>
-        </form>
+        /* restruction*/
     );
 
 
