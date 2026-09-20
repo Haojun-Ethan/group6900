@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import {  useNavigate } from "react-router-dom";
-import { getTempToken } from "../../utils/storage";
 import { useAuth } from "../../hooks/useAuth";
 import { getTempToken, get2FAFlow } from "../../utils/storage";
 
