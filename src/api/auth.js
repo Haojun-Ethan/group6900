@@ -1,7 +1,7 @@
 // src/api/auth.js
 import apiClient from "./client";
 import { ENDPOINTS,REQ, RES } from "../config/apiContract";
-import { QrCode } from "@mui/icons-material";
+
 
 
 /**
@@ -9,12 +9,12 @@ import { QrCode } from "@mui/icons-material";
  * @param {object} res - Raw response
  * @returns {mfaRequired:boolean, access?:string, refresh?:string,challengeId?:string}
  */
-const normalizaLogin = (res) => (
+const normalizeLogin = (res) => (
   {
     mfaRequired: res[RES.mfaRequired],
     access:res[RES.access],
     refresh:res[RES.refresh],
-    challengeID:res[RES.challengeId],
+    challengeId:res[RES.challengeId],
   }
 );
 
@@ -41,7 +41,7 @@ export async function login(credentials){
     [REQ.username]:credentials.username,
     [REQ.password]:credentials.password,
   });
-  return normalizaLogin(res)
+  return normalizeLogin(res)
 }
 
 /**
@@ -67,10 +67,10 @@ export async function setup2FA (){
 
 export async function fetch2FAQR() {
   const res = await apiClient.get(ENDPOINTS.twoFAQr);
-  return {QrCode:res[RES.qrCode]};
+  return {qrCode:res[RES.qrCode]};
 }
 
-export async function verify2FA(){
-  const res = await apiClient.post(ENDPOINTS.twoFAVerify, {[REQ.otp]:otp});
+export async function verify2FA(otp){
+  const res = await apiClient.post(ENDPOINTS.twoFAVerify, {[REQ.otp]: otp});
   return res;
 }
