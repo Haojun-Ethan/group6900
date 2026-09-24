@@ -1,6 +1,7 @@
 // src/api/auth.js
 import apiClient from "./client";
 import { ENDPOINTS,REQ, RES } from "../config/apiContract";
+import { QrCode } from "@mui/icons-material";
 
 
 /**
@@ -57,3 +58,19 @@ export async function submitOTP({challengeId,otp}){
 
 }
 
+
+export async function setup2FA (){
+  const res = await apiClient.post(ENDPOINTS.twoFASetup);
+  return {secret:res[RES.secret]};
+}
+
+
+export async function fetch2FAQR() {
+  const res = await apiClient.get(ENDPOINTS.twoFAQr);
+  return {QrCode:res[RES.qrCode]};
+}
+
+export async function verify2FA(){
+  const res = await apiClient.post(ENDPOINTS.twoFAVerify, {[REQ.otp]:otp});
+  return res;
+}
