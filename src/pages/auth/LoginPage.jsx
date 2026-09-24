@@ -24,8 +24,8 @@ import { ActionButton, AlertMessage, FormField } from "../../components/ui";
 */
 /* rewrite 5-01, add LOGIN_FIELDS */
 const LOGIN_FIELDS = [
-    {name:'username', label:'Username', type:'text', placeholder:'Enter your username'},
-    {name:'password', label:'Password', type:'password', placeholder:'Enter your password'},
+    {name:'username', label:'Username', type:'text', placeholder:'Enter your username', autoComplete:'username'},
+    {name:'password', label:'Password', type:'password', placeholder:'Enter your password', autoComplete:'username'},
 ];
 
 
@@ -107,7 +107,7 @@ function LoginPage() {
             key={field.name}
             label={field.label}
             type={field.type}
-            value={field.value}
+            value={field.name}    
             onChange={(e)=> updateField(field.name,e.target.value)}
             error={errors[field.name]}
             disabled={isLoading}
@@ -116,7 +116,7 @@ function LoginPage() {
 
         ))}
 
-        <ActionButton type="sumbie" loading={isFinite} loadingText="Loging in.."> Login </ActionButton>
+        <ActionButton type="submit" loading={isLoading} loadingText="Loging in.."> Login </ActionButton>  {/* debugged here */}
 
         // eslint-disable-next-line no-undef
         <MuiLink 

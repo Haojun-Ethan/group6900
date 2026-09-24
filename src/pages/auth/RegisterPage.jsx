@@ -48,8 +48,8 @@ function RegisterPage() {
      const validate = ( ) => { 
         const newError = {};
 
-        if(!form.name.trim()) {
-            newError.name = 'Username is required';
+        if(!form.username.trim()) {
+            newError.username = 'Username is required';   //* debuge .name issue,   6-03 */
         }
 
         for(const rule of EMAIL_RULES) {
@@ -99,9 +99,9 @@ function RegisterPage() {
             setIsLoading(false);
         }
     };
-
+ 
     return(
-      <AuthLayout title="Regiser" subtitle="Create your account.">
+      <AuthLayout title="Register" subtitle="Create your account.">     {/* debug  title="Regiser"*/}
         <form onSubmit={handleSubmit}>
             <Stack spacing={2.5}>
                 {serverError && <AlertMessage type="error">{serverError}</AlertMessage>}
