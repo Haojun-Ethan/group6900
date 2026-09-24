@@ -107,7 +107,7 @@ function LoginPage() {
             key={field.name}
             label={field.label}
             type={field.type}
-            value={field.name}    
+            value={form[field.name]}       
             onChange={(e)=> updateField(field.name,e.target.value)}
             error={errors[field.name]}
             disabled={isLoading}
