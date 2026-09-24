@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
      /**
       * login and handle 2fa requirement
-      * @param {{emal:string, password:string}} credentials
+      * @param {{email:string, password:string}} credentials
       * @returns {Promise<{mfaRequired:boolean}>}
       */
     const login = useCallback(async (credentials) => {
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     
        const submitOTP = useCallback(async ({otp}) => {
             const challengeId = storage.getChallengeId();
-            if(!challengeId) throw {message:'Please login again.'};
+            if(!challengeId) throw new Error('Please login again.');
 
             const{access, refresh} = await authApi.submitOTP({challengeId, otp});
             storage.removeChallengeId();
