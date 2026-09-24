@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { getActiveRules, validatePassword } from "../../utils/passwordRules";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import * as authApi from "../../api/auth";
+
 
 
 
 
 
 const REGISTER_FIELDS = [
-    { name: 'name',            label: 'Name',             type: 'text',     placeholder: 'Enter your name' },
+    { name: 'username',        label: 'Username',         type: 'text',     placeholder: 'Enter your username' },
     { name: 'email',           label: 'Email',            type: 'text',     placeholder: 'Enter your email' },
     { name: 'password',        label: 'Password',         type: 'password', placeholder: 'Enter your password' },
     { name: 'confirmPassword', label: 'Confirm Password', type: 'password', placeholder: 'Re-enter your password' },
-];
+]; /* rewrite 5-01, change partial assignment name:username laber:username  */
 
 const EMAIL_RULES = [
     { test: (v) => !!v.trim(), msg: 'Email is required' },
@@ -20,12 +21,11 @@ const EMAIL_RULES = [
 ];
 
 function RegisterPage() {
-    const { register } = useAuth();
     const navigate = useNavigate();
 
 
     const [form, setForm] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -44,7 +44,7 @@ function RegisterPage() {
         const newError = {};
 
         if(!form.name.trim()) {
-            newError.name = 'Name is required';
+            newError.name = 'Username is required';
         }
 
         for(const rule of EMAIL_RULES) {
@@ -80,20 +80,14 @@ function RegisterPage() {
         setErrors({});
 
         setIsLoading(true);
-        try{
-            // clean confirPassword before sending
-            const {confirmPassword,...payload} = form;  /* debug   */
-
-         
-              const result = await register(payload);   
-
-                    
-                if (result.requires2FASetup) {   /* 2FA 3-01*/
-                    navigate('/register/setup-2fa', { replace: true });
-                } else {
-                    navigate('/', { replace: true });
-                }    
-
+        try{ /* rewrite 5-01, try */
+            
+            await authApi.register({
+                username: form.username,
+                email: form.email,
+                password: form.password
+            });
+            navigate('/login', {replace:true});  
         } catch (err) {
             setServerError(err.message || 'Registration failed!');
         } finally {
@@ -117,7 +111,7 @@ function RegisterPage() {
                     disabled={isLoading}
                 />
                 {errors[field.name] && (
-                    <p>{errors[field.name]}</p>
+                    <p style={{color:'red'}}>{errors[field.name]}</p>
                 )}
 
                 {/* Password rule checklist, only under password field / 密码规则清单，只在密码字段下 */}

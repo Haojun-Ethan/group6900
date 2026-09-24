@@ -2,25 +2,27 @@ import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
-import { getActiveRules, validatePassword,} from '../../utils/passwordRules'
 
-/* ---- Router 2-02 add strong password---- */
-const LOGIN_FIELDS = [
-  { name: 'email', label: 'Email', type: 'text', placeholder: 'Enter your email' },
-  { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter your password' },
-];
+
+
 
 
 //https://zod.dev/api?id=strings    https://react-hook-form.com/get-started
 //https://blog.logrocket.com/build-a-password-generator-app-in-react-with-reusable-components/
 
-const RULES = {
+/* const RULES = {
     email: [ 
         {test: (v) => !!v.trim(), message:'Email is required'},
         {test:(v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), message: 'Email format is invalid' },
     
     ],
 };
+*/
+/* rewrite 5-01, add LOGIN_FIELDS */
+const LOGIN_FIELDS = [
+    {name:'username', label:'Username', type:'text', placeholder:'Enter your username'},
+    {name:'password', label:'Password', type:'password', placeholder:'Enter your password'},
+];
 
 
 function LoginPage() {
@@ -30,7 +32,7 @@ function LoginPage() {
      const {login} = useAuth(); /* ---Router 2-02 add---- */
      const navigate = useNavigate();/* ---Router 2-02 add---- */
 
-     const [form, setForm] = useState({email: '', password: ''});
+     const [form, setForm] = useState({username:'', password: ''});
      const [errors, setErrors] = useState({});
     // Loading state / 加载状态
     const [isLoading, setIsLoading] = useState(false);
@@ -41,37 +43,29 @@ function LoginPage() {
         setForm((prev) => ({ ...prev, [name]:value }));
      };
 
-  //validation form, return errors object
-    const validate = ( ) => { 
-        const newErrors = {}
-    
-        /* ---Router 2-02 add---- */
-        for (const rule of RULES.email) {
-            if(!rule.test(form.email)){
-                newErrors.email = rule.message;
-                break;
-            }
+     const validate = () => {
+        const err = {};
+        if (!form.username.trim()) {
+            err.username = 'Username is required';
         }
-
-        const pwdErr = validatePassword(form.password);
-        if (pwdErr) newErrors.password = pwdErr;
-
-         return newErrors;
-    }
-
+        if (!form.password.trim()) {
+            err.password = 'Password is required';
+        }
+        return err;
+    };
 
   // Handle form submit  / 处理表单提交
   const handleSubmit = async (e) => {       /* must use async */
-    // Prevent page reload / 阻止页面刷新（浏览器默认行为）// importent
-    e.preventDefault();
+    // Prevent page reload / 阻止页面刷新（浏览器默认行为）
+    e.preventDefault();    /* Read from Fullstackopen,  this is important */
 
     setServerError(''); // Reset server error / 重置服务器错误
 
 
-    const newErrors = validate();
+    const err = validate();
     
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
+        if (Object.keys(err).length > 0) {
+            setErrors(err);
             return;
         }
         setErrors({}); 
@@ -82,13 +76,8 @@ function LoginPage() {
 
         try {
             const result = await login(form);    /* login is an async function, return Promise.  MUST USE await */
-            //console.log('Login successful:', result);
-              if (result.requires2FA) {
-                    navigate('/login/2fa', { replace: true });
-                } else {
-                    navigate('/', { replace: true });
-                }/* ---Router 2-02 add  , 2FA 3-01 ---- */
-
+            
+            navigate(result.mfaRequired ? '/login/2fa' : '/', { replace: true }); /* ---Rewrite 5-01 ,Router 2-02 add  , 2FA 3-01 ---- */
         } catch (error) {
             setServerError(error.message || 'An error occurred during login'); // Set server error / 设置服务器错误
             console.error('Login failed:', error);
@@ -106,23 +95,12 @@ function LoginPage() {
         {serverError && <p style={{ color: 'red' }}>{serverError}</p>}
 
         {LOGIN_FIELDS.map((field) => (
-            <div key={field.name}> <label> {field.label}</label> <input type={field.type} placeholder={field.placeholder} value={form[field.name]} onChange={(a)=>updateField(field.name, a.target.value)} disabled={isLoading} />
-            {errors[field.name] && (<p>{errors[field.name]}</p>)
-        }
-
-        {/* pass word rule check */}
-        {field.name === 'password' && (
-            <ul> 
-                {getActiveRules().map((rule) => { 
-                    const passed = rule.test(form.password);
-                    return (
-                        <li key={rule.key}> {passed ? '✓' : '○'}{rule.label}</li>
-                    )
-                 })}
-            </ul>
-        )}
-        </div>
-  ))}
+            <div key={field.name}> 
+            <label> {field.label}</label> 
+            <input type={field.type} placeholder={field.placeholder} value={form[field.name]} onChange={(a)=>updateField(field.name, a.target.value)} disabled={isLoading} />
+            {errors[field.name] && <p style={{ color: 'red' }}>{errors[field.name]}</p>}
+            </div>
+            ))}
 
       <button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
