@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { validatePassword, getActiveRules } from '../../utils/passwordRules';
-import AuthLayout from '../../components/layout/AuthLayout';
+
 import { FormField, ActionButton, AlertMessage, Icon } from '../../components/ui';
 import { Stack, Box, List, ListItem, ListItemIcon, ListItemText, Link as MuiLink } from '@mui/material';
+import AuthLayout from '../../components/ui/AuthLayout';
 
 
 
