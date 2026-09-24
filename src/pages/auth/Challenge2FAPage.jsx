@@ -16,7 +16,7 @@ function Challenge2FAPage (){
     const navigate = useNavigate();
 
     const handleSubmit = async (otp) => {
-        await submitOTP(otp);
+        await submitOTP({otp});   /* debug here isnot otp, is {otp}*/
         navigate('/', { replace: true }); // Redirect to homepage after successful OTP submission
     };
 
