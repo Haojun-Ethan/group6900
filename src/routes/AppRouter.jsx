@@ -23,7 +23,7 @@ function AppRouter(){
                 <Route path="/" element={<PtcRoute require="auth"><Homepage /></PtcRoute>} />
 
                 <Route path="/account" element={<PtcRoute require="auth"><AccountPage/></PtcRoute>}/>
-                <Route path="/account/sfa/setup" element= {<PtcRoute require="auth"><Setup2FAPage/></PtcRoute>} />
+                <Route path="/account/2fa/setup" element= {<PtcRoute require="auth"><Setup2FAPage/></PtcRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
                     
             </Routes>   
