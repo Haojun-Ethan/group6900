@@ -5,7 +5,8 @@ import axios from 'axios';
 import {
   getAccess, getRefresh, setAccess, clearAll,
 } from '../utils/storage';
-import { ENDPOINTS, REQ, API_VERSION } from '../config/apiContract';
+import { ENDPOINTS, REQ } from '../config/apiContract';
+
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -17,7 +18,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const access = getAccess();
   if (access) config.headers.Authorization = `Bearer ${access}`;
-  config.headers['X-API-Version'] = API_VERSION;
+  //config.headers['X-API-Version'] = API_VERSION;
   return config;
 });
 
