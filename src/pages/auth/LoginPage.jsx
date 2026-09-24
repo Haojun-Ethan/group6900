@@ -25,7 +25,7 @@ import { ActionButton, AlertMessage, FormField } from "../../components/ui";
 /* rewrite 5-01, add LOGIN_FIELDS */
 const LOGIN_FIELDS = [
     {name:'username', label:'Username', type:'text', placeholder:'Enter your username', autoComplete:'username'},
-    {name:'password', label:'Password', type:'password', placeholder:'Enter your password', autoComplete:'username'},
+    {name:'password', label:'Password', type:'password', placeholder:'Enter your password', autoComplete:'current-password'},
 ];
 
 
@@ -118,7 +118,7 @@ function LoginPage() {
 
         <ActionButton type="submit" loading={isLoading} loadingText="Loging in.."> Login </ActionButton>  {/* debugged here */}
 
-        // eslint-disable-next-line no-undef
+
         <MuiLink 
             component={RouterLink}
             to="/register"
