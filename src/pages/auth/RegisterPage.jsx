@@ -1,8 +1,12 @@
-import { useState } from "react";
-import { getActiveRules, validatePassword } from "../../utils/passwordRules";
-import { useNavigate, Link } from "react-router-dom";
-import * as authApi from "../../api/auth";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { Link as RouterLink } from 'react-router-dom';
+import * as authApi from '../../api/auth';
+import { validatePassword, getActiveRules } from '../../utils/passwordRules';
+import AuthLayout from '../../components/layout/AuthLayout';
+import { FormField, ActionButton, AlertMessage, Icon } from '../../components/ui';
+import { Stack, Box, List, ListItem, ListItemIcon, ListItemText, Link as MuiLink } from '@mui/material';
 
 
 
@@ -96,7 +100,71 @@ function RegisterPage() {
     };
 
     return(
+      <AuthLayout title="Regiser" subtitle="Create your account.">
         <form onSubmit={handleSubmit}>
+            <Stack spacing={2.5}>
+                {serverError && <AlertMessage type="error">{serverError}</AlertMessage>}
+
+                {REGISTER_FIELDS.map((field) => (
+                    <Box key={field.name}>
+                        <FormField 
+                        label={field.label}
+                        type={field.type}
+                        value={form[field.name]}
+                        onChange={(e) => updateField(field.name, e.target.value)}
+                        error={errors[field.name]}
+                        disabled={isLoading}
+                        />
+
+                        {field.name ==="password" && form.password.length > 0 && (
+                            <List dense sx={{mt:1,pl:1}}>
+                                {getActiveRules().map((rule) => {
+                                const passed = rule.test(form.password);
+                                return (
+                                <ListItem key={rule.key} disableGutters sx={{ py: 0 }}>
+                                    <ListItemIcon sx={{ minWidth: 28 }}>
+                                    {passed
+                                        ? <Icon.CheckCircle fontSize="small" color="success" />
+                                        : <Icon.RadioButtonUnchecked fontSize="small" sx={{ color: 'text.disabled' }} />}
+                                    </ListItemIcon>
+                                    <ListItemText
+                                    primary={rule.label}
+                                    primaryTypographyProps={{
+                                        variant: 'body2',
+                                        color: passed ? 'success.main' : 'text.secondary',
+                                    }}
+                                    />
+                                </ListItem>
+                                );
+                            })}
+                            </List>
+                        )}
+                    </Box>
+                    ))}
+
+                    <ActionButton type="submit" loading={isLoading} loadingText="Registering...">
+                        Register
+                    </ActionButton>
+
+                    <MuiLink
+                        component={RouterLink}
+                        to="/login"
+                        underline="hover"
+                        sx={{ textAlign: 'center', fontSize: '0.9rem' }}
+                    >
+                        Already have an account? Login
+                    </MuiLink>
+                    </Stack>
+        </form>
+    </AuthLayout>
+  );
+}
+
+export default RegisterPage;
+
+
+/*   MUI ---6-01 rewrite
+  <form onSubmit={handleSubmit}>
             <h1>Register</h1>
             {serverError && <p style={{ color: 'red' }}>{serverError}</p>}
 
@@ -114,7 +182,7 @@ function RegisterPage() {
                     <p style={{color:'red'}}>{errors[field.name]}</p>
                 )}
 
-                {/* Password rule checklist, only under password field / 密码规则清单，只在密码字段下 */}
+               
                 {field.name === 'password' && (
                     <ul style={{ fontSize: 12, color: '#666', marginTop: 4, paddingLeft: 16 }}>
                     {getActiveRules().map((rule) => {
@@ -134,13 +202,9 @@ function RegisterPage() {
                 {isLoading ? 'Registering...' : 'Register'}
             </button>
 
-            {/* Link to login  */}
+        
             <p>
                 Already have an account? <Link to="/login">Login</Link>
             </p>
         </form>
-    );
-    
-}
-
-export default RegisterPage
+*/

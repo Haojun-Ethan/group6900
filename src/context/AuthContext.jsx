@@ -16,7 +16,7 @@ const computeAuthState = ( ) => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(storage.getUser());
-    const [authState, setAuthstate] = useState(computeAuthState);
+    const [authState, setAuthstate] = useState('LOADING');  /* rewrite 5-01 - check error  */
 
     //const [isLoading, setIsLoading] = useState(true); // Loading state, when loading is running, the state is true, finished loading change to false
   
@@ -46,12 +46,14 @@ export const AuthProvider = ({ children }) => {
         /* 2FA ----3-01 */
         if (result.mfaRequired) {
             storage.setChallengeId(result.challengeId);    /*rewrite 5-01 */
+            storage.setUser({username: credentials.username});  /*rewrite 5-01 */
             refreshState();
             return{ mfaRequired:true};
         }
         storage.setAccess(result.access);   /*rewrite 5-01 */
 
-        storage.setRefresh(result.refresh);        /*rewrite 5-01 */
+        storage.setRefresh(result.refresh);        /*rewrite 5-03 */
+        storage.setUser({username: credentials.username});  /*rewrite 5-03 */
         refreshState(); /*rewrite 5-01 */
         return { mfaRequired:false };
         }, [refreshState]);

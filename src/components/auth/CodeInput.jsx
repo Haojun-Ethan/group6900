@@ -1,6 +1,8 @@
 import { useState,useRef, useEffect } from "react";
 import {validateCode, filterCode} from '../../utils/codeValidation';
-
+import { Stack } from "@mui/material";
+// eslint-disable-next-line no-unused-vars
+import { FormField, ActionButton, AlertMessage } from "../ui";
 
 
 function CodeInput({onSubmit, submitLabel ='Verity', loadingLabel = 'Verifying', autoFocus = true,}){
@@ -38,7 +40,53 @@ function CodeInput({onSubmit, submitLabel ='Verity', loadingLabel = 'Verifying',
     };
 
     return(
+    
         <form onSubmit={handleSubmit}>
+            <Stack spacing={2.5}>
+                {error && <AlertMessage type="error">{error}</AlertMessage>}
+
+                <FormField
+                label="Verification Code"
+                value={code}
+                onChange={handleChange}
+                
+                disabled={isLoading}
+                inputRef={inputRef}
+
+
+                inputProps={{
+                    inputMode: 'numeric',
+                    autoComplete: 'one-time-code',
+                    maxLength: 6,
+                    style: {
+                    textAlign: 'center',
+                    fontSize: '1.5rem',
+                    letterSpacing: '0.5rem',
+                    },
+                }}
+                />
+
+                <ActionButton
+                type="submit"
+                loading={isLoading}
+                loadingText={loadingLabel}
+                disabled={code.length !== 6}
+                >
+                {submitLabel}
+                </ActionButton>
+            </Stack>
+        </form>       
+    );
+    
+
+
+}
+
+export default CodeInput;
+
+ 
+/*  MUI ----06-01
+ <form onSubmit={handleSubmit}>
 
             {error && <p style={{color:'red'}}> {error}</p>}
             <h1>Two-Factor Authentication</h1>
@@ -70,10 +118,4 @@ function CodeInput({onSubmit, submitLabel ='Verity', loadingLabel = 'Verifying',
                 Wrong account? <a href="/login">Back to login</a>
             </p>
         </form>
-    );
-    
-
-
-}
-
-export default CodeInput;
+        */

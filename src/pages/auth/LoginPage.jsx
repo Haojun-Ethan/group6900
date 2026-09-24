@@ -1,7 +1,11 @@
 import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
+import { Stack, Link as MuiLink } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import AuthLayout from "../../components/ui/AuthLayout";
+import { ActionButton, AlertMessage, FormField } from "../../components/ui";
 
 
 
@@ -56,10 +60,11 @@ function LoginPage() {
 
   // Handle form submit  / 处理表单提交
   const handleSubmit = async (e) => {       /* must use async */
-    // Prevent page reload / 阻止页面刷新（浏览器默认行为）
+    // Prevent page reload 
     e.preventDefault();    /* Read from Fullstackopen,  this is important */
+    if (isLoading) return; // Prevent duplicate submission /防重复提交
 
-    setServerError(''); // Reset server error / 重置服务器错误
+    setServerError(''); // Reset server error  /    重置服务器错误
 
 
     const err = validate();
@@ -69,8 +74,8 @@ function LoginPage() {
             return;
         }
         setErrors({}); 
-        setIsLoading(true); // Set loading state / 设置加载状态
-        // Log form data / 打印表单数据
+        setIsLoading(true); // Set loading state 
+        // Log form data 
         //console.log('Email:', email);
         //console.log('Password:', password);
 
@@ -79,37 +84,70 @@ function LoginPage() {
             
             navigate(result.mfaRequired ? '/login/2fa' : '/', { replace: true }); /* ---Rewrite 5-01 ,Router 2-02 add  , 2FA 3-01 ---- */
         } catch (error) {
-            setServerError(error.message || 'An error occurred during login'); // Set server error / 设置服务器错误
+            setServerError(error.message || 'An error occurred during login'); // Set server error 
             console.error('Login failed:', error);
         } finally {
-            setIsLoading(false); //stop Loading / 停止加载
+            setIsLoading(false); //stop Loading 
         }
 
      };
 
   return (
     // Use form instead of div - can use enter
+    /* MUI ----06-01*/
+    <AuthLayout title="Login" subtitle="Welcome back. Please sign in.">
+   
     <form onSubmit={handleSubmit}>
-        <h1>Login</h1>
+        <Stack spacing={2.5}>
+            {serverError && <AlertMessage type="error">{serverError}</AlertMessage>}
 
-        {serverError && <p style={{ color: 'red' }}>{serverError}</p>}
-
+  
         {LOGIN_FIELDS.map((field) => (
-            <div key={field.name}> 
+            <FormField 
+            key={field.name}
+            label={field.label}
+            type={field.type}
+            value={field.value}
+            onChange={(e)=> updateField(field.name,e.target.value)}
+            error={errors[field.name]}
+            disabled={isLoading}
+            autoComplete={field.autoComplete}
+            />
+
+        ))}
+
+        <ActionButton type="sumbie" loading={isFinite} loadingText="Loging in.."> Login </ActionButton>
+
+        // eslint-disable-next-line no-undef
+        <MuiLink 
+            component={RouterLink}
+            to="/register"
+            underline="hover"
+            sx={{ textAlign:'center', fontSize:'0,9rem'}}
+          >
+            Do not have an account? Register 
+        </MuiLink>
+
+     
+      </Stack>
+    </form>
+     </AuthLayout>
+    );
+}
+
+export default LoginPage;
+
+/*    MUI ---6-01 rewrite
+              <div key={field.name}> 
             <label> {field.label}</label> 
             <input type={field.type} placeholder={field.placeholder} value={form[field.name]} onChange={(a)=>updateField(field.name, a.target.value)} disabled={isLoading} />
             {errors[field.name] && <p style={{ color: 'red' }}>{errors[field.name]}</p>}
             </div>
-            ))}
 
-      <button type="submit" disabled={isLoading}>
+             <button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
       </button>
       <p>
         Do not have an account? <Link to="/register">Register</Link>
       </p>
-    </form>
-    );
-}
-
-export default LoginPage;
+            */
