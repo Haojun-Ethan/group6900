@@ -75,7 +75,7 @@ function HomePage() {
     return (
     <PageContainer className="home-page" maxWidth="lg">
 
-    <Box sx={{ mb: 4 }}>
+    <Box className="homepage-welcome" sx={{ mb: 4 }}>
         <Typography variant="h1" gutterBottom>
         Welcome back, {user?.username || 'User'}
         </Typography>
@@ -83,28 +83,30 @@ function HomePage() {
         Here's an overview of what you can do.
         </Typography>
     </Box>
+    <Box sx={{ mb: 3 }}>
+        <Typography variant="h2" sx={{ fontWeight: 600 }}>
+            Quick Access
+        </Typography>
 
+        <Typography variant="body2" color="text.secondary">
+            Would you like to explore the available modules, manage your courses, or adjust your account settings? Select an option below to get started.
+        </Typography>
+    </Box>
     
     <Grid container spacing={{ xs: 2, md: 3 }}>
         {visibleCards.map((card) => {
         const IconComp = ICON_MAP[card.icon] || Icon.School;
         return (
-            <Grid item xs={12} sm={6} md={4} key={card.key}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={card.key}>
             <Paper
+                className="module-card"
                 elevation={0}
                 onClick={() => navigate(card.path)}
                 sx={{
-                p: 3,
+                
                 height: '100%',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                // Hover lift  /* easier than asp+vb script */
                 
-                // https://mui.com/material-ui/customization/transitions/
-                '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                },
                 }}
             >
                 <Box

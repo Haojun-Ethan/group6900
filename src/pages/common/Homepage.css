@@ -1,19 +1,82 @@
+
+/* Main homepage */
 .home-page {
-  min-height: 100%;
+    background-color: #b1c5e4;
+    min-height: 100vh;
 }
 
-.home-page .MuiPaper-root {
-  border: 1px solid #e4e8ec;
-  border-radius: 8px;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+/* Welcome banner */
+.home-page .homepage-welcome {
+    background: linear-gradient(
+        135deg,
+        #173654,
+        #286584
+    );
+
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 32px;
 }
 
-.home-page .MuiPaper-root:hover {
-  border-color: #a9bac9;
+/* Welcome title */
+.home-page .homepage-welcome h1 {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Welcome description */
+.home-page .homepage-welcome p {
+    color: #d0e1ed;
+}
+
+.home-page .module-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  padding: 28px;
+  min-height: 190px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.home-page .module-card:hover {
+  transform: translateY(-6px);
+  border-color: #38bdf8;
+  box-shadow: 0 12px 25px rgba(30, 58, 95, 0.15);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .home-page {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .home-page .homepage-welcome {
+        padding: 24px;
+    }
+
+    .home-page .module-card {
+        padding: 18px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-page .MuiPaper-root {
-    transition: none;
-  }
+    .home-page .module-card {
+        transition: none;
+    }
+
+    .home-page .module-card:hover {
+        transform: none;
+    }
 }
