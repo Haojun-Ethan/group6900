@@ -3,6 +3,7 @@ import { Paper, Stack, Typography, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PageContainer, PageTitle } from '../../components/ui';
+import SecurityIcon from '@mui/icons-material/Security';
 import './AccountPage.css';
 
 /**
@@ -16,16 +17,23 @@ function AccountPage() {
   return (
     <PageContainer className="account-page" maxWidth="md">
       <Stack spacing={3}>
-        <PageTitle
-          title="Account"
-          subtitle={`Signed in as ${user?.username || 'User'}`}
-        />
-
-   
-        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: 2 }}>
-          <Typography variant="h3" gutterBottom>
-            Security
-          </Typography>
+        <Box className="account-welcome">
+          <PageTitle
+            title="Account"
+            subtitle={`Signed in as ${user?.username || 'User'}`}
+          />
+        </Box>
+        
+        <Paper className="account-security" elevation={0} sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: 2 }}>
+          
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1.5, mb: 2, }}>
+            <Box className="account-security-icon">
+              <SecurityIcon />
+            </Box>
+            <Typography variant="h3" gutterBottom>
+              Security
+            </Typography>
+          </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
             <Box>
