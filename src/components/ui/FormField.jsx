@@ -24,13 +24,13 @@ function FormField ( {
             onChange={onChange}
             error= {!!error}
             helperText={error}
-            disable={disabled}
+            disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
             inputRef={inputRef}
             fullWidth
             variant="outlined"
-            inputProps={inputProps}
+            {...(inputProps ? { inputProps } : {})}
             sx={sx}
             />
     );
