@@ -25,7 +25,7 @@ function AppRouter(){
                 
                 <Route element={<PtcRoute require="auth"> <AppLayout /></PtcRoute> }>
                 
-                    <Route path="/" element={Homepage}/>
+                    <Route path="/" element={<Homepage />}/>
 
                     <Route path="/account" element={<AccountPage />} />
                     <Route path="/account/2fa/setup" element= {<Setup2FAPage/>} />

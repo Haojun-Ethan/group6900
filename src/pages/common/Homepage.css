@@ -1,0 +1,19 @@
+.home-page {
+  min-height: 100%;
+}
+
+.home-page .MuiPaper-root {
+  border: 1px solid #e4e8ec;
+  border-radius: 8px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.home-page .MuiPaper-root:hover {
+  border-color: #a9bac9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .MuiPaper-root {
+    transition: none;
+  }
+}

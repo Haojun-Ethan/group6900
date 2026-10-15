@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 import { PageContainer, Icon } from '../../components/ui';
+import './Homepage.css';
 
 
 const HOME_CARDS = [
@@ -72,7 +73,7 @@ function HomePage() {
     : HOME_CARDS;
 
     return (
-    <PageContainer maxWidth="lg">
+    <PageContainer className="home-page" maxWidth="lg">
 
     <Box sx={{ mb: 4 }}>
         <Typography variant="h1" gutterBottom>

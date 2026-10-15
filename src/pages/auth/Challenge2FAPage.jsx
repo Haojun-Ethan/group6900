@@ -7,6 +7,7 @@ import CodeInput from "../../components/auth/CodeInput";
 import { Stack,Link as MuiLink } from "@mui/material";
 import {Link as RouterLink} from "react-router-dom";
 import AuthLayout from "../../components/ui/AuthLayout";
+import './Challenge2FAPage.css';
 
 
 /* rewrite 5-01 , all Challenge2FAPage*/
@@ -22,6 +23,7 @@ function Challenge2FAPage (){
 
     return (
     <AuthLayout
+      className="challenge-2fa-page"
       title="Two-Factor Authentication"
       subtitle="Enter the 6-digit code from your authenticator app."
     >

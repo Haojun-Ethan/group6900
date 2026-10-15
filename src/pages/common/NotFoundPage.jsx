@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Stack } from "@mui/material";
 import { ActionButton, PageTitle } from "../../components/ui";
+import './NotFoundPage.css';
 
 function NotFoundPage() {
     const navigate=useNavigate();
     return (
         <Box
+        className="not-found-page"
         sx={{
             minHeight: '100vh',
             display: 'flex',

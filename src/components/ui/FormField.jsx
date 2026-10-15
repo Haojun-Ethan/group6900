@@ -24,7 +24,7 @@ function FormField ( {
             onChange={onChange}
             error= {!!error}
             helperText={error}
-            disable={disabled}
+            disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
             inputRef={inputRef}

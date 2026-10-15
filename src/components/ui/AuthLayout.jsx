@@ -1,6 +1,6 @@
 import { Box, Paper } from "@mui/material";
 import PageTitle from "./PageTitle";
-
+import { Stack, Typography, Link as MuiLink } from "@mui/material";
 /**
  * Layout for auth pages (login / register / 2FA)
 
@@ -13,9 +13,10 @@ import PageTitle from "./PageTitle";
 
 
 
-function AuthLayout({title, subtitle, children}) {
+function AuthLayout({title, subtitle, children, className = ''}) {
     return(
         <Box
+            className={className}
             sx={{
                 minHeight:'100vh',
                 display:'flex',
@@ -26,10 +27,10 @@ function AuthLayout({title, subtitle, children}) {
                 py:{xs:3, sm:4},
             }}
         >
-            <Paper elevation={0}
+            <Paper className="auth-layout__paper" elevation={0}
             sx={{
                 width:'100%',
-                maxWith:{xs:'100%',sm:420  },
+                maxWidth:{xs:'100%',sm:420  },
                 p:{xs:2.5,sm:3,md:4},
                 borderRadius:2,
             }}

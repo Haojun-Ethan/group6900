@@ -1,0 +1,16 @@
+.account-page {
+  min-height: 100%;
+}
+
+.account-page .MuiPaper-root {
+  border: 1px solid #e2e6eb;
+  border-radius: 8px;
+}
+
+@media (max-width: 480px) {
+  .account-page .MuiPaper-root > .MuiBox-root {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+}

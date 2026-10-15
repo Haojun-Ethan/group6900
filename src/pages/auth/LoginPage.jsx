@@ -2,9 +2,10 @@ import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
 import {  useNavigate } from "react-router-dom";
-import { Stack, Link as MuiLink } from "@mui/material";
+import { Stack, Typography, Link as MuiLink } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import AuthLayout from "../../components/ui/AuthLayout";
+import './LoginPage.css';
 import { ActionButton, AlertMessage, FormField } from "../../components/ui";
 
 
@@ -95,7 +96,7 @@ function LoginPage() {
   return (
     // Use form instead of div - can use enter
     /* MUI ----06-01*/
-    <AuthLayout title="Login" subtitle="Welcome back. Please sign in.">
+    <AuthLayout className="login-page" title="Login" subtitle="Welcome back. Please sign in.">
    
     <form onSubmit={handleSubmit}>
         <Stack spacing={2.5}>
@@ -117,17 +118,29 @@ function LoginPage() {
         ))}
 
         <ActionButton type="submit" loading={isLoading} loadingText="Loging in.."> Login </ActionButton>  {/* debugged here */}
-
-
-        <MuiLink 
-            component={RouterLink}
-            to="/register"
-            underline="hover"
-            sx={{ textAlign:'center', fontSize:'0,9rem'}}
-          >
-            Do not have an account? Register 
+        <Stack spacing={2.5} direction="row">
+            <Typography
+                variant="body2"
+                sx={{ color: "#374151" }}
+            >
+                Don't have an account?
+            </Typography>
+            <MuiLink 
+                component={RouterLink}
+                to="/register"
+                underline="hover"
+                sx={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "#3b82f6",
+                "&:hover": {
+                color: "#1d4ed8",
+            },
+        }}
+            >
+                Register Now
         </MuiLink>
-
+        </Stack>
      
       </Stack>
     </form>

@@ -3,6 +3,7 @@ import { Paper, Stack, Typography, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PageContainer, PageTitle } from '../../components/ui';
+import './AccountPage.css';
 
 /**
  MUI handbook
@@ -13,7 +14,7 @@ function AccountPage() {
   const navigate = useNavigate();
 
   return (
-    <PageContainer maxWidth="md">
+    <PageContainer className="account-page" maxWidth="md">
       <Stack spacing={3}>
         <PageTitle
           title="Account"
