@@ -7,6 +7,7 @@ import {
 import * as authApi from '../../api/auth';
 import { PageContainer, PageTitle, ActionButton, AlertMessage, Icon } from '../../components/ui';
 import CodeInput from '../../components/auth/CodeInput';
+import './Setup2FAPage.css';
 
 /*
  PyOTP handbook : https://pyauth.github.io/pyotp/
@@ -63,7 +64,7 @@ function Setup2FAPage() {
 
   if (isLoadingSetup) {
     return (
-      <PageContainer maxWidth="sm">
+      <PageContainer className="setup-2fa-page" maxWidth="sm">
         <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2, textAlign: 'center' }}>
           <Typography>Loading 2FA setup...</Typography>
         </Paper>
@@ -74,7 +75,7 @@ function Setup2FAPage() {
 
   if (setupError) {
     return (
-      <PageContainer maxWidth="sm">
+      <PageContainer className="setup-2fa-page" maxWidth="sm">
         <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2 }}>
           <Stack spacing={2.5}>
             <PageTitle title="Setup Failed" />
@@ -91,7 +92,7 @@ function Setup2FAPage() {
   // Success
   if (isEnabled) {
     return (
-      <PageContainer maxWidth="sm">
+      <PageContainer className="setup-2fa-page" maxWidth="sm">
         <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2 }}>
           <Stack spacing={2.5} alignItems="center">
             <Icon.CheckCircle sx={{ fontSize: 64, color: 'success.main' }} />
@@ -110,7 +111,7 @@ function Setup2FAPage() {
 
 
   return (
-    <PageContainer maxWidth="sm">
+    <PageContainer className="setup-2fa-page" maxWidth="sm">
       <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2 }}>
         <Stack spacing={3}>
           <PageTitle

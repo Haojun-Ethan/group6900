@@ -1,0 +1,17 @@
+.register-page {
+  min-height: 100vh;
+  width: 100%;
+
+  background-image: url('/images/loginpage_background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-page .auth-layout__paper {
+  background-color: #dbeafe;
+}

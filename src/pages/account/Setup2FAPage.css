@@ -1,0 +1,21 @@
+.setup-2fa-page {
+  min-height: 100%;
+}
+
+.setup-2fa-page .MuiPaper-root {
+  border: 1px solid #e2e6eb;
+  border-radius: 8px;
+}
+
+.setup-2fa-page img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+@media (max-width: 480px) {
+  .setup-2fa-page code {
+    font-size: 0.75rem;
+  }
+}

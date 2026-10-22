@@ -1,0 +1,9 @@
+.placeholder-page {
+  min-height: 100%;
+}
+
+.placeholder-page .MuiPaper-root {
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid #e2e6eb;
+  border-radius: 8px;
+}
