@@ -4,7 +4,8 @@ import {
   Link as RouterLink,
   useLocation,
 } from "react-router-dom";
-
+import { Button } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
   Paper,
@@ -24,22 +25,17 @@ import "./ModulesPage.css";
 
 function ModulesPage() {
   const location = useLocation();
-
-  // Check whether user selected Browse Modules or My Modules
+ 
   const isMyModules = location.pathname.startsWith("/user/modules");
 
-  const basePath = isMyModules
-    ? "/user/modules"
-    : "/modules";
+  const basePath = isMyModules ? "/user/modules" : "/modules";
 
-  // Backend module data
   const [modules, setModules] = useState([]);
-
-  // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch modules when page loads
+
+  
   useEffect(() => {
     let active = true;
 
@@ -52,7 +48,7 @@ function ModulesPage() {
 
         let visibleModules = allModules;
 
-        // My Modules displays only enrolled modules
+
         if (isMyModules) {
           const enrollments = await getEnrollments();
 
@@ -92,20 +88,21 @@ function ModulesPage() {
     <Box className="modules-page">
       <PageContainer maxWidth="lg">
 
-        {/* Main header */}
+        <Button classname="back-button" component={RouterLink} to="/" startIcon={<ArrowBackIcon />}> 
+          Back to Homepage
+        </Button>
+
         <Box className="modules-banner">
           <Typography variant="h1">
             {isMyModules ? "My Modules" : "Browse Modules"}
           </Typography>
 
-          <Typography variant="body1">
-            {isMyModules
+          <Typography variant="body1"> {isMyModules
               ? "Continue your enrolled cybersecurity training modules."
               : "Explore available cybersecurity training modules."}
           </Typography>
         </Box>
 
-        {/* Loading state */}
         {loading && (
           <Box
             sx={{
@@ -118,24 +115,18 @@ function ModulesPage() {
           </Box>
         )}
 
-        {/* Error state */}
-        {!loading && error && (
-          <Alert severity="error">
+        {!loading && error && (<Alert severity="error">
             {error}
           </Alert>
         )}
 
-        {/* No modules available */}
         {!loading && !error && modules.length === 0 && (
           <Alert severity="info">
             {isMyModules
               ? "You are not enrolled in any available modules yet."
               : "No training modules are currently available."}
           </Alert>
-        )}
-
-        {/* Module grid */}
-        {!loading && !error && modules.length > 0 && (
+        )} {!loading && !error && modules.length > 0 && (
           <Box className="modules-grid">
 
             {modules.map((module) => (
@@ -144,10 +135,8 @@ function ModulesPage() {
                 component={RouterLink}
                 to={`${basePath}/${module.id}`}
                 className="module-overview-card"
-                elevation={0}
-              >
+                elevation={0}>
 
-                {/* Icon and section count */}
                 <Box className="module-card-top">
                   <Box className="module-overview-icon">
                     <SchoolIcon />
@@ -160,34 +149,24 @@ function ModulesPage() {
                   />
                 </Box>
 
-                {/* Module name */}
                 <Typography
                   variant="h6"
-                  fontWeight={600}
-                >
+                  fontWeight={600}>
                   {module.title}
                 </Typography>
 
-                {/* Module description */}
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  className="module-description"
-                >
-                  {module.summary ||
-                    module.description ||
-                    "Explore this cybersecurity training module."}
+                  className="module-description">
+                  {module.summary || module.description || "Explore this cybersecurity training module."}
                 </Typography>
 
-                {/* View module */}
+
                 <Box className="module-view-link">
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                  >
+                  <Typography variant="body2" fontWeight={600}>
                     View Module
                   </Typography>
-
                   <ArrowForwardIcon fontSize="small" />
                 </Box>
 

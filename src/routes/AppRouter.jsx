@@ -12,7 +12,7 @@ import Setup2FAPage from '../pages/account/Setup2FAPage';
 import PlaceholderPage from "../pages/common/PlaceholderPage";
 import AppLayout from "../components/layout/AppLayout";
 import ModulesPage from "../pages/Modules/ModulesPages";
-import moduleDetailsPage from "../pages/Modules/ModuleDetailsPage";
+import ModuleDetailsPage from "../pages/Modules/ModuleDetailsPage";
 
 /* rewrite 5-01 */
 function AppRouter(){
@@ -20,7 +20,7 @@ function AppRouter(){
         <BrowserRouter>
             <Routes>
                 {/* Pulic, rewrite 5-01 */ }
-                <Route path="/login" element={<PtcRoute require="guest"><LoginPage /></PtcRoute>} />
+                <Route path="/login" element={<PtcRoute require="guest"><ModulesPage /></PtcRoute>} />
                 <Route path="/register" element={<PtcRoute require="guest"><RegisterPage /></PtcRoute>} />
                 <Route path="/login/2fa" element={<PtcRoute require="mfa"><Challenge2FAPage /></PtcRoute>} />
                 
@@ -33,8 +33,8 @@ function AppRouter(){
 
                     <Route path="/modules" element={<ModulesPage />} />
                     <Route path="/user/modules" element={<ModulesPage />} />
-                    <Route path="/modules/:moduleId" element={<moduleDetailsPage />} />
-                    <Route path="/user/modules/:moduleId" element={<moduleDetailsPage />} />
+                    <Route path="/modules/:moduleId" element={<ModuleDetailsPage />} />
+                    <Route path="/user/modules/:moduleId" element={<ModuleDetailsPage />} />
 
                     <Route path="/owner/modules" element={<PlaceholderPage />} />
                     <Route path="/admin/users" element={<PlaceholderPage />} />

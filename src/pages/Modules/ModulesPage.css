@@ -1,13 +1,12 @@
 
-/* Main background */
+
+
 .modules-page {
     min-height: 100vh;
     width: 100%;
     background-color: #f3f6fb;
     padding: 32px 0 64px;
 }
-
-/* Header banner */
 .modules-page .modules-banner {
     background: linear-gradient(
         135deg,
@@ -36,14 +35,13 @@
     color: #d0e1ed;
 }
 
-/* Three-column module grid */
 .modules-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
 }
 
-/* Main module cards */
+
 .modules-page .module-overview-card {
     display: flex;
     flex-direction: column;
@@ -66,7 +64,6 @@
         border-color 0.2s ease;
 }
 
-/* Module hover */
 .modules-page .module-overview-card:hover {
     transform: translateY(-5px);
     border-color: #3b82f6;
@@ -79,7 +76,7 @@
     outline-offset: 3px;
 }
 
-/* Card top section */
+ 
 .module-card-top {
     display: flex;
     align-items: center;
@@ -87,8 +84,7 @@
     gap: 12px;
     margin-bottom: 20px;
 }
-
-/* Module icon */
+ 
 .module-overview-icon {
     width: 48px;
     height: 48px;
@@ -100,14 +96,12 @@
     background-color: #eaf0f7;
     color: #3b5998;
     border-radius: 10px;
-}
-
-/* Module description */
+} 
 .module-description {
     margin-top: 8px !important;
 }
 
-/* View Module link */
+ 
 .module-view-link {
     display: flex;
     align-items: center;
@@ -118,7 +112,7 @@
     padding-top: 24px;
 }
 
-/* Individual module detail card */
+ 
 .modules-page .module-detail-card {
     padding: 28px;
     background-color: #ffffff;
@@ -127,8 +121,7 @@
 
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 }
-
-/* Expandable layers */
+ 
 .modules-page .module-detail-layer.MuiAccordion-root {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -149,7 +142,6 @@
     background-color: #edf5ff;
 }
 
-/* Lessons inside each layer */
 .module-lesson-row {
     display: flex;
     align-items: center;
@@ -161,14 +153,13 @@
     padding: 14px;
 }
 
-/* Tablet */
+/* For mobile and tablet layouts */
 @media (max-width: 900px) {
     .modules-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
-
-/* Mobile */
+ 
 @media (max-width: 600px) {
     .modules-page {
         padding-top: 16px;

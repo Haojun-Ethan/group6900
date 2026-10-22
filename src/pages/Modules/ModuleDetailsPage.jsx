@@ -37,12 +37,11 @@ function ModuleDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Determine where Back to Modules should lead
   const basePath = location.pathname.startsWith("/user/modules")
     ? "/user/modules"
     : "/modules";
 
-  // Fetch the selected module from Django
+
   useEffect(() => {
     let active = true;
 
@@ -75,7 +74,7 @@ function ModuleDetailsPage() {
     };
   }, [moduleId]);
 
-  // Loading screen
+
   if (loading) {
     return (
       <Box className="modules-page">
@@ -94,7 +93,6 @@ function ModuleDetailsPage() {
     );
   }
 
-  // Error or missing module
   if (error || !selectedModule) {
     return (
       <Box className="modules-page">
@@ -119,18 +117,13 @@ function ModuleDetailsPage() {
     );
   }
 
-  // Sort backend sections by their order
-  const sections = Array.isArray(selectedModule.sections)
-    ? [...selectedModule.sections].sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0)
-      )
-    : [];
+
+  const sections = Array.isArray(selectedModule.sections) ? [...selectedModule.sections].sort( (a, b) => (a.order ?? 0) - (b.order ?? 0) ) : [];
 
   return (
     <Box className="modules-page">
       <PageContainer maxWidth="lg">
-
-        {/* Back to module grid */}
+ 
         <Button
           component={RouterLink}
           to={basePath}
@@ -143,7 +136,7 @@ function ModuleDetailsPage() {
           Back to Modules
         </Button>
 
-        {/* Module header */}
+
         <Box className="modules-banner">
           <Typography variant="h1">
             {selectedModule.title}
@@ -154,18 +147,12 @@ function ModuleDetailsPage() {
               selectedModule.description ||
               "Cybersecurity training module"}
           </Typography>
-        </Box>
-
-        {/* Section heading */}
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          sx={{ mb: 3 }}
-        >
+        </Box> 
+        <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }} >
           Learning Sections
         </Typography>
 
-        {/* Section container */}
+
         <Paper
           className="module-detail-card"
           elevation={0}
@@ -180,14 +167,9 @@ function ModuleDetailsPage() {
             <Stack spacing={2}>
 
               {sections.map((section, index) => (
-                <Accordion
-                  key={section.id}
-                  className="module-detail-layer"
-                  elevation={0}
-                  disableGutters
-                >
+                <Accordion key={section.id} className="module-detail-layer" elevation={0}  disableGutters >
 
-                  {/* Section title */}
+
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                   >
@@ -198,7 +180,7 @@ function ModuleDetailsPage() {
                     </Box>
                   </AccordionSummary>
 
-                  {/* Section learning content */}
+
                   <AccordionDetails>
                     <Box className="module-lesson-row">
                       <MenuBookIcon
