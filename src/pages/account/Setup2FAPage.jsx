@@ -65,7 +65,7 @@ function Setup2FAPage() {
   if (isLoadingSetup) {
     return (
       <PageContainer className="setup-2fa-page" maxWidth="sm">
-        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2, textAlign: 'center' }}>
+        <Paper className="setup-2fa-card" elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2, textAlign: 'center' }}>
           <Typography>Loading 2FA setup...</Typography>
         </Paper>
       </PageContainer>
@@ -121,7 +121,7 @@ function Setup2FAPage() {
 
           {/* QR code */}
           {qrCode && (
-            <Box sx={{ textAlign: 'center' }}>
+            <Box className="setup-2fa-qr" sx={{ textAlign: 'center' }}>
               <img
                 src={`data:image/png;base64,${qrCode}`}
                 alt="2FA QR Code"
@@ -162,10 +162,11 @@ function Setup2FAPage() {
             submitLabel="Verify & Enable"
             loadingLabel="Enabling..."
           />
-
-          <ActionButton variant="ghost" onClick={() => navigate('/account')}>
-            Cancel
-          </ActionButton>
+          <Box className="setup-2fa-cancel-row">
+            <ActionButton className="setup-2fa-cancel" variant="ghost" onClick={() => navigate('/account')}>
+              Cancel
+            </ActionButton>
+          </Box>
         </Stack>
       </Paper>
     </PageContainer>

@@ -1,21 +1,87 @@
+
 .setup-2fa-page {
-  min-height: 100%;
+    min-height: 100vh;
+    padding-top: 32px;
+    padding-bottom: 32px;
 }
 
-.setup-2fa-page .MuiPaper-root {
-  border: 1px solid #e2e6eb;
-  border-radius: 8px;
+.setup-2fa-page .setup-2fa-card {
+    background-color: #dbeafe;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+
+    padding: 28px;
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-.setup-2fa-page img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin-inline: auto;
+.setup-2fa-page {
+    background-color: #f3f6fb;
 }
 
-@media (max-width: 480px) {
-  .setup-2fa-page code {
-    font-size: 0.75rem;
-  }
+.setup-2fa-page h1,
+.setup-2fa-page h2 {
+    color: #173654;
+    font-weight: 700;
+}
+
+.setup-2fa-page .setup-2fa-qr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    padding: 20px;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.setup-2fa-page .setup-2fa-qr img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    max-width: 100%;
+}
+
+
+.setup-2fa-page .setup-2fa-secret {
+    display: block;
+    padding: 14px;
+
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    font-family: monospace;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+
+
+.setup-2fa-page .setup-2fa-cancel {
+    color: #3b5998;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .setup-2fa-page {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .setup-2fa-page .setup-2fa-card {
+        padding: 20px;
+    }
+
+    .setup-2fa-page .setup-2fa-qr {
+        padding: 12px;
+    }
+
+    .setup-2fa-page .setup-2fa-qr img {
+        width: 180px;
+        height: 180px;
+    }
 }
