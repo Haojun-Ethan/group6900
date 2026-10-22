@@ -8,10 +8,15 @@ import {
 import { ENDPOINTS, REQ } from '../config/apiContract';
 
 
+import { demoAdapter } from './demoAdapter';
+
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';  // DEMO
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
+  ...(DEMO_MODE ? { adapter: demoAdapter } : {}),  //DEMO
 });
 
 // Request interceptor 

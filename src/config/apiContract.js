@@ -11,6 +11,24 @@ export const ENDPOINTS ={
     twoFAQr: '/accounts/2fa/qr/',
     twoFAVerify: '/accounts/2fa/verify/',
 
+
+    /*  Courses List ----07-01   */
+    modules: '/modules/',
+    moduleDetail: (id) => `/modules/${id}/`,
+    moduleSchedule: (id) => `/modules/${id}/schedule/`,
+
+    sections: '/sections/',
+    sectionDetail: (id) => `/sections/${id}/`,
+    sectionComplete: (id) => `/sections/${id}/complete/`,
+
+    pathways: '/pathways/',
+    pathwayDetail: (id) => `/pathways/${id}/`,
+    pathwayAssign: (id) => `/pathways/${id}/assign/`,
+
+    enrollments: '/enrollments/',
+    enrollmentDetail: (id) => `/enrollments/${id}/`,
+    enrollmentAssign: '/enrollments/assign/',
+
 };
 
 // Request
@@ -37,6 +55,22 @@ export const RES = {
     secret: 'secret',
     qrCode: 'qr_code',
 
+   /*  Courses List ----07-01   */
+    id: 'id',
+    title: 'title',
+    slug: 'slug',
+    summary: 'summary',
+    description: 'description',
+    category: 'category',
+    status: 'status',
+    passMark: 'pass_mark',
+    estimatedMinutes: 'estimated_minutes',
+    selfEnrollAllowed: 'self_enroll_allowed',
+    createdBy: 'created_by',
+    sections: 'sections',
+    schedule: 'schedule',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
 };
 
 // keys

@@ -53,7 +53,10 @@ export const AuthProvider = ({ children }) => {
         storage.setAccess(result.access);   /*rewrite 5-01 */
 
         storage.setRefresh(result.refresh);        /*rewrite 5-03 */
-        storage.setUser({username: credentials.username});  /*rewrite 5-03 */
+        //storage.setUser({username: credentials.username});  /*rewrite 5-03 */
+        const user = result.user || { username: credentials.username };
+  storage.setUser(user);
+
         refreshState(); /*rewrite 5-01 */
         return { mfaRequired:false };
         }, [refreshState]);
