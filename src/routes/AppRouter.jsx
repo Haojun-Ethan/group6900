@@ -20,7 +20,7 @@ function AppRouter(){
         <BrowserRouter>
             <Routes>
                 {/* Pulic, rewrite 5-01 */ }
-                <Route path="/login" element={<PtcRoute require="guest"><moduleDetailsPage /></PtcRoute>} />
+                <Route path="/login" element={<PtcRoute require="guest"><LoginPage /></PtcRoute>} />
                 <Route path="/register" element={<PtcRoute require="guest"><RegisterPage /></PtcRoute>} />
                 <Route path="/login/2fa" element={<PtcRoute require="mfa"><Challenge2FAPage /></PtcRoute>} />
                 
