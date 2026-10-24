@@ -6,6 +6,7 @@ export const ENDPOINTS ={
     login: '/accounts/login/',
     login2FA: '/accounts/login/2fa/',
     refresh: '/api/token/refresh/',
+    me: '/accounts/me/',
 
     twoFASetup: '/accounts/2fa/setup/',
     twoFAQr: '/accounts/2fa/qr/',
