@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import {  Paper,   Chip, IconButton, Tooltip, Box, Table, TableHead, TableBody, TableRow, TableCell, Select, MenuItem, FormControl, } from '@mui/material';
-//import * as usersApi from '../../api/users';
+import * as usersApi from '../../api/users';
 import { PageContainer, PageTitle, Icon } from '../../components/ui';
-import { MOCK_USERS } from '../modules/_mockData';
+//import { MOCK_USERS } from '../modules/_mockData';
 //import { setUser } from '../../utils/storage';
 
 
 
-const DEMO_STATE = "normal"; // 'normal' | 'loading' | 'empty' | 'error'
+//const DEMO_STATE = "normal"; // 'normal' | 'loading' | 'empty' | 'error'
 
 
 
@@ -24,9 +24,10 @@ function ManageUsersPage() {
             setError('');
             try {
                 // future: const data = await usersApi.listUsers();
-                const data = await new Promise((r) =>
+               /* const data = await new Promise((r) =>
                     setTimeout(() => r(MOCK_USERS), 400)
-                );
+                );*/
+                const data = await usersApi.listUsers();
                 if (!ignore) setUsers(data);
             } catch (err) {
                 if (!ignore)  setError(err.message || 'Failed to load users');
@@ -35,6 +36,7 @@ function ManageUsersPage() {
             }
         };
         load();
+        return () => { ignore = true; };
     }, []);
 
     const handleRoleChange = async (userId, newRole) => {
@@ -43,7 +45,8 @@ function ManageUsersPage() {
 
         try {
             // future: await usersApi.updateUserRole(userId, newRole);
-            await new Promise((r) => setTimeout(r, 300));
+            /*await new Promise((r) => setTimeout(r, 300)); */
+            await usersApi.updateUserRole(userId, newRole);
 
         }   catch (err) {
             setUsers(prev);  // roll back 
@@ -62,30 +65,32 @@ function ManageUsersPage() {
 
         try {
             // future: await usersApi.deleteUser(userId);
-            await new Promise((r) => setTimeout(r, 300));
+           /* await new Promise((r) => setTimeout(r, 300)); */
+            await usersApi.deleteUser(userId);
         } catch (err) {
             setUsers(prev);  // roll back 
             setError(err.message || 'Failed to delete user');
         }
     };
 
-    const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
+   /* const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
   const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
     const effectiveUsers = DEMO_STATE === 'empty' ? [] : users;
+*/
 
     return (
         <PageContainer maxWidth="lg">
-            <PageTitle title="Manage Users"  subtitle={`${effectiveUsers.length} user${effectiveUsers.length === 1 ? '' : 's'}`} />
+            <PageTitle title="Manage Users"  subtitle={`${users.length} user${users.length === 1 ? '' : 's'}`} />
             
-             {effectiveError && (
+             {error && (
                 <Paper severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-                    {effectiveError}
+                    {error}
                 </  Paper  >    
             )}
 
-            {effectiveLoading ? (
+            {isLoading ? (
                 <Paper sx={{ p: 4, textAlign: 'center' }}>Loading... </ Paper>
-            ) : effectiveUsers.length === 0 ? (
+            ) : users.length === 0 ? (
                 <Paper sx={{ p: 4, textAlign: 'center' }}> No users </ Paper>
             ) : (
                 <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden' }}>
@@ -102,49 +107,53 @@ function ManageUsersPage() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {effectiveUsers.map((u) => (
-                        <TableRow key={u.id}>
-                            <TableCell>{u.username}</TableCell>
-                            <TableCell>{u.email}</TableCell>
-                            <TableCell>
-                            <FormControl size="small" sx={{ minWidth: 110 }}>
-                                <Select
-                                value={u.role}
-                                onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                                >
-                                <MenuItem value="USER">User</MenuItem>
-                                <MenuItem value="OWNER">Owner</MenuItem>
-                                <MenuItem value="ADMIN">Admin</MenuItem>
-                                </Select>
-                            </FormControl>
-                            </TableCell>
-                            <TableCell>
-                            {u.is_2fa_enabled ? (
-                                <Chip label="On" color="success" size="small" />
-                            ) : (
-                                <Chip label="Off" size="small" />
-                            )}
-                            </TableCell>
-                            <TableCell align="right">
-                            <Tooltip title="Delete user">
-                                <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleDelete(u.id)}
-                                >
-                                <Icon.Delete fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
-                            </TableCell>
-                        </TableRow>
-                        ))}
+                        {users.map((u) => {
+                            const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
+                            return (
+                                <TableRow key={u.id}>
+                                    <TableCell>{u.username}</TableCell>
+                                    <TableCell>{u.email}</TableCell>
+                                    <TableCell>
+                                    <FormControl size="small" sx={{ minWidth: 110 }}>
+                                        <Select
+                                        value={u.role || 'USER'}
+                                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                                        >
+                                        <MenuItem value="USER">User</MenuItem>
+                                        <MenuItem value="OWNER">Owner</MenuItem>
+                                        <MenuItem value="ADMIN">Admin</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    </TableCell>
+                                    <TableCell>
+                                        {has2FA ? (
+                                            <Chip label="On" color="success" size="small" />
+                                        ) : (
+                                            <Chip label="Off" size="small" />
+                                        )}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                    <Tooltip title="Delete user">
+                                        <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() => handleDelete(u.id)}
+                                        >
+                                        <Icon.Delete fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
-                    </Table>
-                </Box>
-                </Paper>
+                </Table>
+            </Box>
+            </Paper>
             )}
-    </PageContainer>
+        </PageContainer>
   );
 }
+
 
 export default ManageUsersPage;

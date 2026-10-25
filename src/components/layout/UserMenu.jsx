@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {IconButton, Menu, MenuItem, Avatar, ListItemIcon, Divider,} from '@mui/material';
+import { IconButton, Menu, MenuItem, Avatar, ListItemIcon, Divider, Box, Typography, Chip} from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 import { Icon } from '../ui';
 
@@ -53,8 +53,31 @@ function UserMenu(){
             onClose={handleClose}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            slotProps={{ paper: { sx: { minWidth: 180, mt: 1 } } }}
+            slotProps={{ paper: { sx: { minWidth: 200, mt: 1 } } }}
         >
+            // Add user identity overview header    08-01
+            <Box sx={{ px: 2, py: 1.5 }}>
+                <Typography variant="body1" fontWeight={600} noWrap>
+                    {user?.username || 'User'}
+                </Typography>
+                {user?.email && (
+                    <Typography variant="caption" color="text.secondary" display="block" noWrap sx={{ mb: 0.5 }}>
+                        {user.email}
+                    </Typography>
+                )}
+                {user?.role && (
+                    <Chip
+                        label={user.role}
+                        size="small"
+                        color={user.role === 'ADMIN' ? 'error' : user.role === 'OWNER' ? 'warning' : 'primary'}
+                        sx={{ fontSize: '0.65rem', height: 20 }}
+                    />
+                )}
+            </Box>
+
+
+            <Divider />
+
             <MenuItem onClick={handleAccount}>
             <ListItemIcon><Icon.Settings fontSize="small" /></ListItemIcon>
             Account

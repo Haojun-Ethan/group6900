@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {Grid, Skeleton, Alert, Chip, Typography, Paper, Stack, LinearProgress, Box } from '@mui/material';
 import { PageContainer, PageTitle, ActionButton, EmptyState,  } from '../../../components/ui';
-import { MOCK_ENROLLED_MODULES } from '../_mockData';
+//import { MOCK_ENROLLED_MODULES } from '../_mockData';
+import * as enrollmentsApi from '../../../api/enrollments';
 
-
-const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
+//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
 
 /* Enrollment status badge  */
 const STATUS_MAP = {
@@ -24,31 +24,39 @@ function MyModulesPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        
+        let ignore = false;
         const load = async () => {
         setIsLoading(true);
         setError('');
         try {
 
             // future :  const data = await enrollmentsApi.listMyEnrollments();
-            const data = await new Promise((r) =>
+            const data = await enrollmentsApi.listMyEnrollments(); /* new Promise((r) =>
             setTimeout(() => r(MOCK_ENROLLED_MODULES), 400)
-            );
-            setEnrollments(data);
+            ); 
+            setEnrollments(data);*/
+            if (!ignore) {
+                setEnrollments(Array.isArray(data) ? data: []);
+            }
         } catch (err) {
             setError(err.message || 'Failed to load enrollments');
         } finally {
-            setIsLoading(false);
+            if(!ignore) {setIsLoading(false);}
         }
         };
         load();
+
+        return ( ) => { ignore = true; };
     }, []);
 
-    const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
+    /*const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
 
     const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
     const effectiveEnrollments = DEMO_STATE === 'empty' ? [] : enrollments;
+        */
 
-    if (effectiveLoading) {
+    if (isLoading) {
         return (
         <PageContainer maxWidth="lg">
             <PageTitle title="My Modules" />
@@ -63,16 +71,16 @@ function MyModulesPage() {
         );
     }
 
-    if (effectiveError) {
+    if (error) {
         return (
         <PageContainer maxWidth="lg">
             <PageTitle title="My Modules" />
-            <Alert severity="error">{effectiveError}</Alert>
+            <Alert severity="error">{error}</Alert>
         </PageContainer>
         );
     }
 
-    if (effectiveEnrollments.length === 0) {
+    if (enrollments.length === 0) {
         return (
         <PageContainer maxWidth="lg">
             <PageTitle title="My Modules" subtitle="Courses you're enrolled in." />
@@ -96,11 +104,11 @@ function MyModulesPage() {
         <PageContainer maxWidth="lg">
         <PageTitle
             title="My Modules"
-            subtitle={`${effectiveEnrollments.length} enrolled course${effectiveEnrollments.length === 1 ? '' : 's'}`}
+            subtitle={`${enrollments.length} enrolled course${enrollments.length === 1 ? '' : 's'}`}
         />
 
         <Grid container spacing={{ xs: 2, md: 3 }}>
-            {effectiveEnrollments.map((e) => {
+            {enrollments.map((e) => {
             const status = STATUS_MAP[e.status] || STATUS_MAP.PENDING;
             const progress = e.progress || { completed: 0, total: 1 };
 
@@ -144,11 +152,11 @@ function MyModulesPage() {
 
                     </Stack>
 
-                    <Typography variant="h3" sx={{ mb: 1 }}>{e.module_title}</Typography>
+                    <Typography variant="h3" sx={{ mb: 1 }}>{e.moduleTitle || 'Untitled Module'}</Typography>
 
                     {e.due_at && (
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Due {new Date(e.due_at).toLocaleDateString()}
+                            Due {new Date(e.dueAt).toLocaleDateString()}
                         </Typography>
                     )}
 

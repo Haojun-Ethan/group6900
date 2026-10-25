@@ -2,7 +2,7 @@
 
 import { BrowserRouter, Routes, Route,  } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
-import Homepage from "../pages/common/HomePage";
+import HomePage from "../pages/common/HomePage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PtcRoute from "./ptcRoute";
 import RegisterPage from "../pages/auth/RegisterPage";
@@ -37,7 +37,7 @@ function AppRouter(){
                 
                 <Route element={<PtcRoute require="auth"> <AppLayout /></PtcRoute> }>
                 
-                    <Route path="/" element={<Homepage />}/>
+                    <Route path="/" element={<HomePage />}/>
        
                     <Route path="/account" element={<AccountPage />} />
                     <Route path="/account/2fa/setup" element= {<Setup2FAPage/>} />
@@ -55,6 +55,10 @@ function AppRouter(){
                     <Route path="/user/modules/:id/quiz" element={<TakeQuizPage />} />      {/* add by 07-02  */ }
                     <Route path="/user/modules/:id/quiz/result/:attemptId" element={<QuizResultPage />} />  {/* add by 07-02  */ }
                     <Route path="/admin/users" element={<ManageUsersPage />} />
+                    <Route path="/owner/modules" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ManageModulesPage /></PtcRoute>} />          {/* add by 08-01  */ }
+                    <Route path="/owner/modules/create" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />      {/* add by 08-01  */ }
+                    <Route path="/owner/modules/:id/edit" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />       {/* add by 08-01  */ }
+                    <Route path="/admin/users" element={<PtcRoute require="auth" roles={['ADMIN']}><ManageUsersPage /></PtcRoute>} />                       {/* add by 08-01  */ }
                                 
                 
                 

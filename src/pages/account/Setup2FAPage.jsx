@@ -1,19 +1,19 @@
 // src/pages/account/Setup2FAPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Stack, Box, Typography, Paper, 
-} from '@mui/material';
+import { Stack, Box, Typography, Paper,  } from '@mui/material';
 import * as authApi from '../../api/auth';
+import { useAuth } from '../../hooks/useAuth';
 import { PageContainer, PageTitle, ActionButton, AlertMessage, Icon } from '../../components/ui';
 import CodeInput from '../../components/auth/CodeInput';
+
 
 /*
  PyOTP handbook : https://pyauth.github.io/pyotp/
  */
 function Setup2FAPage() {
   const navigate = useNavigate();
-
+  const { refreshUser } = useAuth();
   // Setup data 
   const [secret,setSecret]=useState('');
   const [qrCode,setQrCode]=useState('');
@@ -26,28 +26,34 @@ function Setup2FAPage() {
 
   // generate secret + fetch QR
   useEffect(() => {
+    let ignore = false; 
+
     const load = async () => {
       try {
         // Step 1: generate secret 
        // await authApi.setup2FA();
         const setupRes = await authApi.setup2FA();
-        setSecret(setupRes.secret);
+        
 
         // Step 2: get QR
        
-        const { qrCode } = await authApi.fetch2FAQR();
-        setQrCode(qrCode);
+        const qrRes = await authApi.fetch2FAQR();
+        if (!ignore) {
+          setSecret(setupRes.secret);
+          setQrCode(qrRes.qrCode);
+        }
 
         // Also fetch secret for manual entry 
         //const setupRes = await authApi.setup2FA();   /* put at here, setup is called 2 times */
         //setSecret(setupRes.secret);
       } catch (err) {
-        setSetupError(err.message || 'Failed to load 2FA setup');
+        if (!ignore) { setSetupError(err.message || 'Failed to load 2FA setup');  }
       } finally {
-        setIsLoadingSetup(false);
+        if (!ignore) {setIsLoadingSetup(false);}
       }
     };
     load();
+    return () => { ignore = true; }; 
   }, []);
 
   /**
@@ -56,6 +62,7 @@ function Setup2FAPage() {
    */
   const handleSubmit = async (otp) => {
     await authApi.verify2FA(otp);
+    await refreshUser();
     setIsEnabled(true);
   };
 

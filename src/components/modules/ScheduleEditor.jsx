@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { Stack,Box, Alert, MenuItem,  FormControl, InputLabel, Select,  } from '@mui/material';
 import { FormField,  ActionButton } from '../ui';
-import { MOCK_SCHEDULE, FREQUENCY_CHOICES } from '../../pages/modules/_mockData';
+import {  FREQUENCY_CHOICES } from '../../pages/modules/_mockData';
+import * as modulesApi from '../../api/modules';
 
 /* Schedule editor for a module 课程周期  */
-function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
+function ScheduleEditor({ moduleId, initialSchedule}) {
     const [form, setForm] = useState(
-        initialSchedule || MOCK_SCHEDULE || {
+        initialSchedule  || {
         frequency: 'ANNUAL',
-        custom_interval_days: null,
-        initial_due_days: 30,
-        reminder_days_before: 7,
-        overdue_reminder_days: 3,
-        is_active: true,
+        customIntervalDays: null,
+        initialDueDays: 30,
+        reminderDaysBefore: 7,
+        overdueReminderDays: 3,
+        isActive: true,
         }
     );
 
@@ -27,7 +28,7 @@ function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
         setError('');
         setSuccess('');
 
-        if (form.frequency === 'CUSTOM' && !form.custom_interval_days) {
+        if (form.frequency === 'CUSTOM' && !form.customIntervalDays) {
             setError('Custom interval days required when frequency is CUSTOM');
             return;
         }
@@ -37,9 +38,8 @@ function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
         try {
 
         // future: await schedulesApi.setSchedule(moduleId, form);
-
-        await new Promise((r) =>  setTimeout(r, 400));
-
+        /* await new Promise((r) =>  setTimeout(r, 400)); */
+            await modulesApi.setModuleSchedule(moduleId, form);
         setSuccess('Schedule saved');
         } catch (err) {
             setError(err.message || 'Failed to save schedule');
@@ -68,8 +68,8 @@ function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
                 <FormField
                     label="Custom Interval (days)"
                     type="number"
-                    value={form.custom_interval_days || ''}
-                    onChange={(e) => updateField('custom_interval_days', Number(e.target.value))}
+                    value={form.customIntervalDays || ''}
+                    onChange={(e) => updateField('customIntervalDays', Number(e.target.value))}
                     inputProps={{ min: 1 }}
                 />
             )}
@@ -78,16 +78,16 @@ function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
                 <FormField
                     label="Initial Due (days)"
                     type="number"
-                    value={form.initial_due_days}
-                    onChange={(e) => updateField('initial_due_days' , Number(e.target.value))}
+                    value={form.initialDueDays}
+                    onChange={(e) => updateField('initialDueDays' , Number(e.target.value))}
                     inputProps={{ min: 1 }}
                 />
 
                 <FormField
                     label="Reminder Before (days)"
                     type="number"
-                    value={form.reminder_days_before}
-                    onChange={(e) => updateField('reminder_days_before', Number(e.target.value))}
+                    value={form.reminderDaysBefore}
+                    onChange={(e) => updateField('reminderDaysBefore', Number(e.target.value))}
                     inputProps={{ min: 0 }}
                 />
 
@@ -95,15 +95,15 @@ function ScheduleEditor({ /* future:moduleId, */ initialSchedule }) {
                 <FormField
                     label="Overdue Reminder (days)"
                     type="number"
-                    value={form.overdue_reminder_days}
-                    onChange={(e) => updateField( 'overdue_reminder_days',  Number(e.target.value))}
+                    value={form.overdueReminderDays}
+                    onChange={(e) => updateField( 'overdueReminderDays',  Number(e.target.value))}
                     inputProps={{ min: 0 }}
                 />
             </Stack>
 
             <Box>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input type="checkbox"  checked={form.is_active} onChange={(e) => updateField('is_active', e.target.checked)} />
+                    <input type="checkbox"  checked={form.isActive} onChange={(e) => updateField('isActive', e.target.checked)} />
 
                     Schedule is active
                 </label>

@@ -4,13 +4,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Paper, Stack, Box, Typography, Tabs, Tab, Alert, Divider, Chip, } from '@mui/material';
-// import * as modulesApi from '../../../api/modules';
+import * as modulesApi from '../../../api/modules';
 import {   PageContainer, PageTitle, FormField, ActionButton, Icon , } from '../../../components/ui';
 import SectionManager from '../../../components/modules/SectionManager';
 import ScheduleEditor from '../../../components/modules/ScheduleEditor';
-import { MOCK_MODULE_DETAIL } from '../_mockData';
+//import { MOCK_MODULE_DETAIL } from '../_mockData';
 
-const DEMO_STATE = 'normal';    // 'normal' | 'loading'
+//const DEMO_STATE = 'normal';    // 'normal' | 'loading'
 
 /**
  * create/edit module form page
@@ -33,9 +33,9 @@ function ModuleFormPage() {
         summary: '',
         description: '',
         category: '',
-        pass_mark: 80,              // 0-100
-        estimated_minutes: 30,      // Estimated study time 预计学习时间
-        self_enroll_allowed: true,
+        passMark: 80,              // 0-100
+        estimatedMinutes: 30,      // Estimated study time 预计学习时间
+        selfEnrollAllowed: true,
     });
 
 
@@ -47,7 +47,7 @@ function ModuleFormPage() {
     // Load module for edit 
     useEffect(() => {
         if (!isEdit) return;            // only load when editing
-
+        let ignore = false;
         const load = async () => {
             setIsLoading(true);     // show loading state
             setError('');
@@ -56,29 +56,32 @@ function ModuleFormPage() {
                 // temporary
                 // const data = await modulesApi.getModule(id);
 
-                const data = await new Promise((r) =>
+                const data = await modulesApi.getModule(id); /* new Promise((r) =>
                 setTimeout(() => r(MOCK_MODULE_DETAIL), 400)
                 );
+                */
 
-
+                if (!ignore) {
                 setModule(data);
 
-                setForm({ 
-                    title: data.title || '',
-                    summary: data.summary || '',
-                    description: data.description || '',
-                    category: data.category || '',
-                    pass_mark: data.pass_mark ?? 80,
-                    estimated_minutes: data.estimated_minutes ?? 30,
-                    self_enroll_allowed: data.self_enroll_allowed ?? true,
-                });
+                    setForm({ 
+                        title: data.title || '',
+                        summary: data.summary || '',
+                        description: data.description || '',
+                        category: data.category || '',
+                        passMark: data.passMark ?? 80,
+                        estimatedMinutes: data.estimatedMinutes ?? 30,
+                        selfEnrollAllowed: data.selfEnrollAllowed ?? true,
+                    });
+                 }
             } catch (err) {
-                setError(err.message || 'Failed to load module');
+                if (!ignore) {setError(err.message || 'Failed to load module');}
             } finally {
-                setIsLoading(false);
+                if (!ignore) {setIsLoading(false);}
             }
         };
         load();
+        return () => { ignore = true; };
     }, [id, isEdit]);
 
     const updateField = (name, value) =>
@@ -100,24 +103,27 @@ function ModuleFormPage() {
             if (isEdit) {
 
                 // future: await modulesApi.updateModule(id, form);
-                await new Promise((r) => setTimeout(r, 400));
+                //await new Promise((r) => setTimeout(r, 400));
+                await modulesApi.updateModule(id, form);
                 setSuccess('Module updated' );
             } else {
 
                 // future:      const created = await modulesApi.createModule(form);
                 // future ：     navigate(`/owner/modules/${created.id}/edit`);
 
-                const created = await new Promise((r) =>
+                const created = await modulesApi.createModule(form); /*new Promise((r) =>
                 setTimeout(() => r({ id: 999  }),  400)
                 );
+                */
+
                 navigate(`/owner/modules/${created.id}/edit`, { replace: true });
             }
 
 
         } catch (err) {
-        setError(err.message || 'Failed to save');
+            setError(err.message || 'Failed to save');
         } finally {
-        setIsSaving(false);
+            setIsSaving(false);
         }
     };
 
@@ -133,7 +139,8 @@ function ModuleFormPage() {
         try {
 
         // future : await modulesApi.updateModule(id, { status: 'PUBLISHED' });
-        await new Promise((r) => setTimeout(r, 400));
+        await modulesApi.updateModule(id, { status: 'PUBLISHED' });
+        //await new Promise((r) => setTimeout(r, 400));
 
         setModule((prev) => ({ ...prev, status: 'PUBLISHED' }));    // update local state to reflect published status
         
@@ -144,7 +151,7 @@ function ModuleFormPage() {
     };
 
 
-    if (DEMO_STATE === 'loading'|| isLoading ) {    // Showwing state 
+    if (isLoading ) {    // Showwing state 
         return (
             <PageContainer maxWidth="lg">
                 <Typography>  Loading... </Typography>

@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {Paper, Stack, Box, Typography, Skeleton, Alert, Button, Divider,} from '@mui/material';
-//import * as modulesApi from '../../../api/modules';
-//import * as enrollmentsApi from '../../../api/enrollments';
+import * as modulesApi from '../../../api/modules';
+import * as enrollmentsApi from '../../../api/enrollments';
 import { PageContainer, ActionButton,  Icon } from '../../../components/ui';
 import SectionList from '../../../components/modules/SectionList';
-import {MOCK_MODULE_DETAIL, MOCK_COMPLETED_SECTION_IDS,} from '../_mockData';
+//import {MOCK_MODULE_DETAIL, MOCK_COMPLETED_SECTION_IDS,} from '../_mockData';
 
 
 
-const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error'
+//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error'
 
 
 function StudyPage() {
@@ -22,25 +22,30 @@ function StudyPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        let ignore = false;
         const load = async () => {
         setIsLoading(true);
         setError('');
         try {
             // future: const data = await modulesApi.getModule(id);
             // future: const progress = await enrollmentsApi.listSectionProgress(id);
-            const data = await new Promise((r) =>
-            setTimeout(() => r(MOCK_MODULE_DETAIL), 400)
-            );
+            const data = await modulesApi.getModule(id);
 
-            setModule(data);
-            setCompletedIds(MOCK_COMPLETED_SECTION_IDS);
+            if (!ignore) {
+                setModule(data);
+                // Retain array initialization for compatibility
+                setCompletedIds([]);
+                }
+
         } catch (err) {
-            setError(err.message || 'Failed to load module');
+            if (!ignore) { setError(err.message || 'Failed to load module'); }
+
         } finally {
-            setIsLoading(false);
+            if (!ignore) { setIsLoading(false); }
         }
         };
-        load();
+        load ();
+        return ( ) => { ignore=true };
     }, [id]);
 
     /**  Mark a section as complete 标记章节完成 */
@@ -55,7 +60,7 @@ function StudyPage() {
 
         try {
         // 未来: await enrollmentsApi.markSectionComplete(sectionId);
-        await new Promise((r) => setTimeout(r, 300));
+        await enrollmentsApi.markSectionComplete(sectionId);
         } catch (err) {
         // 失败回滚 / Rollback on failure
         setCompletedIds((prev) => prev.filter((id) => id !== sectionId));
@@ -63,11 +68,8 @@ function StudyPage() {
         }
     };
 
-    const effectiveLoading = DEMO_STATE === 'loading' ? true :isLoading;
 
-    const effectiveError = DEMO_STATE === 'error' ? 'Failed to load':error;
-
-    if (effectiveLoading) {
+    if (isLoading) {
         return (
             <PageContainer maxWidth="md">
                 <Skeleton variant="rounded" height={100} sx={{ mb: 3 }} />
@@ -78,10 +80,10 @@ function StudyPage() {
     }
 
 
-    if (effectiveError) {
+    if (error && !module) {
         return (
             <PageContainer maxWidth="md">
-                <Alert severity="error">{effectiveError}</Alert>
+                <Alert severity="error">{error}</Alert>
             </PageContainer>
         );
     }
@@ -109,6 +111,8 @@ function StudyPage() {
                     Back to My Modules
                 </Button>
             </Box>
+
+            {error && <Alert severity="error">{error}</Alert>}
 
             {/* Header */}
             <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: 2 }}>
@@ -170,24 +174,15 @@ function StudyPage() {
                     color: '#fff',
                     }}
                 >
-                <Stack spacing={1} alignItems="center">
+                <Stack spacing={2} alignItems="center">
                     <Icon.CheckCircle sx={{ fontSize: 48 }} />
                     <Typography variant="h3">All sections complete</Typography>
-                    <Typography variant="h3">
-                        {percent === 100 && (
-                            <Paper  elevation={0}sx={{p: 3,borderRadius: 2, textAlign: 'center', backgroundColor: 'success.main',color: '#fff',}}>
-                                <Stack spacing={2} alignItems="center">
-                                    <Icon.CheckCircle sx={{ fontSize: 48 }} />
-                                    <Typography variant="h3">All sections complete</Typography>
-                                    
-                                    <Typography variant="body2"> You're ready to take the quiz.</Typography>
-                                
-                                    <ActionButton fullWidth={false}  onClick={() => navigate(`/user/modules/${id}/quiz`)}> Start Quiz </ActionButton >
-                                </Stack>
-                            </Paper>
-                        )}
+                    <Typography variant="body2">
+                        You're ready to take the quiz.
                     </Typography>
-                    <Typography variant="body2" >  Ready for the quiz? (Coming soon) </Typography >
+                    <ActionButton fullWidth={false} onClick={() => navigate(`/user/modules/${id}/quiz`)} >
+                        Start Quiz
+                    </ActionButton>
                 </Stack>
             </Paper>
 

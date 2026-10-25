@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Stack, Box, Typography, Paper, IconButton, Tooltip, Alert,  } from '@mui/material';
 import { FormField, ActionButton, Icon } from '../ui';
 import EmptyState from '../ui/EmptyState';
-
+import * as sectionsApi from '../../api/sections';
 /**
  * Section manager - add/edit/delete sections inline  -> 新增/编辑/删除
  *
@@ -17,6 +17,7 @@ function SectionManager({ moduleId, initialSections = [] }) {
     const [sections, setSections] = useState(initialSections);
     const [editingId, setEditingId] = useState(null);
      const [error, setError] = useState('');
+     const [isSaving, setIsSaving] = useState(false);    /* 08-01 */
 
     const [draft, setDraft] = useState({ title: '', body: '', order: 1 });
    
@@ -50,24 +51,41 @@ function SectionManager({ moduleId, initialSections = [] }) {
         return;
         }
 
+        setIsSaving(true);   /* 08-01 */
+        setError('');
+
         try {
         if (isCreating) {
 
             // future: const created = await sectionsApi.createSection({ module: moduleId, ...draft });
-            const created = { id: Date.now(), module: moduleId, ...draft };
+            /*const created = { id: Date.now(), module: moduleId, ...draft };
             await new Promise((r) => setTimeout(r, 300));
+            */
+            const created = await sectionsApi.createSection({
+                    module: moduleId,
+                    title: draft.title,
+                    body: draft.body,
+                    order: draft.order,
+                });
             setSections((prev) => [...prev, created]);
         } else {
 
             // future: await sectionsApi.updateSection(editingId, draft);
-            await new Promise((r) => setTimeout(r, 300));
+            /*await new Promise((r) => setTimeout(r, 300)); */
+            const updated = await sectionsApi.updateSection(editingId, {
+                    title: draft.title,
+                    body: draft.body,
+                    order: draft.order,
+                });
             setSections((prev) =>           // Update the section in the list
-            prev.map((s) => (s.id === editingId ? { ...s, ...draft } : s))      //https://react.dev/learn/updating-arrays-in-state
+            prev.map((s) => (s.id === editingId ? updated : s))      //https://react.dev/learn/updating-arrays-in-state
             );
         }
         cancel();
         } catch (err) {
         setError(err.message || 'Failed to save section');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -76,14 +94,18 @@ function SectionManager({ moduleId, initialSections = [] }) {
 
         if (!window.confirm('Delete this section?')) return;
         
-        
+        const prev = sections;
+        setSections((items) => items.filter((s) => s.id !== sectionId));
+
         try {
 
         // future: await sectionsApi.deleteSection(sectionId);
-        await new Promise((r) => setTimeout(r, 300));
-        setSections((prev) => prev.filter((s) => s.id !== sectionId));
+        /*await new Promise((r) => setTimeout(r, 300));*/
+        await sectionsApi.deleteSection(sectionId);
+
         } catch (err) {
-        setError(err.message || 'Failed to delete');
+            setSections(prev);
+            setError(err.message || 'Failed to delete');
         }
     };
 
@@ -106,12 +128,12 @@ function SectionManager({ moduleId, initialSections = [] }) {
         {isCreating && (    // creating  form
             <Paper elevation={0} sx={{ p: 2, border: '2px solid', borderColor: 'primary.main' }}>
                 <Stack spacing={2}>
-                    <FormField  label="Title"   value={draft.title} onChange={(e) => setDraft((d) => ({ ...d,  title:e.target.value }))} />
-                    <FormField  label="Body"    value={draft.body}  onChange={( e) => setDraft((d) => ({ ...d, body: e.target.value }))}                            inputProps={{ multiline: true, rows: 4 }}  />
-                    <FormField  label="Order"   type="number"   value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}    inputProps={{ min: 1 }} />
+                    <FormField  label="Title"   value={draft.title} onChange={(e) => setDraft((d) => ({ ...d,  title:e.target.value }))}  disabled={isSaving} />
+                    <FormField  label="Body"    value={draft.body}  onChange={( e) => setDraft((d) => ({ ...d, body: e.target.value }))}                            inputProps={{ multiline: true, rows: 4 }} disabled={isSaving}   />
+                    <FormField  label="Order"   type="number"   value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}    inputProps={{ min: 1 }}  disabled={isSaving} />
                     <Stack direction="row" spacing={1}>
-                        <ActionButton fullWidth={false} onClick={handleSave}>Save</ActionButton>
-                        <ActionButton fullWidth={false} variant="ghost" onClick={cancel}>Cancel </ActionButton>
+                        <ActionButton fullWidth={false} onClick={handleSave} loading={isSaving}>Save</ActionButton>
+                        <ActionButton fullWidth={false} variant="ghost" onClick={cancel} disabled={isSaving} >Cancel </ActionButton>
                     </Stack>
                 </Stack>
 
@@ -134,14 +156,14 @@ function SectionManager({ moduleId, initialSections = [] }) {
                 <Stack spacing={2}>
                     
                     
-                    <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} />
-                    <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} inputProps={{ multiline: true, rows: 4 }}/>
-                    <FormField label="Order" type="number"  value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}   />
+                    <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}  disabled={isSaving}  />
+                    <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} inputProps={{ multiline: true, rows: 4 }}  disabled={isSaving} />
+                    <FormField label="Order" type="number"  value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}   inputProps={{ min:1}} disabled={isSaving}  />
 
 
                     <Stack direction="row" spacing={1}>
-                        <ActionButton fullWidth={false} onClick={handleSave}>Save</ActionButton>
-                        <ActionButton fullWidth={false} variant="ghost" onClick={cancel}>Cancel</ActionButton>
+                        <ActionButton fullWidth={false} onClick={handleSave} loading={isSaving}>Save</ActionButton>
+                        <ActionButton fullWidth={false} variant="ghost" onClick={cancel}  disabled={isSaving}  >Cancel</ActionButton>
                     </Stack>
                 </Stack>
                 ) : (

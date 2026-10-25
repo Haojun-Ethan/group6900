@@ -1,5 +1,5 @@
 
-import { Paper, Stack, Typography, Box, Button } from '@mui/material';
+import { Paper, Stack, Typography, Box, Button , Chip} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 //import { PageContainer, PageTitle } from '../../components/ui';
@@ -11,6 +11,7 @@ https://mui.com/material-ui/react-list/
 function AccountPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const is2FaActive = Boolean(user?.is2FaEnabled);
 
   return (
     <PageContainer maxWidth="md">
@@ -32,16 +33,22 @@ function AccountPage() {
                 Two-Factor Authentication
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Add an extra layer of security to your account
+                {is2FaActive 
+                  ? 'Two-factor authentication is currently protecting your account.'
+                  : 'Add an extra layer of security to your account.'}
               </Typography>
             </Box>
 
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/account/2fa/setup')}
-            >
-              Enable
-            </Button>
+                {is2FaActive ? (
+                  <Chip label="Active" color="success" size="small" sx={{ fontWeight: 600 }} />
+                    ) : (
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/account/2fa/setup')}
+                >
+                  Enable
+                </Button>
+            )}
           </Box>
         </Paper>
 

@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Grid, Skeleton, Alert, Stack, Box,
-} from '@mui/material';
-//import * as modulesApi from '../../../api/modules';
+import { Grid, Skeleton, Alert, Stack, Box, } from '@mui/material';
+import * as modulesApi from '../../../api/modules';
 import { useAuth } from '../../../hooks/useAuth';
-import {
-  PageContainer, PageTitle, ActionButton, EmptyState, Icon,
-} from '../../../components/ui';
+import { PageContainer, PageTitle, ActionButton, EmptyState, Icon, } from '../../../components/ui';
 import ModuleCard from '../../../components/modules/ModuleCard';
-import { MOCK_MODULES } from '../_mockData';
+//import { MOCK_MODULES } from '../_mockData';
 
-const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
+//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
 
 /*  Owner's module management page   课程管理员 */
 function ManageModulesPage() {
@@ -23,6 +19,7 @@ function ManageModulesPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        let ignore = false; 
         const load = async () => {
             setIsLoading(true);
 
@@ -32,25 +29,32 @@ function ManageModulesPage() {
 
                 // future : const data = await modulesApi.listMyCreatedModules(user.username);
 
-                const data = await new Promise((r) =>
+                const allModules = await modulesApi.listModules();    /*await new Promise((r) =>
                 setTimeout(() => r(MOCK_MODULES.filter((m) => m.created_by?.username === 'owner_test')),400)
                 );
+                */
+                const myModules = (allModules || []).filter(
+                    (m) => m.createdBy?.username === user?.username
+                );
 
-                setModules(data);
+                if (!ignore) { setModules(myModules); }
             } catch (err) {
-                setError(err.message || 'Failed to load modules');
+                if (!ignore) {
+                    setError(err.message || 'Failed to load modules');
+                }
             } finally {
-                setIsLoading(false);
+                if (!ignore) {setIsLoading(false);}
             }
         };
         load();
+        return () => { ignore = true; }
     }, [user]);
 
-    const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
-    const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
-    const effectiveModules = DEMO_STATE === 'empty' ? [] : modules;
+   // const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
+    //const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
+    //const effectiveModules = DEMO_STATE === 'empty' ? [] : modules;
 
-    if (effectiveLoading) {
+    if (isLoading) {
         return (
             <PageContainer maxWidth="lg">
                 <PageTitle title="Manage Modules" />
@@ -65,11 +69,11 @@ function ManageModulesPage() {
         );
     }
 
-    if (effectiveError) {
+    if (error) {
         return (
             <PageContainer maxWidth="lg">
                 <PageTitle title="Manage Modules" />
-                <Alert severity="error">{effectiveError}</Alert>
+                <Alert severity="error">{error}</Alert>
             </PageContainer>
         );
     }
@@ -85,7 +89,7 @@ function ManageModulesPage() {
         >
             <PageTitle
             title="Manage Modules"
-            subtitle={`${effectiveModules.length} module${effectiveModules.length === 1 ? '' : 's'} created by you`}
+            subtitle={`${modules.length} module${modules.length === 1 ? '' : 's'} created by you`}
             />
 
 
@@ -101,7 +105,7 @@ function ManageModulesPage() {
             </ActionButton>
         </Stack>
 
-        {effectiveModules.length === 0 ? (
+        {modules.length === 0 ? (
             <EmptyState
             title="No modules yet"
             subtitle="Create your first training module to get started."
@@ -114,7 +118,7 @@ function ManageModulesPage() {
             />
         ) : (
             <Grid container spacing={{ xs: 2, md: 3 }}>
-                {effectiveModules.map((m) => (
+                {modules.map((m) => (
                     <Grid item xs={12} sm={6} md={4} key={m.id}>
                     <ModuleCard module={m} />
 

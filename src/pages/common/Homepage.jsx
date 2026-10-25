@@ -63,13 +63,12 @@ function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Backend does not return user.role yet
 
     const userRole = user?.role;
     // Filter cards for different role
     const visibleCards = userRole
     ? HOME_CARDS.filter((card) => card.roles.includes(userRole))
-    : HOME_CARDS;
+    : HOME_CARDS.filter((card) => card.roles.includes('USER'));
 
     return (
     <PageContainer maxWidth="lg">

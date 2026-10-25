@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Stack, Skeleton, Alert, Chip, Divider } from '@mui/material';
-//import { PageContainer,ActionButton, Icon } from '../../../components/ui';
+import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, ActionButton, Icon } from '../../../components/ui';
 import QuestionRenderer from '../../../components/quizzes/QuestionRenderer';
-import { MOCK_QUIZ_QUESTIONS } from '../_mockQuizData';
+//import { MOCK_QUIZ_QUESTIONS } from '../_mockQuizData';
 
-
+/*  delete 08-01
 const MOCK_RESULT = {
   id: 999,
   score_percent: 80,
@@ -20,6 +20,7 @@ const MOCK_RESULT = {
 
   },
 };
+*/
 
 function QuizResultPage() {
   const { id: moduleId, attemptId } = useParams();
@@ -31,6 +32,7 @@ function QuizResultPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       setIsLoading(true);
       setError('');
@@ -38,18 +40,31 @@ function QuizResultPage() {
     
         // future:const r = await quizzesApi.getAttempt(attemptId);
         // future: const qs = await quizzesApi.listQuestions(moduleId);
-        const r = await new Promise((resolve) =>
+        /*const r = await new Promise((resolve) =>
           setTimeout(() => resolve(MOCK_RESULT), 400)
         );
         setResult(r);
         setQuestions(MOCK_QUIZ_QUESTIONS);
+        08-01 */
+
+        const [attemptResult, questionList] = await Promise.all([
+          quizzesApi.getAttempt(attemptId),
+          quizzesApi.listQuestions(moduleId),
+        ]);
+
+        if (!ignore) {
+          setResult(attemptResult);
+          setQuestions(Array.isArray(questionList) ? questionList : []);
+        }
       } catch (err) {
-        setError(err.message || 'Failed to load result');
+        if (!ignore) {setError(err.message || 'Failed to load result');}
       } finally {
-        setIsLoading(false);
+        if (!ignore) {setIsLoading(false);}
       }
     };
     load();
+
+    return () => { ignore = true; };
   }, [moduleId, attemptId]);
 
   if (isLoading) {
@@ -61,15 +76,15 @@ function QuizResultPage() {
     );
   }
 
-  if (error) {
+  if (error || !result) {
     return (
       <PageContainer maxWidth="md">
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error">{error || 'Attempt result not found'}</Alert>
       </PageContainer>
     );
   }
 
-  const { score_percent, passed, user_answers } = result;
+  const {  scorePercent = 0, passed = false, userAnswers = {}  } = result;
 
   return (
     <PageContainer maxWidth="md">
@@ -110,7 +125,7 @@ function QuizResultPage() {
               }}
             >
               <Typography variant="h1" sx={{ color: '#fff', fontSize: '2rem' }}>
-                {score_percent}%
+                {scorePercent}%
               </Typography>
             </Box>
 
@@ -135,15 +150,15 @@ function QuizResultPage() {
             <Box key={q.id}>
               <Box sx={{ mb: 1 }}>
                 <Chip
-                  label={`Q${idx + 1} • ${user_answers[q.id] != null ? 'Answered' : 'Skipped'}`}
+                  label={`Q${idx + 1} • ${userAnswers[q.id] != null ? 'Answered' : 'Skipped'}`}
                   size="small"
-                  color={user_answers[q.id] != null ? 'success' : 'default'}
+                  color={userAnswers[q.id] != null ? 'success' : 'default'}
                   variant="outlined"
                 />
               </Box>
               <QuestionRenderer
                 question={q}
-                answer={user_answers[q.id]}
+                answer={userAnswers[q.id]}
                 onChange={() => {}}
                 disabled
                 index={idx}

@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,  } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Paper, Box, Typography, Stack, Skeleton, Alert, Chip, Divider, Button,
-} from '@mui/material';
-//import * as modulesApi from '../../api/modules';
-//import * as enrollmentsApi from '../../api/enrollments';
+import {  Paper, Box, Typography, Stack, Skeleton, Alert, Chip, Divider, Button,} from '@mui/material';
+import * as modulesApi from '../../api/modules';
+import * as enrollmentsApi from '../../api/enrollments';
 import { PageContainer, ActionButton, Icon } from '../../components/ui';
 import StatusBadge from '../../components/modules/StatusBadge';
 import SectionList from '../../components/modules/SectionList';
-import { MOCK_MODULE_DETAIL, MOCK_MY_ENROLLMENTS } from './_mockData';
+
+//import { MOCK_MODULE_DETAIL, MOCK_MY_ENROLLMENTS } from './_mockData';
 
 /*  用于静态设计阶段快速切换三态  */
-const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error' | 'notfound'
+//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error' | 'notfound'
 
 /* Module detail page  */
 function ModuleDetailPage() {
@@ -21,11 +20,51 @@ function ModuleDetailPage() {
   const [module, setModule] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEnrolling,setIsEnrolling] = useState(false);
   const [error, setError] = useState('');
+
+
 
   // ★ Load module + my enrollment
   useEffect(() => {
-    const load = async () => {
+    let ignore = false; 
+
+    const fetchModuleData = async () => {
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const [moduleData, myEnrollments] = await Promise.all([
+          modulesApi.getModule(id),
+          enrollmentsApi.listMyEnrollments().catch(() => []),
+        ]);
+
+        if (!ignore) {
+          setModule(moduleData);
+          const currentEnrollment = (myEnrollments || []).find(
+            (e) => String(e.module) === String(id)
+          );
+          setEnrollment(currentEnrollment || null);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(err.message || 'Failed to load module details.');
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchModuleData();
+
+    return () => {
+      ignore = true; 
+    };
+  }, [id]);
+    /* delete 08-01
+    {const load = async () => {
       setIsLoading(true);
       setError('');
       try {
@@ -55,10 +94,25 @@ function ModuleDetailPage() {
   const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
   const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
   const effectiveNotFound = DEMO_STATE === 'notfound' ? true : false;
+*/
 
+  // handleEnroll
+  const handleEnroll = async () => {
+    setIsEnrolling(true);
+    setError('');
+
+    try {
+      const newEnrollment = await enrollmentsApi.enroll(id);
+      setEnrollment(newEnrollment);
+    } catch (err) {
+      setError(err.message || 'Failed to enroll in this module.');
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
   // ===== Render states  =====
 
-  if (effectiveLoading) {
+  if (isLoading) {
     return (
       <PageContainer maxWidth="lg">
         <Skeleton variant="text" width={120} height={32} sx={{ mb: 2 }} />
@@ -69,15 +123,16 @@ function ModuleDetailPage() {
     );
   }
 
-  if (effectiveError) {
+  if (error && !module) {
     return (
       <PageContainer maxWidth="lg">
-        <Alert severity="error">{effectiveError}</Alert>
+        <Alert severity="error" sx={{mb:2}}>{error}</Alert>
+        <Button startIcon={<Icon.ArrowBack />} onClick={ () => navigate('/modules')}> Back to Modules </Button>
       </PageContainer>
     );
   }
 
-  if (effectiveNotFound || !module) {
+  if (!module) {
     return (
       <PageContainer maxWidth="lg">
         <Stack spacing={2} alignItems="center" sx={{ py: 8 }}>
@@ -109,6 +164,7 @@ function ModuleDetailPage() {
             Back to Modules
           </Button>
         </Box>
+          {error && <Alert severity="error">{error}</Alert>}
 
         {/* Header card   */}
         <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 2 }}>
@@ -144,20 +200,20 @@ function ModuleDetailPage() {
               spacing={3}
               sx={{ flexWrap: 'wrap', color: 'text.secondary' }}
             >
-              {module.estimated_minutes && (
+              {module.estimatedMinutes  && (
                 <Stack direction="row" spacing={0.5} alignItems="center">
                   <Icon.School fontSize="small" />
 
                   <Typography variant="body2">
-                    {module.estimated_minutes} min
+                    {module.estimatedMinutes} min
                   </Typography>
 
                 </Stack>
               )}
-              <Typography variant="body2">Pass: {module.pass_mark}%</Typography>
+              <Typography variant="body2">Pass: {module.passMark}%</Typography>
 
               <Typography variant="body2">
-                By {module.created_by?.username}
+                By {module.createdBy.username}
               </Typography>
             </Stack>
 
@@ -170,30 +226,20 @@ function ModuleDetailPage() {
             <Stack direction="row" spacing={2} sx={{ pt: 1 }}>
               {isEnrolled ? (
                 <>
-                    <Chip
-                        label={`Enrolled (${enrollment.status})`}
-                        color="success"
-                        sx={{ fontWeight: 600 }}
-                    />
+                    <Chip label={`Enrolled (${enrollment.status})`} color="success" sx={{ fontWeight: 600 }}  />
 
 
-                    <ActionButton
-                        fullWidth={false}
-                        variant="secondary"
-                        onClick={() => navigate(`/user/modules/${module.id}/study`)}
-                    >
+                    <ActionButton fullWidth={false} variant="secondary" onClick={() => navigate(`/user/modules/${module.id}/study`)} >
                         Start Learning
                     </ActionButton>
 
                 </>
               ) : (
-                module.status === 'PUBLISHED' &&
-                module.self_enroll_allowed && (
-                  <ActionButton fullWidth={false}>
+                  <ActionButton fullWidth={false} onClick={handleEnroll} loading={isEnrolling} loadingText="Enrolling..." >
                     Enroll
                   </ActionButton>
                 )
-              )}
+              }
             </Stack>
           </Stack>
         </Paper>
