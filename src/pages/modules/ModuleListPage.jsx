@@ -92,18 +92,18 @@ function ModuleListPage() {
   // ===== Render  =====
 
 
-  if (error) {
+  if (error) { // PageContainer is a custom component that wraps the content and provides consistent padding and maxWidth
     return (
-      <PageContainer maxWidth="lg"> // PageContainer is a custom component that wraps the content and provides consistent padding and maxWidth
+      <PageContainer maxWidth="lg"> 
         <PageTitle title="Modules" />
         <Alert severity="error">{error}</Alert>
       </PageContainer>
     );
   }
 
-  if (modules.length === 0) {
+  if (modules.length === 0) { // PageContainer is a custom component that wraps the content and provides consistent padding and maxWidth
     return (
-      <PageContainer maxWidth="lg"> // PageContainer is a custom component that wraps the content and provides consistent padding and maxWidth
+      <PageContainer maxWidth="lg"> 
         <PageTitle title="Modules" />
         <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
           <Typography variant="h3" gutterBottom>

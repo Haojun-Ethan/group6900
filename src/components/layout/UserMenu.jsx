@@ -55,7 +55,7 @@ function UserMenu(){
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             slotProps={{ paper: { sx: { minWidth: 200, mt: 1 } } }}
         >
-            // Add user identity overview header    08-01
+           {/* Add user identity overview header    08-01 */}
             <Box sx={{ px: 2, py: 1.5 }}>
                 <Typography variant="body1" fontWeight={600} noWrap>
                     {user?.username || 'User'}

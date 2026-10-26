@@ -31,7 +31,7 @@ function QuestionRenderer({
             <Paper elevation={0}  sx={{ p: { xs: 2.5, sm: 3 },  borderRadius: 2,  border:'1px solid', borderColor: 'divider', }} >
                 <Stack spacing={2}>
 
-                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'center' }}>   // header, number, type, points
+                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', alignItems: 'center' }}>  {/* // header, number, type, points */}
                         {typeof index === 'number' && (
                             <Chip label={`Q${index + 1}`}  size="small" color="primary" sx={{ fontWeight: 600 }} />
                         )}
