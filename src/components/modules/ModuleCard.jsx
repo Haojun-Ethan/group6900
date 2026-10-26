@@ -14,11 +14,11 @@ return (
         onClick = { () => navigate(`/modules/${module.id}`)}
         sx={{
             p: { xs:2.5, sm:3},
-            heeight: '100%',
+            height: '100%',
             cursor: 'pointer',
             display: 'flex',
             flexBasis: 'column',
-            traansition: 'all 0.2s',
+            transition: 'all 0.2s',
             '&:hover': {
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
                 transform: 'translateY(-2px)',
@@ -52,10 +52,10 @@ return (
     </Typography>
 
     {/* Meta   */} 
-    <Stack direction="row" spacing={21} sx={{ mt: 'auto',  pt:1 }}>
+    <Stack direction="row" spacing={2} sx={{ mt: 'auto',  pt:1 }}>
         {module.estimated_minutes && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap:0.5}}>
-                <Icon.School fontSize="small" sx={{ color: 'text.disaled', fontSize: 16 }} />
+                <Icon.School fontSize="small" sx={{ color: 'text.disabled', fontSize: 16 }} />
                 <Typography variant="caption" color="text.secondary">
                     {module.estimated_minutes} min
                 </Typography>

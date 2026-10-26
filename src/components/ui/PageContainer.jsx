@@ -14,8 +14,8 @@ function PageContainer({ children, maxWidth='md',sx}) {
     return(
 
         <Box sx={{
-            minheight: '100vh',
-            backgroundColor:'Background.default',
+            minHeight: '100vh',
+            backgroundColor:'background.default',
             py:{xs:3, sm:4, md:6},
             ...sx,
         }}

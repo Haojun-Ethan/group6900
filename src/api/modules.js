@@ -13,7 +13,7 @@ export async function listModules() {
  * @param {string|number} id
  * @returns {Promise<Object>}
  */
-export async function getModules(id) {
+export async function getModule(id) {
     return apiClient.get(ENDPOINTS.moduleDetail(id));
 }
 

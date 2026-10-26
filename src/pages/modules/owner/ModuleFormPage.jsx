@@ -206,9 +206,9 @@ function ModuleFormPage() {
                     <FormField label="Category"     value={form.category}       onChange={(e)=> updateField('category', e.target.value)}    disabled={isSaving}/>
 
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    <FormField label="Pass Mark (%)" type="number" value={form.pass_mark} onChange={(e) => updateField('pass_mark', Number(e.target.value))} disabled={isSaving} inputProps={{ min: 0, max: 100 }}  />
+                    <FormField label="Pass Mark (%)" type="number" value={form.passMark} onChange={(e) => updateField('passMark', Number(e.target.value))} disabled={isSaving} inputProps={{ min: 0, max: 100 }}  />
                     
-                    <FormField label="Estimated Minutes" type="number"  value={form.estimated_minutes} onChange={(e) => updateField('estimated_minutes', Number(e.target.value))} disabled={isSaving} inputProps={{ min: 1 }}  />
+                    <FormField label="Estimated Minutes" type="number"  value={form.estimatedMinutes} onChange={(e) => updateField('estimatedMinutes', Number(e.target.value))} disabled={isSaving} inputProps={{ min: 1 }}  />
                 </Stack>
 
                 <Box>
