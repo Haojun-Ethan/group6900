@@ -45,11 +45,8 @@ function AccountPage() {
               </Typography>
             </Box>
 
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/account/2fa/setup')}
-            >
-              Enable
+            <Button variant="outlined" onClick={() => navigate('/account/2fa/setup')}>
+              {user?.is_2fa_enabled ? "Disable 2FA" : "Enable 2FA"}
             </Button>
           </Box>
         </Paper>

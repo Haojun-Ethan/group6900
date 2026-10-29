@@ -70,6 +70,14 @@ export const AuthProvider = ({ children }) => {
             refreshState();
 
         }, [refreshState]);
+
+
+        // cancel MFA so that user can go back to the login page and re-login.
+        const cancelMFA = useCallback(() => {
+            storage.removeChallengeId();
+            storage.removeUser();
+            refreshState();
+        } , [refreshState]);
         
         // logout  
         const logout = useCallback(() => {
@@ -86,7 +94,7 @@ export const AuthProvider = ({ children }) => {
         login,
         submitOTP,
         logout,
-       
+        cancelMFA
     };
 
         

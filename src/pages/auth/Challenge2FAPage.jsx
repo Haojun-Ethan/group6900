@@ -4,8 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 import CodeInput from "../../components/auth/CodeInput";
 
-import { Stack,Link as MuiLink } from "@mui/material";
-import {Link as RouterLink} from "react-router-dom";
+import { Stack,Link as MuiLink } from "@mui/material"; 
 import AuthLayout from "../../components/ui/AuthLayout";
 import './Challenge2FAPage.css';
 
@@ -13,13 +12,18 @@ import './Challenge2FAPage.css';
 /* rewrite 5-01 , all Challenge2FAPage*/
 
 function Challenge2FAPage (){
-    const { submitOTP } = useAuth();       
+    const { submitOTP, cancelMFA } = useAuth();       
     const navigate = useNavigate();
 
     const handleSubmit = async (otp) => {
         await submitOTP({otp});   /* debug here isnot otp, is {otp}*/
         navigate('/', { replace: true }); // Redirect to homepage after successful OTP submission
     };
+
+    const BackToLogin = () => {
+        cancelMFA();
+        navigate('/login', { replace: true }); // Redirect to login page
+    }
 
     return (
     <AuthLayout
@@ -30,9 +34,8 @@ function Challenge2FAPage (){
       <Stack spacing={3}>
         <CodeInput onSubmit={handleSubmit} submitLabel="Verify" />
 
-        <MuiLink
-          component={RouterLink}
-          to="/login"
+        <MuiLink component="button"
+          onClick={BackToLogin}
           underline="hover"
           sx={{ textAlign: 'center', fontSize: '0.9rem' }}
         >
