@@ -1,6 +1,6 @@
 import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import {UserMenu} from "./UserMenu";
+import UserMenu from "./UserMenu";
 
 
 
