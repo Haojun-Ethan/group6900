@@ -29,11 +29,13 @@ export const AuthProvider = ({ children }) => {
     const syncUserSession = async () => {
         try {
             const fullUser = await authApi.getMe();
+            console.log("getMe successful");
             storage.setUser(fullUser);
             setUser(fullUser);
             setAuthState('AUTHENTICATED');
             return fullUser;
         } catch (err) {
+            console.error("getMe failed:", {status: err?.response?.status ?? err?.status,message: err?.message});
             storage.clearAll();
             setUser(null);
             setAuthState('UNAUTHENTICATED');
