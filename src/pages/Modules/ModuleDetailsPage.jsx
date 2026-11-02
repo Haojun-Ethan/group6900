@@ -12,7 +12,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { PageContainer } from "../../components/ui";
 import { getModule } from "../../api/modules";
 
-import "./ModulesPage.css";
+import "./ModulesPages.css";
 
 function ModuleDetailsPage() {
   const { id: moduleId } = useParams();
