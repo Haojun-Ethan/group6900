@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
-import HomePage from "../pages/common/HomePage";
+import HomePage from "../pages/common/Homepage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PtcRoute from "./ptcRoute";
 import RegisterPage from "../pages/auth/RegisterPage";
