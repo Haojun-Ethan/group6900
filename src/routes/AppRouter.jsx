@@ -11,11 +11,11 @@ import Setup2FAPage from '../pages/account/Setup2FAPage';
 import AppLayout from "../components/layout/AppLayout";
 
 import ModulesPage from "../pages/Modules/ModulesPages";
-import ModuleDetailsPage from "../pages/modules/ModuleDetailsPage";
-import ManageModulesPage from '../pages/modules/owner/ManageModulesPage';
-import MyModulesPage from '../pages/modules/user/MyModulesPage';
-import StudyPage from '../pages/modules/user/StudyPage';
-import ModuleFormPage from "../pages/modules/owner/ModuleFormPage";
+import ModuleDetailsPage from "../pages/Modules/ModuleDetailsPage";
+import ManageModulesPage from '../pages/Modules/owner/ManageModulesPage';
+import MyModulesPage from '../pages/Modules/user/MyModulesPage';
+import StudyPage from '../pages/Modules/user/StudyPage';
+import ModuleFormPage from "../pages/Modules/owner/ModuleFormPage";
 import ManageUsersPage from "../pages/admin/ManageUsersPage";
 import QuizResultPage from "../pages/quizzes/user/QuizResultPage";
 import QuizGalleryPage from "../pages/quizzes/QuizGalleryPage";
