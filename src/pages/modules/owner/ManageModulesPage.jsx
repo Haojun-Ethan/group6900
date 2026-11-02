@@ -33,9 +33,10 @@ function ManageModulesPage() {
                 setTimeout(() => r(MOCK_MODULES.filter((m) => m.created_by?.username === 'owner_test')),400)
                 );
                 */
-                const myModules = (allModules || []).filter(
-                    (m) => m.createdBy?.username === user?.username
-                );
+                const myModules = (allModules || []).filter((m) => {
+                        if (user?.role === 'ADMIN' || !m.createdBy) return true;
+                        return m.createdBy?.username === user?.username;
+                });
 
                 if (!ignore) { setModules(myModules); }
             } catch (err) {
