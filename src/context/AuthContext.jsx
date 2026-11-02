@@ -146,7 +146,13 @@ export const AuthProvider = ({ children }) => {
             await syncUserSession();
 
         }, []);
-        
+        const cancelMFA = useCallback(() => {
+            storage.clearAll();
+            setUser(null);
+            setAuthState("UNAUTHENTICATED");
+        }, []);
+
+
         // logout  
         const logout = useCallback(() => {
             storage.clearAll();
@@ -162,6 +168,7 @@ export const AuthProvider = ({ children }) => {
         isMFAPending: authState === 'MFA_PENDING',
         login,
         submitOTP,
+        cancelMFA,
         logout,
         refreshUser:initSession,
        
