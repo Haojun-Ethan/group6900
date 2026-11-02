@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Skeleton, Alert, Stack, Box, } from '@mui/material';
+import { Grid, Skeleton, Alert, Stack, Box, Button, } from '@mui/material';
 import * as modulesApi from '../../../api/modules';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageContainer, PageTitle, ActionButton, EmptyState, Icon, } from '../../../components/ui';
@@ -121,6 +121,9 @@ function ManageModulesPage() {
                 {modules.map((m) => (
                     <Grid item xs={12} sm={6} md={4} key={m.id}>
                     <ModuleCard module={m} />
+                        <Button  variant="outlined"  fullWidth  sx={{ mt: 1 }} startIcon={<Icon.Quiz />} onClick={(e) => { e.stopPropagation(); navigate(`/owner/modules/${m.id}/quiz`); }} >
+                                Manage Quiz
+                        </Button>
 
                     </Grid>
                 ))}

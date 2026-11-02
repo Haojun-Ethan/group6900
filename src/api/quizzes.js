@@ -40,3 +40,31 @@ export async function submitQuiz(attemptId, answers) {
 export async function getAttempt(attemptId) {
     return apiClient.get(`/attempts/${attemptId}/`);
 }
+
+
+/**
+ * 
+ * @param {Object} data 
+ * @returns {Promise<Object>}
+ */
+export async function createQuestion(data) {
+    return apiClient.post('/questions/', data);
+}
+
+/**
+ * 
+ * @param {Object} data 
+ * @returns {Promise<Object>}
+ */
+export async function createChoice(data) {
+    return apiClient.post('/choices/', data);
+}
+
+/**
+ * 
+ * @param {number | String } id 
+ * @returns {Promise<Object>}
+ */
+export async function deleteQuestion(id) {
+    return apiClient.delete(`/questions/${id}/`);
+}

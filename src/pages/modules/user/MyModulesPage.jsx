@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {Grid, Skeleton, Alert, Chip, Typography, Paper, Stack, LinearProgress, Box } from '@mui/material';
+import {Grid, Skeleton, Alert, Chip, Typography, Paper, Stack, LinearProgress, Box, Button, } from '@mui/material';
 import { PageContainer, PageTitle, ActionButton, EmptyState,  } from '../../../components/ui';
+
+import { Icon } from '../../../components/ui';
 //import { MOCK_ENROLLED_MODULES } from '../_mockData';
 import * as enrollmentsApi from '../../../api/enrollments';
 
@@ -58,8 +60,15 @@ function MyModulesPage() {
 
     if (isLoading) {
         return (
-        <PageContainer maxWidth="lg">
-            <PageTitle title="My Modules" />
+        <PageContainer maxWidth="lg">  {/* add 08-05 */}
+            <Box sx={{ mb: 2 }}>
+                <Button startIcon={<Icon.ArrowBack />} onClick={() => navigate('/')} sx={{ textTransform: 'none' }}>
+                    Back to Home
+                </Button>
+            </Box>
+
+
+            <PageTitle title="My Modules" subtitle={`${enrollments.length} enrolled course${enrollments.length === 1 ? '' : 's'}`} />
             <Grid container spacing={{ xs: 2, md: 3 }}>
             {[1, 2].map((n) => (
                 <Grid item xs={12} sm={6} md={4} key={n}>

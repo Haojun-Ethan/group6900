@@ -5,6 +5,7 @@ import * as modulesApi from '../../../api/modules';
 import * as enrollmentsApi from '../../../api/enrollments';
 import { PageContainer, ActionButton,  Icon } from '../../../components/ui';
 import SectionList from '../../../components/modules/SectionList';
+
 //import {MOCK_MODULE_DETAIL, MOCK_COMPLETED_SECTION_IDS,} from '../_mockData';
 
 
@@ -20,6 +21,7 @@ function StudyPage() {
     const [completedIds, setCompletedIds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [submittingIds, setSubmittingIds] = useState([]); 
 
     useEffect(() => {
         let ignore = false;
@@ -56,7 +58,11 @@ function StudyPage() {
         //  https://react.dev/reference/react/useOptimistic
 
 
-        setCompletedIds((prev) => [...prev, sectionId]);
+        if (completedIds.includes(sectionId) || submittingIds.includes(sectionId)) return;  // already completed or submitting
+
+        setSubmittingIds((prev) => [...prev, sectionId]); 
+
+        setCompletedIds((prev) => [...prev, sectionId]); 
 
         try {
         // 未来: await enrollmentsApi.markSectionComplete(sectionId);
@@ -65,7 +71,10 @@ function StudyPage() {
         // 失败回滚 / Rollback on failure
         setCompletedIds((prev) => prev.filter((id) => id !== sectionId));
         setError(err.message || 'Failed to mark complete');
+        } finally {
+        setSubmittingIds((prev) => prev.filter((id) => id !== sectionId));
         }
+
     };
 
 
@@ -159,7 +168,7 @@ function StudyPage() {
             <Box>
                 <Typography variant="h2" sx={{ mb: 2 }}>  Sections  </Typography>
                 
-                <SectionList sections={module.sections} completedIds={completedIds}  onMarkComplete={handleMarkComplete} />
+                <SectionList sections={module.sections} completedIds={completedIds} submittingIds={submittingIds} onMarkComplete={handleMarkComplete} />
             </Box>
 
             {/* Continue button (optional)   */}

@@ -21,7 +21,9 @@ import QuizResultPage from "../pages/quizzes/user/QuizResultPage";
 import QuizGalleryPage from "../pages/quizzes/QuizGalleryPage";
 import TakeQuizPage from "../pages/quizzes/user/TakeQuizPage";
 import QuizDemoPage from "../pages/quizzes/QuizDemoPage.jsx";
-
+import ManageQuizPage from "../pages/quizzes/owner/ManageQuizPage"; 
+import PathwayListPage from '../pages/modules/user/PathwayListPage';
+import PathwayDetailPage from '../pages/modules/user/PathwayDetailPage';
 
 
 /* rewrite 5-01 */
@@ -60,7 +62,10 @@ function AppRouter() {
 
                     <Route path="/quiz-demo" element={<QuizDemoPage />} />              {/* add by 07-01  */ }
                     <Route path="/quiz-gallery" element={<QuizGalleryPage />} />        {/* add by 07-01  */ }
+                    <Route path="/owner/modules/:id/quiz" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ManageQuizPage /></PtcRoute>} />        {/* add by 08-06 */ }
 
+                    <Route path="/pathways" element={<PathwayListPage />} />             {/* add by 08-06 */ }
+                    <Route path="/pathways/:id" element={<PathwayDetailPage />} />       {/* add by 08-06 */ }
 
                 </Route>
 

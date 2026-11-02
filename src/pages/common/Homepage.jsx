@@ -31,6 +31,14 @@ const HOME_CARDS = [
         icon: 'Dashboard',
     },
     {
+        key: 'pathways',
+        title: 'Learning Pathways',
+        description: 'Follow structured learning tracks',
+        path: '/pathways',
+        roles: ['USER', 'OWNER', 'ADMIN'],
+        icon: 'School',
+    },
+    {
         key: 'manage-users',
         title: 'Manage Users',
         description: 'Manage user accounts and roles',

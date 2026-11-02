@@ -1,8 +1,6 @@
-import {
-  Paper, Box, Typography, Stack, IconButton, Tooltip, Chip,
-} from '@mui/material';
+import {  Paper, Box, Typography, Stack, IconButton, Tooltip, Chip,} from '@mui/material';
 import { Icon } from '../ui';
-
+import CircularProgress from '@mui/material/CircularProgress';
 /**
  * Section list for a module
  * MUI handbook - List
@@ -17,6 +15,7 @@ import { Icon } from '../ui';
 function SectionList({
   sections = [],
   completedIds = [],
+  submittingIds = [],
   onMarkComplete,
   readOnly = false,
 }) {
@@ -101,8 +100,13 @@ function SectionList({
                   <IconButton
                     size="small"
                     onClick={() => onMarkComplete(section.id)}
+                    disabled={submittingIds.includes(section.id)}
                   >
-                    <Icon.CheckCircle fontSize="small" />
+                    {submittingIds.includes(section.id) ? (
+                        <CircularProgress size={20} /> 
+                    ) : (
+                        <Icon.CheckCircle fontSize="small" />
+                    )}
                   </IconButton>
                 </Tooltip>
               )}
