@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import UserMenu from './UserMenu';
 
 
-
 function AppLayout() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
