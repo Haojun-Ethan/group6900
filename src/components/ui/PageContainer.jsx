@@ -10,7 +10,7 @@ import { Box, Container } from "@mui/material";
 
 
 
-function PageContainer({ children, maxWidth='md',sx}) {
+function PageContainer({ children, maxWidth='md', sx, className }) {
     return(
 
         <Box sx={{
@@ -19,6 +19,7 @@ function PageContainer({ children, maxWidth='md',sx}) {
             py:{xs:3, sm:4, md:6},
             ...sx,
         }}
+        className={className}
         ><Container maxWidth={maxWidth}>{children}</Container></Box>
     );
 }

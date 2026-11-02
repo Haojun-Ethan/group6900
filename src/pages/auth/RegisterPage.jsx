@@ -8,6 +8,7 @@ import { validatePassword, getActiveRules } from '../../utils/passwordRules';
 import { FormField, ActionButton, AlertMessage, Icon } from '../../components/ui';
 import { Stack, Box, List, ListItem, ListItemIcon, ListItemText, Link as MuiLink } from '@mui/material';
 import AuthLayout from '../../components/ui/AuthLayout';
+import './RegisterPage.css';
 
 
 
@@ -101,7 +102,7 @@ function RegisterPage() {
     };
  
     return(
-      <AuthLayout title="Register" subtitle="Create your account.">     {/* debug  title="Regiser"*/}
+    <AuthLayout className="register-page" title="Register" subtitle="Create your account.">     {/* debug  title="Regiser"*/}
         <form onSubmit={handleSubmit}>
             <Stack spacing={2.5}>
                 {serverError && <AlertMessage type="error">{serverError}</AlertMessage>}

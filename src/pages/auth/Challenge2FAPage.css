@@ -1,0 +1,9 @@
+.challenge-2fa-page .auth-layout__paper {
+  max-width: 31rem;
+  border: 1px solid #e2e6eb;
+  box-shadow: 0 16px 44px rgba(29, 43, 57, 0.08);
+}
+
+.challenge-2fa-page a {
+  min-height: 24px;
+}

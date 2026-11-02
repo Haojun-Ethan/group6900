@@ -9,6 +9,7 @@ import AccountPage from '../pages/account/AccountPage';
 import Setup2FAPage from '../pages/account/Setup2FAPage';
 //import PlaceholderPage from "../pages/common/PlaceholderPage";
 import AppLayout from "../components/layout/AppLayout";
+
 import ModuleListPage from "../pages/modules/ModuleListPage";
 import ModuleDetailPage from "../pages/modules/ModuleDetailPage";
 import ManageModulesPage from '../pages/modules/owner/ManageModulesPage';
@@ -28,6 +29,7 @@ function AppRouter() {
     return (
         <BrowserRouter>
             <Routes>
+
                 {/* Public, rewrite 5-01 */ }
                 <Route path="/login" element={<PtcRoute require="guest"><LoginPage /></PtcRoute>} />
                 <Route path="/register" element={<PtcRoute require="guest"><RegisterPage /></PtcRoute>} />
@@ -36,6 +38,7 @@ function AppRouter() {
                 <Route element={<PtcRoute require="auth"> <AppLayout /></PtcRoute>}>
 
                     <Route path="/" element={<HomePage />} />
+
 
                     <Route path="/account" element={<AccountPage />} />
                     <Route path="/account/2fa/setup" element={<Setup2FAPage />} />
@@ -57,6 +60,7 @@ function AppRouter() {
 
                     <Route path="/quiz-demo" element={<QuizDemoPage />} />              {/* add by 07-01  */ }
                     <Route path="/quiz-gallery" element={<QuizGalleryPage />} />        {/* add by 07-01  */ }
+
 
                 </Route>
 
