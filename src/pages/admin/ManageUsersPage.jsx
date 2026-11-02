@@ -30,7 +30,7 @@ function ManageUsersPage() {
                 const data = await usersApi.listUsers();
                 if (!ignore) setUsers(data);
             } catch (err) {
-                if (!ignore)  setError(err.message || 'Failed to load users');
+                if (!ignore)  setError('The user management interface has not been fully developed yet and data cannot be loaded.');  // (err.message || 'Failed to load users');
             } finally {
                 if(!ignore)  setIsLoading(false);
             }

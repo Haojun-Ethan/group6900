@@ -106,7 +106,7 @@ function StudyPage() {
         <PageContainer maxWidth="md">
         <Stack spacing={3}>
          
-            <Box>    {/* Back / 返回 */}
+            <Box>    {/* Back  */}
                 <Button startIcon={<Icon.ArrowBack />}  onClick={() => navigate('/user/modules')} sx={{ textTransform: 'none' }} >
                     Back to My Modules
                 </Button>

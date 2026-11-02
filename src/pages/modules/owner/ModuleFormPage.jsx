@@ -213,7 +213,7 @@ function ModuleFormPage() {
 
                 <Box>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <input type="checkbox"  checked={form.self_enroll_allowed} onChange={(e) => updateField('self_enroll_allowed', e.target.checked)} disabled={isSaving}  />
+                        <input type="checkbox"  checked={form.selfEnrollAllowed} onChange={(e) => updateField('selfEnrollAllowed', e.target.checked)} disabled={isSaving}  />
                         Allow self-enrollment
                     </label>
                 </Box>

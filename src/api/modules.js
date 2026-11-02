@@ -51,3 +51,7 @@ export async function listMyCreatedModules(username) {
     const all = await apiClient.get(ENDPOINTS.modules);
     return all.filter((m) => m.created_by?.username === username);
 }
+
+export async function setModuleSchedule(moduleId, scheduleData) {
+    return apiClient.put(ENDPOINTS.moduleSchedule(moduleId), scheduleData);
+}
