@@ -8,16 +8,11 @@ import {
 } from "react-router-dom";
 
 import {
-  Box,
-  Paper,
-  Typography,
-  Stack,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button,
-  CircularProgress,
-  Alert,
+  Box, Paper,
+  Typography, Stack,
+  Accordion, AccordionSummary,
+  AccordionDetails, Button,
+  CircularProgress, Alert,
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -37,9 +32,7 @@ function ModuleDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const basePath = location.pathname.startsWith("/user/modules")
-    ? "/user/modules"
-    : "/modules";
+  const basePath = location.pathname.startsWith("/user/modules") ? "/user/modules" : "/modules";
 
 
   useEffect(() => {
@@ -71,21 +64,14 @@ function ModuleDetailsPage() {
 
     return () => {
       active = false;
-    };
-  }, [moduleId]);
+    };}, [moduleId]);
 
 
   if (loading) {
     return (
       <Box className="modules-page">
         <PageContainer maxWidth="lg">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              py: 5,
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", py: 5,}}>
             <CircularProgress />
           </Box>
         </PageContainer>
