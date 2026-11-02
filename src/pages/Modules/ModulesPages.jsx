@@ -6,22 +6,13 @@ import {
 } from "react-router-dom";
 import { Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {
-  Box,
-  Paper,
-  Typography,
-  Chip,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
+import { Box, Paper, Typography, Chip, CircularProgress, Alert} from "@mui/material";
 
 import SchoolIcon from "@mui/icons-material/School";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
 import { PageContainer } from "../../components/ui";
-import { getModules, getEnrollments } from "../../api/modules";
-
-import "./ModulesPage.css";
+import { listModules } from "../../api/modules";
+import "./ModulesPages.css";
 
 function ModulesPage() {
   const location = useLocation();
@@ -36,53 +27,54 @@ function ModulesPage() {
 
 
   
+  
+
   useEffect(() => {
-    let active = true;
+  let active = true;
 
-    const loadModules = async () => {
-      setLoading(true);
-      setError("");
+  const loadModules = async () => {
+    setLoading(true);
+    setError("");
 
-      try {
-        const allModules = await getModules();
+    try {
+      const response = await listModules();
 
-        let visibleModules = allModules;
+      console.log("Backend modules:", response);
 
+      const data = response?.data ?? response;
 
-        if (isMyModules) {
-          const enrollments = await getEnrollments();
+      const allModules = Array.isArray(data)
+        ? data
+        : data?.results ?? data?.result ?? data?.modules;
 
-          const enrolledIds = new Set(
-            enrollments.map((enrollment) =>
-              Number(enrollment.module)
-            )
-          );
-
-          visibleModules = allModules.filter((module) =>
-            enrolledIds.has(Number(module.id))
-          );
-        }
-
-        if (active) {
-          setModules(visibleModules);
-        }
-      } catch (err) {
-        if (active) {
-          setError(err.message || "Failed to load modules");
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
+      if (!Array.isArray(allModules)) {
+        throw new Error("Unexpected backend modules response");
       }
-    };
 
-    loadModules();
+      if (active) {
+        setModules(allModules);
+      }
+    } catch (err) {
+      console.error("Module loading error:", err);
 
-    return () => {
-      active = false;
-    };
-  }, [isMyModules]);
+      if (active) {
+        setError(err.message || "Failed to load modules");
+      }
+    } finally {
+      if (active) {
+        setLoading(false);
+      }
+    }
+  };
+
+  loadModules();
+
+  return () => {
+    active = false;
+  };
+}, []);
+
+
 
   return (
     <Box className="modules-page">

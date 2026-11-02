@@ -1,24 +1,9 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  useParams,
-  useLocation,
-  Link as RouterLink,
-} from "react-router-dom";
+import { useParams,useLocation,Link as RouterLink} from "react-router-dom";
 
-import {
-  Box,
-  Paper,
-  Typography,
-  Stack,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
+import {Box,Paper,Typography,Stack,Accordion,AccordionSummary,AccordionDetails, Button, CircularProgress,Alert} from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -30,7 +15,7 @@ import { getModule } from "../../api/modules";
 import "./ModulesPage.css";
 
 function ModuleDetailsPage() {
-  const { moduleId } = useParams();
+  const { id: moduleId } = useParams();
   const location = useLocation();
 
   const [selectedModule, setSelectedModule] = useState(null);
@@ -51,10 +36,12 @@ function ModuleDetailsPage() {
       setSelectedModule(null);
 
       try {
-        const data = await getModule(moduleId);
+        const response = await getModule(moduleId);
+        const data = response?.data ?? response;
+        const moduledata = data?.result ?? data?.module ?? data?.results ?? data;
 
         if (active) {
-          setSelectedModule(data);
+          setSelectedModule(moduledata);
         }
       } catch (err) {
         if (active) {

@@ -10,8 +10,8 @@ import Setup2FAPage from '../pages/account/Setup2FAPage';
 //import PlaceholderPage from "../pages/common/PlaceholderPage";
 import AppLayout from "../components/layout/AppLayout";
 
-import ModuleListPage from "../pages/modules/ModuleListPage";
-import ModuleDetailPage from "../pages/modules/ModuleDetailPage";
+import ModulesPage from "../pages/Modules/ModulesPages";
+import ModuleDetailsPage from "../pages/modules/ModuleDetailsPage";
 import ManageModulesPage from '../pages/modules/owner/ManageModulesPage';
 import MyModulesPage from '../pages/modules/user/MyModulesPage';
 import StudyPage from '../pages/modules/user/StudyPage';
@@ -44,8 +44,8 @@ function AppRouter() {
                     <Route path="/account" element={<AccountPage />} />
                     <Route path="/account/2fa/setup" element={<Setup2FAPage />} />
 
-                    <Route path="/modules" element={<ModuleListPage />} />              {/* change by 07-01 PlaceholderPage-> ModuleListPage */ }
-                    <Route path="/modules/:id" element={<ModuleDetailPage />} />        {/* add by 07-01  */ }
+                    <Route path="/modules" element={<ModulesPage />} />              {/* change by 07-01 PlaceholderPage-> ModuleListPage */ }
+                    <Route path="/modules/:id" element={<ModuleDetailsPage />} />        {/* add by 07-01  */ }
                     <Route path="/user/modules" element={<MyModulesPage />} />          {/* change by 07-01 PlaceholderPage-> ModuleListPage */ }
                     <Route path="/user/modules/:id/study" element={<StudyPage />} />    {/* add by 07-01  */ }
                     <Route path="/user/modules/:id/quiz" element={<TakeQuizPage />} />  {/* add by 07-02  */ }
