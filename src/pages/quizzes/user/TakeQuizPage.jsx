@@ -59,9 +59,22 @@ function TakeQuizPage() {
 
         // Create an attempt and submit answers
         const attempt = await quizzesApi.startQuiz(moduleId);
-        const result = await quizzesApi.submitQuiz(attempt.id, answers);
+
+        const validAnswers = {};
+        questions.forEach(q => {
+            const qType = q.question_type || q.questionType;
+            if ((qType === 'SINGLE' || qType === 'MULTIPLE') && answers[q.id] !== undefined) {
+                validAnswers[q.id] = answers[q.id];
+            }
+
+        });
+
+
+        const result = await quizzesApi.submitQuiz(attempt.id, validAnswers );
         //templete
-        navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`);
+        navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`, { 
+            state: { attemptData: result } 
+        });
         } catch (err) {
             setError(err.message || 'Failed to submit quiz');
         }

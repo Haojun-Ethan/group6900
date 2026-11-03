@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Paper, Typography, Button } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
 
+import { Alert } from '@mui/material';
 /**
  * Flashcard question 
  * Interaction: click card → 3D flip; click again → flip back
@@ -19,6 +20,11 @@ function FlashcardQuestion({ question, disabled = false }) {
     return (
 
         <Box>
+
+            <Alert severity="info" sx={{ mb: 2 }}>
+                This section is only a front-end demonstration and has not yet been integrated with the back-end marking API. Your connection result will not be saved.
+            </Alert>
+
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 Tap the card to reveal the answer.
             </Typography>

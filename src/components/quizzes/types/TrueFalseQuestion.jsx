@@ -2,6 +2,9 @@ import { Stack, Paper, Typography, } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
+
+import { Alert } from '@mui/material';
+
 /**
  *
  * Uses question.choices (2 choices: True, False) if present,
@@ -26,6 +29,10 @@ function TrueFalseQuestion({ question, value, onChange, disabled = false }) {
          return (
                 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+
+                <Alert severity="info" sx={{ mb: 2 }}>
+                This section is only a front-end demonstration and has not yet been integrated with the back-end marking API. Your connection result will not be saved.
+                </Alert>
 
                 {options.map((opt) => {
                     const isSelected = value === opt.value;

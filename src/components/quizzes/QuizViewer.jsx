@@ -38,6 +38,8 @@ function QuizViewer({
                 const a=answers[q.id];
                 if(a==null) return true;
 
+                if (typeof a === 'string' || typeof a === 'number') return false;
+
                 if(Array.isArray(a)) return a.length===0;
 
                 if ( typeof a === 'object')    return Object.keys(a).length===0;

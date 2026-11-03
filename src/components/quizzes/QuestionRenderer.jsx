@@ -15,8 +15,13 @@ function QuestionRenderer({
     question, answer, onChange,  disabled =false,  showType=true, index,
     }) {
 
+        const type = question.question_type || question.questionType;
 
-        const TypeComponent = QUESTION_TYPES[question.question_type];
+        const TypeComponent = QUESTION_TYPES[type];
+
+        if (!TypeComponent) {
+            return <Paper sx={{ p: 3, bgcolor: 'warning.light' }}>Unsupported question types:{question.question_type}</Paper>;
+        }
 
         if (!TypeComponent) {
             return (
@@ -37,7 +42,7 @@ function QuestionRenderer({
                         )}
                         
                         {showType && (
-                            <Chip  label={QUESTION_TYPE_LABELS[question.question_type] || question.question_type}
+                            <Chip  label={QUESTION_TYPE_LABELS[type] || type}
                             size="small"  variant="outlined"  sx={{ fontSize: '0.7rem' }}  />
                         )}
 

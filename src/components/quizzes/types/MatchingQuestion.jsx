@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Stack, Paper, Typography, Box, Chip, Grid } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 
+import { Alert } from '@mui/material';
+
 /**
  * Matching question - Check future: https://mui.com/material-ui/react-grid/  react-stack; react-paper; react-chip for layout
  *https://mui.com/material-ui/react-transfer-list/
@@ -76,6 +78,10 @@ function MatchingQuestion({ question, value = {}, onChange, disabled = false }) 
 
     return (
         <Box>
+            <Alert severity="info" sx={{ mb: 2 }}>
+                This section is only a front-end demonstration and has not yet been integrated with the back-end marking API. Your connection result will not be saved.
+            </Alert>
+
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Tap a term on the left, then tap its match on the right.
         </Typography>

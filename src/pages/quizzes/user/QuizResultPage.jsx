@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, Paper, Stack, Skeleton, Alert, Chip, Divider } from '@mui/material';
 import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, ActionButton, Icon } from '../../../components/ui';
@@ -25,6 +25,7 @@ const MOCK_RESULT = {
 function QuizResultPage() {
   const { id: moduleId, attemptId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [result, setResult] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -36,6 +37,9 @@ function QuizResultPage() {
     const load = async () => {
       setIsLoading(true);
       setError('');
+
+      const passedState = location.state?.attemptData;
+
       try {
     
         // future:const r = await quizzesApi.getAttempt(attemptId);
@@ -47,25 +51,42 @@ function QuizResultPage() {
         setQuestions(MOCK_QUIZ_QUESTIONS);
         08-01 */
 
-        const [attemptResult, questionList] = await Promise.all([
-          quizzesApi.getAttempt(attemptId),
-          quizzesApi.listQuestions(moduleId),
-        ]);
+        const questionList = await quizzesApi.listQuestions(moduleId);
 
         if (!ignore) {
-          setResult(attemptResult);
-          setQuestions(Array.isArray(questionList) ? questionList : []);
-        }
-      } catch (err) {
-        if (!ignore) {setError(err.message || 'Failed to load result');}
-      } finally {
-        if (!ignore) {setIsLoading(false);}
-      }
-    };
-    load();
+                    setQuestions(Array.isArray(questionList) ? questionList : []);
+                    
+                    if (passedState) {
+                    // result is passed from the previous page, use it directly
+                        setResult(passedState);
+                    } else {
+                        // result is not passed, fetch it from the backend
+                        try {
+                            const attemptResult = await quizzesApi.getAttempt(attemptId);
+                            setResult(attemptResult);
+                        } catch  {
+                            // If the backend does not provide a result, we can set a default result for demonstration purposes
+                            setResult({
+                                id: attemptId,
+                                scorePercent: 0,
+                                passed: false,
+                                userAnswers: {}
+                            });
+                            setError('The backend does not yet provide a score inquiry interface. Currently, the displayed data is the default.');
+                        }
+                    }
+                }
+              } catch (err) {
+                if (!ignore) setError(err.message || 'Failed to load questions');
+              } finally {
+                if (!ignore) setIsLoading(false);
+              }
+            };
+            load();
 
-    return () => { ignore = true; };
-  }, [moduleId, attemptId]);
+            return () => { ignore = true; };
+          }, [moduleId, attemptId, location.state]);
+
 
   if (isLoading) {
     return (
@@ -150,7 +171,11 @@ function QuizResultPage() {
             <Box key={q.id}>
               <Box sx={{ mb: 1 }}>
                 <Chip
-                  label={`Q${idx + 1} • ${userAnswers[q.id] != null ? 'Answered' : 'Skipped'}`}
+                  label={
+                    q.question_type === 'SINGLE' || q.question_type === 'MULTIPLE'
+                        ? `Q${idx + 1} • ${userAnswers[q.id] != null ? 'Answered' : 'Skipped'}`
+                        : `Q${idx + 1} • For demonstration only, no points will be scored`
+                }
                   size="small"
                   color={userAnswers[q.id] != null ? 'success' : 'default'}
                   variant="outlined"
