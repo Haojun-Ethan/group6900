@@ -23,6 +23,7 @@ function MyModulesPage() {
 
     const [enrollments, setEnrollments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -30,6 +31,7 @@ function MyModulesPage() {
         let ignore = false;
         const load = async () => {
         setIsLoading(true);
+
         setError('');
         try {
 
@@ -38,11 +40,13 @@ function MyModulesPage() {
             setTimeout(() => r(MOCK_ENROLLED_MODULES), 400)
             ); 
             setEnrollments(data);*/
+
             if (!ignore) {
                 setEnrollments(Array.isArray(data) ? data: []);
             }
         } catch (err) {
             setError(err.message || 'Failed to load enrollments');
+            
         } finally {
             if(!ignore) {setIsLoading(false);}
         }
@@ -51,6 +55,23 @@ function MyModulesPage() {
 
         return ( ) => { ignore = true; };
     }, []);
+
+    /*add cancel handler  09-01 */
+    const handleCancel = async (enrollmentId, e) => {
+        e.stopPropagation(); // prevent card click jumping
+        if (!window.confirm('Are you sure you want to cancel this enrollment?')) {
+            return;
+        }
+        
+        try {
+            // call backend to delete
+            await enrollmentsApi.cancelEnrollment(enrollmentId);
+            // remove from local state
+            setEnrollments((prev) => prev.filter((item) => item.id !== enrollmentId));
+        } catch (err) {
+            setError(err.message || 'Failed to cancel enrollment');
+        }
+    };
 
     /*const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
 
@@ -163,7 +184,8 @@ function MyModulesPage() {
 
                     <Typography variant="h3" sx={{ mb: 1 }}>{e.moduleTitle || 'Untitled Module'}</Typography>
 
-                    {e.due_at && (
+                    {/* 09-01, fix e.due_at to e.dueAt */}
+                    {e.dueAt && (
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                             Due {new Date(e.dueAt).toLocaleDateString()}
                         </Typography>
@@ -181,6 +203,31 @@ function MyModulesPage() {
                         </Typography>
                     </Box>
                     <LinearProgress variant="determinate" value={percent} />
+                    
+                    {/* 09-01, add action buttons for retake and cancel */}
+                    <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                        <Button 
+                            variant="outlined"   
+                            size="small"   
+                            fullWidth
+                            onClick={(ev) => { 
+                                ev.stopPropagation(); 
+                                navigate(`/user/modules/${e.module}/quiz`); 
+                            }}
+                        >
+                            Retake
+                        </Button>
+                        <Button 
+                            variant="outlined" 
+                            size="small" 
+                            color="error"
+                            fullWidth
+                            onClick={(ev) => handleCancel(e.id, ev)}
+                        >
+                            Cancel
+                        </Button>
+                    </Stack>
+
                     </Box>
                 </Paper>
                 </Grid>

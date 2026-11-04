@@ -24,6 +24,9 @@ import QuizDemoPage from "../pages/quizzes/QuizDemoPage.jsx";
 import ManageQuizPage from "../pages/quizzes/owner/ManageQuizPage"; 
 import PathwayListPage from '../pages/modules/user/PathwayListPage';
 import PathwayDetailPage from '../pages/modules/user/PathwayDetailPage';
+import ModuleEnrollmentsPage from '../pages/modules/owner/ModuleEnrollmentsPage';
+import PathwayEditorPage from '../pages/modules/owner/PathwayEditorPage';
+import NotificationsPage from '../pages/common/NotificationsPage';
 
 
 /* rewrite 5-01 */
@@ -51,14 +54,15 @@ function AppRouter() {
                     <Route path="/user/modules/:id/study" element={<StudyPage />} />    {/* add by 07-01  */ }
                     <Route path="/user/modules/:id/quiz" element={<TakeQuizPage />} />  {/* add by 07-02  */ }
                     <Route path="/user/modules/:id/quiz/result/:attemptId" element={<QuizResultPage />} />  {/* add by 07-02  */ }
+                    
 
 
-                    <Route path="/owner/modules" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ManageModulesPage /></PtcRoute>} />           {/* add by 08-01，原 07-01 裸 Route 已删除 */ }
-                    <Route path="/owner/modules/create" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />       {/* add by 08-01，原 07-01 裸 Route 已删除 */ }
-                    <Route path="/owner/modules/:id/edit" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />     {/* add by 08-01，原 07-01 裸 Route 已删除 */ }
+                    <Route path="/owner/modules" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ManageModulesPage /></PtcRoute>} />           {/* add by 08-01 */ }
+                    <Route path="/owner/modules/create" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />       {/* add by 08-01 */ }
+                    <Route path="/owner/modules/:id/edit" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />     {/* add by 08-01 */ }
+                    <Route path="/owner/modules/:id/enrollments" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleEnrollmentsPage /></PtcRoute>} />
 
-
-                    <Route path="/admin/users" element={<PtcRoute require="auth" roles={['ADMIN']}><ManageUsersPage /></PtcRoute>} />                       {/* add by 08-01，原无校验 Route 已删除 */ }
+                    <Route path="/admin/users" element={<PtcRoute require="auth" roles={['ADMIN']}><ManageUsersPage /></PtcRoute>} />                       {/* add by 08-01 */ }
 
                     <Route path="/quiz-demo" element={<QuizDemoPage />} />              {/* add by 07-01  */ }
                     <Route path="/quiz-gallery" element={<QuizGalleryPage />} />        {/* add by 07-01  */ }
@@ -66,6 +70,9 @@ function AppRouter() {
 
                     <Route path="/pathways" element={<PathwayListPage />} />             {/* add by 08-06 */ }
                     <Route path="/pathways/:id" element={<PathwayDetailPage />} />       {/* add by 08-06 */ }
+                    <Route path="/owner/pathways/create" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><PathwayEditorPage /></PtcRoute>} />      {/*add by 09-01 */}
+                    <Route path="/owner/pathways/:id/edit" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><PathwayEditorPage /></PtcRoute>} />    {/* add by 09-01*/}
+                     <Route path="/notifications" element={<NotificationsPage />} />     {/* add by 09-01 */}
 
                 </Route>
 

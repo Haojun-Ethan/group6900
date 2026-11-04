@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import {  Paper,   Chip, IconButton, Tooltip, Box, Table, TableHead, TableBody, TableRow, TableCell, Select, MenuItem, FormControl, } from '@mui/material';
+import {  Paper,   Chip, IconButton, Tooltip, Box, Table, TableHead, TableBody, TableRow, TableCell, Select, MenuItem, FormControl, Alert, Grid, Typography, } from '@mui/material';
 import * as usersApi from '../../api/users';
-import { PageContainer, PageTitle, Icon } from '../../components/ui';
+import { PageContainer, PageTitle, Icon, ActionButton } from '../../components/ui';
 //import { MOCK_USERS } from '../modules/_mockData';
 //import { setUser } from '../../utils/storage';
 
@@ -29,7 +29,7 @@ function ManageUsersPage() {
                 );*/
                 const data = await usersApi.listUsers();
                 if (!ignore) setUsers(data);
-            } catch (err) {
+            } catch   {
                 if (!ignore)  setError( 'The user management interface has not been fully developed yet and data cannot be loaded.');  // (err.message || 'Failed to load users');
             } finally {
                 if(!ignore)  setIsLoading(false);
@@ -78,15 +78,65 @@ function ManageUsersPage() {
     const effectiveUsers = DEMO_STATE === 'empty' ? [] : users;
 */
 
+    const totalUsers = users.length;
+    const adminCount = users.filter(u => u.role === 'ADMIN').length;
+    const ownerCount = users.filter(u => u.role === 'OWNER').length;
+    const regularCount = users.filter(u => u.role === 'USER').length;
+
     return (
         <PageContainer maxWidth="lg">
-            <PageTitle title="Manage Users"  subtitle={`${users.length} user${users.length === 1 ? '' : 's'}`} />
-            
-             {error && (
-                <Paper severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-                    {error}
-                </  Paper  >    
+            <Box sx={{ display: 'flex', flexDirection: {xs:'column', sm:'row'}, justifyContent: 'space-between', alignItems: {xs:'flex-start', sm:'center'}, mb: 3 }}>
+                <PageTitle title="Manage Users"  subtitle={`${users.length} user${users.length === 1 ? '' : 's'}`} />
+                <Tooltip title="Backend API does not support setting password on create yet">
+                    <span>
+                        <ActionButton fullWidth={false} disabled>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Icon.Add fontSize="small" />
+                                Create User
+                            </Box>
+                            </ActionButton>
+                    </span>
+                </Tooltip>
+            </Box>
+
+                {/* 09-01 */}
+            {!isLoading && !error && (
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                    <Grid item xs={6} sm={3}>
+                        <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="h4" color="primary.main">{totalUsers}</Typography>
+                            <Typography variant="body2" color="text.secondary">Total Users</Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                        <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="h4" color="error.main">{adminCount}</Typography>
+                            <Typography variant="body2" color="text.secondary">Admins</Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                        <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="h4" color="warning.main">{ownerCount}</Typography>
+                            <Typography variant="body2" color="text.secondary">Owners</Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                        <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="h4" color="success.main">{regularCount}</Typography>
+                            <Typography variant="body2" color="text.secondary">Learners</Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
             )}
+
+
+
+
+               {error && (
+                    <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+                        {error}
+                    </Alert>   
+                )}
 
             {isLoading ? (
                 <Paper sx={{ p: 4, textAlign: 'center' }}>Loading... </ Paper>
@@ -94,7 +144,7 @@ function ManageUsersPage() {
                 <Paper sx={{ p: 4, textAlign: 'center' }}> No users </ Paper>
             ) : (
                 <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                {/* Horizontal scroll on mobile / 手机横向滚动 */}
+                {/* Horizontal scroll on mobile  */}
                 <Box sx={{ overflowX: 'auto' }}>
                     <Table sx={{ minWidth: 600 }}>
                     <TableHead>

@@ -9,7 +9,7 @@ import ModuleCard from '../../../components/modules/ModuleCard';
 
 //const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
 
-/*  Owner's module management page   课程管理员 */
+/*  Owner's module management page    */
 function ManageModulesPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -50,6 +50,20 @@ function ManageModulesPage() {
         load();
         return () => { ignore = true; }
     }, [user]);
+
+
+    const handleDelete = async (moduleId, e) => {
+        e.stopPropagation();    
+        if (!window.confirm('Are you sure you want to delete this module? This cannot be undone.')) {
+            return;
+        }
+        try {
+            await modulesApi.deleteModule(moduleId);
+            setModules((prev) => prev.filter((m) => m.id !== moduleId));
+        } catch (err) {
+            setError(err.message || 'Failed to delete module');
+        }
+    };
 
    // const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
     //const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
@@ -122,10 +136,39 @@ function ManageModulesPage() {
                 {modules.map((m) => (
                     <Grid item xs={12} sm={6} md={4} key={m.id}>
                     <ModuleCard module={m} />
-                        <Button  variant="outlined"  fullWidth  sx={{ mt: 1 }} startIcon={<Icon.Quiz />} onClick={(e) => { e.stopPropagation(); navigate(`/owner/modules/${m.id}/quiz`); }} >
-                                Manage Quiz
-                        </Button>
+                
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1 }}>
+                            <Button  
+                                variant="outlined"  
+                                fullWidth  
+                                size="small"
+                                startIcon={<Icon.Quiz />} 
+                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/modules/${m.id}/quiz`); }} 
+                            >
+                                Quiz
+                            </Button>
 
+                            <Button  
+                                variant="outlined"  
+                                fullWidth  
+                                size="small"
+                                startIcon={<Icon.Person />} 
+                                onClick={(e) => { e.stopPropagation(); navigate(`/owner/modules/${m.id}/enrollments`); }} 
+                            >
+                                Users
+                            </Button>
+
+                            <Button  
+                                variant="outlined"  
+                                color="error"
+                                fullWidth  
+                                size="small"
+                                startIcon={<Icon.Delete />} 
+                                onClick={(e) => handleDelete(m.id, e)} 
+                            >
+                                Delete
+                            </Button>
+                        </Stack>
                     </Grid>
                 ))}
             </Grid>

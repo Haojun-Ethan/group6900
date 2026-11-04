@@ -9,7 +9,7 @@ import apiClient from "./client";
  * @returns {Promise<Array>}
  */
 export async function listUsers( ) {
-  return apiClient.get('/accounts/user/')
+  return apiClient.get('/accounts/users/')  // users ,  is not user
 
 }
 

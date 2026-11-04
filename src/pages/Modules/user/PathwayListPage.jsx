@@ -1,11 +1,12 @@
 
 
-import { Paper, Typography, Grid, Chip, Alert, } from "@mui/material";
+import { Paper, Typography, Grid, Chip, Alert, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageContainer, PageTitle, ActionButton } from "../../../components/ui";
 import apiClient from "../../../api/client";
 import { useAuth } from "../../../hooks/useAuth";
+
 
 
 
@@ -54,7 +55,19 @@ function PathwayListPage() {
 
     return (
         <PageContainer maxWidth="lg">
-            <PageTitle title="Learning Pathways" subtitle="Complete a series of modules to master a topic."/> 
+            <Box sx={{ display: 'flex', flexDirection: {xs:'column', sm:'row'}, justifyContent: 'space-between', alignItems: {xs:'flex-start', sm:'center'}, mb: 3 }}>
+                <PageTitle title="Learning Pathways" subtitle="Complete a series of modules to master a topic."/> 
+
+                {(user?.role === 'OWNER' || user?.role === 'ADMIN') && (
+                        <ActionButton 
+                            fullWidth={false} 
+                            onClick={() => navigate('/owner/pathways/create')}
+                        >
+                            Create Pathway
+                        </ActionButton>
+                    )}
+            </Box>
+
             {pathways.length === 0 ? (
                 <Paper sx={{ p: 4, textAlign: 'center' }}>
                     <Typography color="text.secondary">No pathways available.</Typography>

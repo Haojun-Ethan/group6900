@@ -1,5 +1,6 @@
-import { AppBar, Box, Toolbar, Typography, Button, Stack, } from "@mui/material";
-import { Outlet, Link as RouterLink, useLocation } from "react-router-dom";
+import { AppBar, Box, Toolbar, Typography, Button, Stack, IconButton, Badge } from "@mui/material";
+import { Outlet, Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import UserMenu from './UserMenu';
 import { useAuth  } from "../../hooks/useAuth";
 
@@ -8,6 +9,8 @@ function AppLayout() {
 
   const { user } = useAuth();
   const location = useLocation();
+  
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -64,6 +67,15 @@ function AppLayout() {
               )}
             </Stack>
 
+            <IconButton 
+              color="inherit" 
+              onClick={() => navigate('/notifications')}
+              sx={{ mr: 1 }}
+            >
+              <Badge badgeContent={0} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
 
           <UserMenu />
         </Toolbar>

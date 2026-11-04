@@ -20,3 +20,7 @@ export async function cancelEnrollment(enrollmentId) {
 export async function markSectionComplete(sectionID) {
     return apiClient.post(ENDPOINTS.sectionComplete(sectionID));
 }
+
+export async function assignEnrollment(moduleId, userIds) {
+    return apiClient.post('/enrollments/assign/', { module: moduleId, user_ids: userIds });
+}

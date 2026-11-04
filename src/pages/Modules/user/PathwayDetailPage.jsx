@@ -59,7 +59,7 @@ function PathwayDetailPage() {
         <PageContainer maxWidth="md">
             <Stack spacing={3   }>
                 <Box>
-                    <ActionButton variant="ghost" fullWidth="false" onClick={() => navigate('/pathways')} >
+                    <ActionButton variant="ghost" fullWidth={false} onClick={() => navigate('/pathways')} >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Icon.ArrowBack fontSize='small' /> Back to Pathways
                         </Box>
@@ -70,14 +70,14 @@ function PathwayDetailPage() {
 
                 <Typography variant='h3' sx={{ mt: 2 }}>Modules in this Pathway</Typography>
 
-                <Stack spacing={2}> {pathway.module?.map((link, index ) => (
-                    <Paper key={index.id} elevation={0} sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Stack spacing={2}> {pathway.modules?.map((link, index ) => (
+                    <Paper key={link.id} elevation={0} sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
                         <Box sx={{ width: 32, height: 32, borderRadius: '50%', bgcolor: 'primary.main', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                             {index + 1}
                         </Box>
                         <Box sx={{ flexGrow: 1 }}>
                             <Typography variant='h4'>{link.module_title}</Typography>
-                            <Typography variant='body2' color='text.secondary'>{link.description}</Typography>
+                            <Typography variant='body2' color='text.secondary'>{link.description || ''}</Typography>
                         </Box>
                         <ActionButton fullWidth={false} onClick={() => navigate(`/modules/${link.module}`)}>View Module</ActionButton>
                     </Paper>

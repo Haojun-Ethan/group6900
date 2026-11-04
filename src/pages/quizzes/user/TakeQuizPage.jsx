@@ -71,6 +71,10 @@ function TakeQuizPage() {
 
 
         const result = await quizzesApi.submitQuiz(attempt.id, validAnswers );
+        try {
+            sessionStorage.setItem(`quiz_result_${result.id}`, JSON.stringify(result));
+        } catch { /* ignore quota error */ }
+        
         //templete
         navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`, { 
             state: { attemptData: result } 

@@ -161,13 +161,16 @@ function ManageQuizPage() {
         if (q.choices.some((c) => !c.text.trim())) throw new Error(`Question ${i + 1} has an empty option description.`);
       }
 
+      const nextQuestions = []; 
 
+      /*
       const existingRemoteQuestions = await apiClient.get(`/modules/${moduleId}/questions/`);
       if (Array.isArray(existingRemoteQuestions)) {
         for (const eq of existingRemoteQuestions) {
           await apiClient.delete(`/questions/${eq.id}/`);
         }
       }
+        */
 
 
       for (let i = 0; i < questions.length; i++) {
@@ -182,25 +185,50 @@ function ManageQuizPage() {
           is_active: true, 
         };
 
-        const createdQ = await apiClient.post('/questions/', qPayload);
-        const questionId = createdQ?.id;
+
+
+        let questionId;
+        if (typeof q.id === 'number') {        
+          await apiClient.patch(`/questions/${q.id}/`, qPayload);
+          questionId = q.id;
+        } else {                                 
+          const createdQ = await apiClient.post('/questions/', qPayload);
+          questionId = createdQ?.id;
+        }
+        if (!questionId) {
+          throw new Error('Failed to obtain Question ID from server.');
+        }
 
         if (!questionId) {
           throw new Error('Failed to obtain Question ID from server.');
         }
 
 
+        const nextChoices = [];
         for (let j = 0; j < q.choices.length; j++) {
           const c = q.choices[j];
-          await apiClient.post('/choices/', {
+          const cPayload = {
             question: questionId,
             text: c.text,
             is_correct: Boolean(c.is_correct),
             order: j + 1,
-          });
+          };
+
+          let choiceId;
+          if (typeof c.id === 'number') {        
+            await apiClient.patch(`/choices/${c.id}/`, cPayload);
+            choiceId = c.id;
+          } else {                               
+            const createdC = await apiClient.post('/choices/', cPayload);
+            choiceId = createdC?.id;
+          }
+          nextChoices.push({ ...c, ...cPayload, id: choiceId ?? c.id });
         }
+
+        nextQuestions.push({ ...q, ...qPayload, id: questionId, choices: nextChoices });
       }
 
+      setQuestions(nextQuestions);              
       setSuccess('The quiz questions have been saved successfully!');
       setTimeout(() => navigate(`/owner/modules/${moduleId}/edit`), 1200);
     } catch (err) {

@@ -41,7 +41,6 @@ function QuizResultPage() {
       const passedState = location.state?.attemptData;
 
       try {
-    
         // future:const r = await quizzesApi.getAttempt(attemptId);
         // future: const qs = await quizzesApi.listQuestions(moduleId);
         /*const r = await new Promise((resolve) =>
@@ -54,39 +53,62 @@ function QuizResultPage() {
         const questionList = await quizzesApi.listQuestions(moduleId);
 
         if (!ignore) {
-                    setQuestions(Array.isArray(questionList) ? questionList : []);
-                    
-                    if (passedState) {
-                    // result is passed from the previous page, use it directly
-                        setResult(passedState);
-                    } else {
-                        // result is not passed, fetch it from the backend
-                        try {
-                            const attemptResult = await quizzesApi.getAttempt(attemptId);
-                            setResult(attemptResult);
-                        } catch  {
-                            // If the backend does not provide a result, we can set a default result for demonstration purposes
-                            setResult({
-                                id: attemptId,
-                                scorePercent: 0,
-                                passed: false,
-                                userAnswers: {}
-                            });
-                            setError('The backend does not yet provide a score inquiry interface. Currently, the displayed data is the default.');
-                        }
-                    }
-                }
-              } catch (err) {
-                if (!ignore) setError(err.message || 'Failed to load questions');
-              } finally {
-                if (!ignore) setIsLoading(false);
-              }
-            };
-            load();
+          setQuestions(Array.isArray(questionList) ? questionList : []);
+          
+          if (passedState) {
+            // result is passed from the previous page, use it directly
+            setResult(passedState);
+          } else {
+            // result is not passed, fetch it from the backend
 
-            return () => { ignore = true; };
-          }, [moduleId, attemptId, location.state]);
+            let cached = null;
+            try {
+              const raw = sessionStorage.getItem(`quiz_result_${attemptId}`);
+              if (raw) cached = JSON.parse(raw);
+            } catch { /* ignore */ }
 
+            if (cached) {
+              setResult(cached);
+            } else {
+              setResult({
+                id: attemptId,
+                scorePercent: 0,
+                passed: false,
+                userAnswers: {},
+              });
+              setError('Result data is not available for this attempt. Please retake the quiz.');
+            }
+          }
+        }
+      } catch (err) {
+        if (!ignore) setError(err.message || 'Failed to load questions');
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    };
+    load();
+
+    return () => { ignore = true; };
+  }, [moduleId, attemptId, location.state]);
+
+ 
+  const gradeQuestion = (q, userAnswer) => {
+    const qType = q.question_type || q.questionType;
+    if (qType !== 'SINGLE' && qType !== 'MULTIPLE') return 'info'; 
+    if (userAnswer == null) return 'skipped';
+
+    const correctIds = (q.choices || [])
+      .filter((c) => c.isCorrect ?? c.is_correct)
+      .map((c) => Number(c.id));
+
+    if (qType === 'SINGLE') {
+      return correctIds.includes(Number(userAnswer)) ? 'correct' : 'wrong';
+    }
+    // MULTIPLE
+    const picked = Array.isArray(userAnswer) ? userAnswer.map(Number) : [Number(userAnswer)];
+    if (picked.length !== correctIds.length) return 'wrong';
+    return picked.every((id) => correctIds.includes(id)) ? 'correct' : 'wrong';
+  };
 
   if (isLoading) {
     return (
@@ -170,20 +192,34 @@ function QuizResultPage() {
           {questions.map((q, idx) => (
             <Box key={q.id}>
               <Box sx={{ mb: 1 }}>
-                <Chip
-                  label={
-                    q.question_type === 'SINGLE' || q.question_type === 'MULTIPLE'
-                        ? `Q${idx + 1} • ${userAnswers[q.id] != null ? 'Answered' : 'Skipped'}`
-                        : `Q${idx + 1} • For demonstration only, no points will be scored`
-                }
-                  size="small"
-                  color={userAnswers[q.id] != null ? 'success' : 'default'}
-                  variant="outlined"
-                />
+                {(() => {
+                  const ua = userAnswers[q.id] ?? userAnswers[String(q.id)];  
+                  const status = gradeQuestion(q, ua);                        
+                  const labelMap = {
+                    correct: `Q${idx + 1} • Correct`,
+                    wrong:   `Q${idx + 1} • Wrong`,
+                    skipped: `Q${idx + 1} • Skipped`,
+                    info:    `Q${idx + 1} • Demo only`,
+                  };
+                  const colorMap = {
+                    correct: 'success',
+                    wrong:   'error',
+                    skipped: 'default',
+                    info:    'default',
+                  };
+                  return (
+                    <Chip
+                      label={labelMap[status]}
+                      size="small"
+                      color={colorMap[status]}
+                      variant="outlined"
+                    />
+                  );
+                })()}
               </Box>
               <QuestionRenderer
                 question={q}
-                answer={userAnswers[q.id]}
+                answer={userAnswers[q.id] ?? userAnswers[String(q.id)]}  
                 onChange={() => {}}
                 disabled
                 index={idx}
