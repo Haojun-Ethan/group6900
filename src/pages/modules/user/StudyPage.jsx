@@ -4,7 +4,10 @@ import {Paper, Stack, Box, Typography, Skeleton, Alert, Button, Divider,} from '
 import * as modulesApi from '../../../api/modules';
 import * as enrollmentsApi from '../../../api/enrollments';
 import { PageContainer, ActionButton,  Icon } from '../../../components/ui';
-import SectionList from '../../../components/modules/SectionList';
+//import SectionList from '../../../components/modules/SectionList';
+import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SectionContent from '../../../components/modules/SectionContent';
 
 //import {MOCK_MODULE_DETAIL, MOCK_COMPLETED_SECTION_IDS,} from '../_mockData';
 
@@ -168,7 +171,43 @@ function StudyPage() {
             <Box>
                 <Typography variant="h2" sx={{ mb: 2 }}>  Sections  </Typography>
                 
-                <SectionList sections={module.sections} completedIds={completedIds} submittingIds={submittingIds} onMarkComplete={handleMarkComplete} />
+                <Stack spacing={2}>
+                    {module.sections?.sort((a,b) => a.order - b.order).map((section, idx) => {
+                        const isCompleted = completedIds.includes(section.id);
+                        const isSubmitting = submittingIds.includes(section.id);
+                        
+                        return (
+                            <Accordion key={section.id} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, '&:before': { display: 'none' } }}>
+                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                                        <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: isCompleted ? 'success.main' : 'primary.light', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            {isCompleted ? '✓' : idx + 1}
+                                        </Box>
+                                        <Typography variant="h4">{section.title}</Typography>
+                                    </Box>
+                                </AccordionSummary>
+
+
+                                <AccordionDetails>
+
+                                    <Box sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+                            
+                                        <SectionContent text={section.body} />
+                                    </Box>
+                                    
+                                    {!isCompleted && (
+                                        <ActionButton  fullWidth={false}  onClick={() => handleMarkComplete(section.id)}  loading={isSubmitting} >
+                                            Mark as Complete
+                                        </ActionButton>
+                                    )}
+
+                                </AccordionDetails>
+
+                            </Accordion>
+                        );
+                         
+                    })}
+                </Stack>
             </Box>
 
             {/* Continue button (optional)   */}
