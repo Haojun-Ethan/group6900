@@ -8,7 +8,7 @@ import * as modulesApi from '../../../api/modules';
 import {   PageContainer, PageTitle, FormField, ActionButton, Icon , } from '../../../components/ui';
 import SectionManager from '../../../components/modules/SectionManager';
 import ScheduleEditor from '../../../components/modules/ScheduleEditor';
-import { useBlocker } from 'react-router-dom';
+//import { useBlocker } from 'react-router-dom';
 //import { MOCK_MODULE_DETAIL } from '../_mockData';
 
 //const DEMO_STATE = 'normal';    // 'normal' | 'loading'
@@ -35,7 +35,7 @@ function ModuleFormPage() {
         description: '',
         category: '',
         passMark: 80,              // 0-100
-        estimatedMinutes: 30,      // Estimated study time 预计学习时间
+        estimatedMinutes: 30,      // Estimated study time 
         selfEnrollAllowed: true,
     });
 
@@ -47,6 +47,26 @@ function ModuleFormPage() {
 
     const [isDirty, setIsDirty] = useState(false);
 
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = ''; // Chrome requirs it
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty]);
+
+    const handleBack = () => {
+
+        if (isDirty) {
+            if (!window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                return;
+            }
+        }
+        navigate('/owner/modules');
+    };
     // Load module for edit 
     useEffect(() => {
         if (!isEdit) return;            // only load when editing
@@ -92,23 +112,7 @@ function ModuleFormPage() {
         setIsDirty(true);
     }
 
-    const blocker = useBlocker(
-        ({ currentLocation, nextLocation }) =>
-        isDirty && currentLocation.pathname !== nextLocation.pathname
-    );
 
-    useEffect(() => {
-
-        if (blocker.state === "blocked") {
-            const confirm = window.confirm("You have unsaved changes. Are you sure you want to leave?");
-            if (confirm) {
-                blocker.proceed();
-            } else {
-                blocker.reset();
-            }
-        }
-
-    }, [blocker]);
 
     const handleSaveBasic = async () => {       // save basic info
         setError('');
@@ -173,6 +177,8 @@ function ModuleFormPage() {
         setModule((prev) => ({ ...prev, status: 'PUBLISHED' }));    // update local state to reflect published status
         
         setSuccess('Module published');     // show success message
+
+        setIsDirty(false);
         } catch (err) {
         setError(err.message || 'Failed to publish');
         }
@@ -191,7 +197,7 @@ function ModuleFormPage() {
         <PageContainer maxWidth="lg" >
         <Stack spacing={3}>
             <Box>
-            <ActionButton variant="ghost" fullWidth={false}  onClick={() => navigate('/owner/modules')} >
+            <ActionButton variant="ghost" fullWidth={false}  onClick={handleBack}>
                 <Box sx={{ display:  'flex', alignItems: 'center', gap: 1 }}>
                     <Icon.ArrowBack fontSize="small"  />
                     Back
