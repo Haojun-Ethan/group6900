@@ -27,8 +27,8 @@ function NotificationsPage() {
                 <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
 
                     <EmptyState 
-                        title="No notifications yet" 
-                        subtitle="The notification backend is not fully connected yet. Check back later!" 
+                        title="Inbox Zero" 
+                        subtitle="Stay tuned! The notification center is currently under construction and will be available soon." 
                     />
                 </Paper>
             </Stack>

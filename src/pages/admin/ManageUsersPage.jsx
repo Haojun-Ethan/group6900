@@ -85,6 +85,12 @@ function ManageUsersPage() {
 
     return (
         <PageContainer maxWidth="lg">
+
+            <Alert severity="info" sx={{ mb: 3 }}>
+                <strong>Notice:</strong> Changing a user's role here immediately updates their frontend interface and access level. 
+                To fully grant system-level execution privileges (such as creating or publishing modules), the account must be verified and authorized by the system Superuser.
+            </Alert>
+
             <Box sx={{ display: 'flex', flexDirection: {xs:'column', sm:'row'}, justifyContent: 'space-between', alignItems: {xs:'flex-start', sm:'center'}, mb: 3 }}>
                 <PageTitle title="Manage Users"  subtitle={`${users.length} user${users.length === 1 ? '' : 's'}`} />
                 <Tooltip title="Backend API does not support setting password on create yet">
@@ -164,16 +170,18 @@ function ManageUsersPage() {
                                     <TableCell>{u.username}</TableCell>
                                     <TableCell>{u.email}</TableCell>
                                     <TableCell>
-                                    <FormControl size="small" sx={{ minWidth: 110 }}>
-                                        <Select
-                                        value={u.role || 'USER'}
-                                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                                        >
-                                        <MenuItem value="USER">User</MenuItem>
-                                        <MenuItem value="OWNER">Owner</MenuItem>
-                                        <MenuItem value="ADMIN">Admin</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <Tooltip title="Updates UI access. System-level privileges require Superuser approval." arrow>
+                                        <FormControl size="small" sx={{ minWidth: 110 }}>
+                                            <Select
+                                            value={u.role || 'USER'}
+                                            onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                                            >
+                                            <MenuItem value="USER">User</MenuItem>
+                                            <MenuItem value="OWNER">Owner</MenuItem>
+                                            <MenuItem value="ADMIN">Admin</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Tooltip>
                                     </TableCell>
                                     <TableCell>
                                         {has2FA ? (
