@@ -158,7 +158,8 @@ function SectionManager({ moduleId, initialSections = [] }) {
                     
                     
                     <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}  disabled={isSaving}  />
-                    <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} inputProps={{ multiline: true, rows: 4 }}  disabled={isSaving} />
+                    <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} multiline={true} rows={8}  disabled={isSaving} 
+                        helperText="To add a YouTube video, just paste the YouTube link on a new line. To add an image, paste a direct image URL."/>
                     <FormField label="Order" type="number"  value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}   inputProps={{ min:1}} disabled={isSaving}  />
 
 
