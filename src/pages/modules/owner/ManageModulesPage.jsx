@@ -140,7 +140,7 @@ function ManageModulesPage() {
                                 <ModuleCard module={m} />
                           </Box>     
 
-                        <Paper  elevation={0}  sx={{  mt: 1, p: 1.5, borderRadius: 2,  border: '1px solid', borderColor: 'divider', display: 'flex', gap: 1  }} >
+                        <Paper  elevation={0}  sx={{  mt: 1, p: 1.5, borderRadius: 2,  border: '1px solid', borderColor: 'divider', display: 'flex', gap: 1,width: '100%', boxSizing: 'border-box'  }} >
                             <Button  
                                 variant="outlined"  
                                 fullWidth  
