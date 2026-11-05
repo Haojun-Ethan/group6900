@@ -44,7 +44,7 @@ return (
         </Stack>
 
       {/* Title */} 
-      <Typography variant="h3" sx={{ mb:1.5, fontWidth:600, lineHeight:1.3}}> {module.title} </Typography>
+      <Typography variant="h3" sx={{ mb:1.5, fontWeight:600, lineHeight:1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-all' }}> {module.title} </Typography>
 
       {/* Summary */} 
       <Typography variant="body2" color="text.secondary" sx={{mb:2, flexGrow:1, display: '-webkit-box', WebkitLineClamp:3, webkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight:1.6}}>        

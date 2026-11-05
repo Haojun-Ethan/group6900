@@ -73,7 +73,7 @@ function ManageModulesPage() {
         return (
             <PageContainer maxWidth="lg">
                 <PageTitle title="Manage Modules" />
-                <Grid container spacing={{ xs: 2, md: 3 }}>
+                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ width: '100%', m: 0 }}>
                     {[1, 2, 3].map((n) => (
                         <Grid item xs={12} sm={6} md={4} key={n}>
                         <Skeleton variant="rounded" height={200} />
@@ -132,9 +132,9 @@ function ManageModulesPage() {
                 }
             />
         ) : (
-            <Grid container spacing={{ xs: 2, md: 3 }}>
+            <Grid container spacing={{ xs: 2, md: 3 }} sx={{ width: '100%', m: 0 }}>
                 {modules.map((m) => (
-                    <Grid item xs={12} sm={6} md={4} key={m.id}>
+                    <Grid item xs={12} sm={6} md={4} key={m.id} sx={{ minWidth: 0 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                         <Box  onClick={() => navigate(`/owner/modules/${m.id}/edit`)}   sx={{ cursor: 'pointer', flexGrow: 1, display: 'flex', flexDirection: 'column' }} >                  
                                 <ModuleCard module={m} />
