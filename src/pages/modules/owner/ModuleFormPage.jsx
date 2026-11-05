@@ -208,6 +208,37 @@ function ModuleFormPage() {
         }
     };
 
+    const handleUnpublish = async () => {
+        if (!isEdit) return;
+        
+        if (!window.confirm('Are you sure you want to revert this module to DRAFT? Users will no longer be able to access it.')) {
+            return;
+        }
+
+        setError('');
+        setSuccess(''); 
+
+        try {
+
+            const payload = {
+                title: form.title,
+                summary: form.summary,
+                description: form.description,
+                category: form.category,
+                pass_mark: form.passMark,
+                estimated_minutes: form.estimatedMinutes,
+                self_enroll_allowed: form.selfEnrollAllowed,
+                status: 'DRAFT'
+            };
+
+            await modulesApi.updateModule(id, payload, { skipTransform: true });
+
+            setModule((prev) => ({ ...prev, status: 'DRAFT' }));    
+            setSuccess('Module reverted to DRAFT.');     
+        } catch (err) {
+            setError(err.message || 'Failed to revert status');
+        }
+    };
 
     if (isLoading ) {    // Showwing state 
         return (
@@ -288,6 +319,13 @@ function ModuleFormPage() {
                         Publish
                         </ActionButton>
                     )}
+
+                    {isEdit && module?.status === 'PUBLISHED' && (
+                        <ActionButton variant="danger" fullWidth={false} onClick={handleUnpublish} >
+                        Unpublish
+                        </ActionButton>
+                    )}
+                    
                     </Stack>
                 </Stack>
                 )}
