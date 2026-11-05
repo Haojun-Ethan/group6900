@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Skeleton, Alert, Stack, Box, Button, } from '@mui/material';
+import { Grid, Skeleton, Alert, Stack, Box, Button, Paper } from '@mui/material';
 import * as modulesApi from '../../../api/modules';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageContainer, PageTitle, ActionButton, EmptyState, Icon, } from '../../../components/ui';
@@ -135,9 +135,12 @@ function ManageModulesPage() {
             <Grid container spacing={{ xs: 2, md: 3 }}>
                 {modules.map((m) => (
                     <Grid item xs={12} sm={6} md={4} key={m.id}>
-                    <ModuleCard module={m} />
-                
-                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <Box  onClick={() => navigate(`/owner/modules/${m.id}/edit`)}   sx={{ cursor: 'pointer', flexGrow: 1, display: 'flex', flexDirection: 'column' }} >                  
+                                <ModuleCard module={m} />
+                          </Box>     
+
+                        <Paper  elevation={0}  sx={{  mt: 1, p: 1.5, borderRadius: 2,  border: '1px solid', borderColor: 'divider', display: 'flex', gap: 1  }} >
                             <Button  
                                 variant="outlined"  
                                 fullWidth  
@@ -168,7 +171,8 @@ function ManageModulesPage() {
                             >
                                 Delete
                             </Button>
-                        </Stack>
+                        </Paper>
+                        </Box>
                     </Grid>
                 ))}
             </Grid>

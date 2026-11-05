@@ -8,6 +8,7 @@ import * as modulesApi from '../../../api/modules';
 import {   PageContainer, PageTitle, FormField, ActionButton, Icon , } from '../../../components/ui';
 import SectionManager from '../../../components/modules/SectionManager';
 import ScheduleEditor from '../../../components/modules/ScheduleEditor';
+import { useBlocker } from 'react-router-dom';
 //import { MOCK_MODULE_DETAIL } from '../_mockData';
 
 //const DEMO_STATE = 'normal';    // 'normal' | 'loading'
@@ -43,6 +44,8 @@ function ModuleFormPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const [isDirty, setIsDirty] = useState(false);
 
     // Load module for edit 
     useEffect(() => {
@@ -84,8 +87,28 @@ function ModuleFormPage() {
         return () => { ignore = true; };
     }, [id, isEdit]);
 
-    const updateField = (name, value) =>
+    const updateField = (name, value) => {
         setForm((prev) => ({ ...prev, [name]: value}));
+        setIsDirty(true);
+    }
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+        isDirty && currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+
+        if (blocker.state === "blocked") {
+            const confirm = window.confirm("You have unsaved changes. Are you sure you want to leave?");
+            if (confirm) {
+                blocker.proceed();
+            } else {
+                blocker.reset();
+            }
+        }
+
+    }, [blocker]);
 
     const handleSaveBasic = async () => {       // save basic info
         setError('');
@@ -106,6 +129,9 @@ function ModuleFormPage() {
                 //await new Promise((r) => setTimeout(r, 400));
                 await modulesApi.updateModule(id, form);
                 setSuccess('Module updated' );
+
+                setIsDirty(false);
+
             } else {
 
                 // future:      const created = await modulesApi.createModule(form);
@@ -115,6 +141,8 @@ function ModuleFormPage() {
                 setTimeout(() => r({ id: 999  }),  400)
                 );
                 */
+
+                setIsDirty(false);
 
                 navigate(`/owner/modules/${created.id}/edit`, { replace: true });
             }
