@@ -110,11 +110,14 @@ function ModuleFormPage() {
     const updateField = (name, value) => {
         setForm((prev) => ({ ...prev, [name]: value}));
         setIsDirty(true);
-    }
 
+    }
+    
+  
 
 
     const handleSaveBasic = async () => {       // save basic info
+
         setError('');
         setSuccess('');
 
@@ -126,12 +129,23 @@ function ModuleFormPage() {
         }
 
         setIsSaving(true);
+
+        const payload = {
+            title: form.title,
+            summary: form.summary,
+            description: form.description,
+            category: form.category,
+            pass_mark: form.passMark,
+            estimated_minutes: form.estimatedMinutes,
+            self_enroll_allowed: form.selfEnrollAllowed,
+        };
+
         try {
             if (isEdit) {
 
                 // future: await modulesApi.updateModule(id, form);
                 //await new Promise((r) => setTimeout(r, 400));
-                await modulesApi.updateModule(id, form);
+                await modulesApi.updateModule(id,payload, { skipTransform: true });
                 setSuccess('Module updated' );
 
                 setIsDirty(false);
@@ -141,7 +155,7 @@ function ModuleFormPage() {
                 // future:      const created = await modulesApi.createModule(form);
                 // future ：     navigate(`/owner/modules/${created.id}/edit`);
 
-                const created = await modulesApi.createModule(form); /*new Promise((r) =>
+                const created = await modulesApi.createModule(payload, { skipTransform: true }); /*new Promise((r) =>
                 setTimeout(() => r({ id: 999  }),  400)
                 );
                 */
@@ -167,11 +181,21 @@ function ModuleFormPage() {
         setError('');
         setSuccess(''); // important - clear previous messages 
 
+        const payload = {
+            title: form.title,
+            summary: form.summary,
+            description: form.description,
+            category: form.category,
+            pass_mark: form.passMark,
+            estimated_minutes: form.estimatedMinutes,
+            self_enroll_allowed: form.selfEnrollAllowed,
+            status: 'PUBLISHED'
+        };
 
         try {
 
         // future : await modulesApi.updateModule(id, { status: 'PUBLISHED' });
-        await modulesApi.updateModule(id, { status: 'PUBLISHED' });
+        await modulesApi.updateModule(id, payload, { skipTransform: true });
         //await new Promise((r) => setTimeout(r, 400));
 
         setModule((prev) => ({ ...prev, status: 'PUBLISHED' }));    // update local state to reflect published status

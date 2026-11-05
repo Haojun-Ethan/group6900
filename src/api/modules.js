@@ -19,19 +19,19 @@ export async function getModule(id) {
 
 
 /**
- * @param {Object} data
+ * @param {Object} data, config
  */
-export async function createModule(data) {
-    return apiClient.post(ENDPOINTS.modules, data);
+export async function createModule(data, config = {}) {
+    return apiClient.post(ENDPOINTS.modules, data, config);
 }
 
 
 /**
- * @param {string|number} id
+ * @param {string|number} id,data
  * @param {Object} data
  */
-export async function updateModule(id, data) {
-    return apiClient.put(ENDPOINTS.moduleDetail(id), data);
+export async function updateModule(id, data, config = {}) {
+    return apiClient.patch(ENDPOINTS.moduleDetail(id), data, config);
 }
 
 
