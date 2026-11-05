@@ -128,8 +128,8 @@ function SectionManager({ moduleId, initialSections = [] }) {
         {isCreating && (    // creating  form
             <Paper elevation={0} sx={{ p: 2, border: '2px solid', borderColor: 'primary.main' }}>
                 <Stack spacing={2}>
-                    <FormField  label="Title"   value={draft.title} onChange={(e) => setDraft((d) => ({ ...d,  title:e.target.value }))}  multiline={true} rows={6} disabled={isSaving} />
-                    <FormField  label="Body"    value={draft.body}  onChange={( e) => setDraft((d) => ({ ...d, body: e.target.value }))}                            inputProps={{ multiline: true, rows: 4 }} disabled={isSaving}
+                    <FormField  label="Title"   value={draft.title} onChange={(e) => setDraft((d) => ({ ...d,  title:e.target.value }))}  multiline={true} rows={2} disabled={isSaving} />
+                    <FormField  label="Body"    value={draft.body}  onChange={( e) => setDraft((d) => ({ ...d, body: e.target.value }))}  multiline={true} rows={8} disabled={isSaving}
                         helperText="To add a YouTube video, please paste the YouTube link (e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ) on a new line. To add an image, paste a direct image URL."   />
                     <FormField  label="Order"   type="number"   value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}    inputProps={{ min: 1 }}  disabled={isSaving} />
                     <Stack direction="row" spacing={1}>
@@ -157,7 +157,7 @@ function SectionManager({ moduleId, initialSections = [] }) {
                 <Stack spacing={2}>
                     
                     
-                    <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}  disabled={isSaving}  />
+                    <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} multiline={true} rows={2} disabled={isSaving}  />
                     <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} multiline={true} rows={8}  disabled={isSaving} 
                         helperText="To add a YouTube video, just paste the YouTube link on a new line. To add an image, paste a direct image URL."/>
                     <FormField label="Order" type="number"  value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}   inputProps={{ min:1}} disabled={isSaving}  />
