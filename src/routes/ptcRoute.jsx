@@ -7,8 +7,8 @@ import { Box, CircularProgress } from "@mui/material";
  *  based on auth state display route
  * @param {{ children: JSX.Element, require: 'auth' | 'guest' | 'mfa' }} props
  */
-function PtcRoute({ children, require = 'auth' }) {
-  const { authState } = useAuth();
+function PtcRoute({ children, require = 'auth',roles }) {
+  const { authState, user } = useAuth();
     if (authState === 'LOADING') {
       return (
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -27,6 +27,15 @@ function PtcRoute({ children, require = 'auth' }) {
 
     if (require === 'mfa' && authState !== 'MFA_PENDING') {
       return <Navigate to={authState === 'AUTHENTICATED' ? '/' : '/login'} replace />;
+    }
+
+    /*  08-01  */
+    //Verify if user role is permitted for this route
+    if (roles && roles.length > 0) {
+      const userRole = user?.role;
+      if (!userRole || !roles.includes(userRole)) {
+        return <Navigate to="/" replace />; // Redirect unauthorized users to homepage
+      }
     }
 
  

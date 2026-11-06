@@ -14,6 +14,9 @@ function FormField ( {
     inputRef,
     inputProps,
     sx,
+    multiline,
+    rows,
+    helperText,
 })
 {
     return (
@@ -23,14 +26,16 @@ function FormField ( {
             value={value}
             onChange={onChange}
             error= {!!error}
-            helperText={error}
+            helperText={error || helperText}
             disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
             inputRef={inputRef}
+            multiline={multiline}
+            rows={rows}
             fullWidth
             variant="outlined"
-            inputProps={inputProps}
+            {...(inputProps ? { inputProps } : {})}
             sx={sx}
             />
     );
