@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import AppRouter from "./routes/AppRouter";
 
+
 function App () {
   const [isWakingUp, setIsWakingUp] = useState(false);
 

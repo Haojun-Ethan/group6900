@@ -53,7 +53,7 @@ function QuestionRenderer({
                         )}
                     </Stack>
 
-                    <Typography variant="h3" sx={{ lineHeight: 1.5 }}> {question.text} </Typography>  // question text
+                    <Typography variant="h3" sx={{ lineHeight: 1.5 }}> {question.text} </Typography> 
 
 
                     <Box>   //question text 

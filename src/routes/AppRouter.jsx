@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
 import Homepage from "../pages/common/Homepage";
 import NotFoundPage from "../pages/common/NotFoundPage";
@@ -32,7 +32,7 @@ import NotificationsPage from '../pages/common/NotificationsPage';
 /* rewrite 5-01 */
 function AppRouter() {
     return (
-        <BrowserRouter>
+        <HashRouter>
             <Routes>
 
                 {/* Public, rewrite 5-01 */ }
@@ -79,7 +79,7 @@ function AppRouter() {
                 <Route path="*" element={<NotFoundPage />} />
 
             </Routes>
-        </BrowserRouter>
+        </HashRouter>
     );
 }
 
