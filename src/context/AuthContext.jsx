@@ -29,6 +29,10 @@ export const AuthProvider = ({ children }) => {
     const syncUserSession = async () => {
         try {
             const fullUser = await authApi.getMe();
+
+            console.log("Current user 2FA status:", fullUser); 
+
+            
             storage.setUser(fullUser);
             setUser(fullUser);
             setAuthState('AUTHENTICATED');
