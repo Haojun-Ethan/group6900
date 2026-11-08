@@ -91,9 +91,22 @@ apiClient.interceptors.response.use(
     const payload = response.data;
     if (response.config?.skipTransform) { return payload; }
 
+        if (response.config.url.includes('/accounts/users/')) {
+        console.log("1. 转换前(原始):", payload[0]); 
+    }
+
+    const camelData = adaptToCamel(payload);
+
+    // 【此处新增 2】：打印转换后的数据
+    if (response.config.url.includes('/accounts/users/')) {
+        console.log("2. 转换后(驼峰):", camelData[0]); 
+    }
+
+    return camelData;
     // auto change to Camel
-    return adaptToCamel(payload);
+    //return adaptToCamel(payload);
   },
+  
 
   async (error) => {
     clearTimeout(wakeUpTimer);
