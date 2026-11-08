@@ -56,7 +56,7 @@ function QuestionRenderer({
                     <Typography variant="h3" sx={{ lineHeight: 1.5 }}> {question.text} </Typography> 
 
 
-                    <Box>   //question text 
+                    <Box>   
                         <TypeComponent question={ question}  value={ answer}  onChange={onChange } disabled={ disabled} />
                     </Box>
                 </Stack>
