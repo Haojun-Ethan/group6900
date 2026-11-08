@@ -164,7 +164,7 @@ function ManageUsersPage() {
                     </TableHead>
                     <TableBody>
                         {users.map((u) => {
-                            const has2FA = String(u.is2FaEnabled) === 'true' || String(u.is_2fa_enabled) === 'true';  
+                            const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
                             return (
                                 <TableRow key={u.id}>
                                     <TableCell>{u.username}</TableCell>
