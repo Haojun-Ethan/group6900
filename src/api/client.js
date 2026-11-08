@@ -13,13 +13,28 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';  // DEMO
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
+  timeout: 40000,
   headers: { 'Content-Type': 'application/json' },
   ...(DEMO_MODE ? { adapter: demoAdapter } : {}),  //DEMO
 });
 
+let wakeUpTimer = null; /* 10 - 02 */
+
+  /*
+    https://axios.rest/pages/advanced/interceptors
+    https://render.com/docs/free#spinning-down-on-idle  // 15 minutes -> spins down
+    https://www.npmjs.com/package/@dpsys/axios-loader
+  */
+
 // Request interceptor 
 apiClient.interceptors.request.use((config) => {
+    /* 10 - 02 */
+    if (!DEMO_MODE) {
+    clearTimeout(wakeUpTimer);
+    wakeUpTimer = setTimeout(() => {
+      window.dispatchEvent(new Event('server-waking-up'));
+    }, 3000);
+  }
   const access = getAccess();
   if (access && !config.headers.Authorization) {         // 08-01  automount JWT Bearer Token
     config.headers.Authorization = `Bearer ${access}`;
@@ -66,21 +81,22 @@ const AUTH_ENDPOINTS = [
 apiClient.interceptors.response.use(
   /*(res) => res.data,      change 08-01*/
 (response) => {
+
+
+  clearTimeout(wakeUpTimer);    
+
     // 204 No Content retrun null
-    if (response.status === 204) {
-      return null;
-    }
+    if (response.status === 204) { return null; }
 
     const payload = response.data;
-    if (response.config?.skipTransform) {
-      return payload;
-    }
+    if (response.config?.skipTransform) { return payload; }
 
     // auto change to Camel
     return adaptToCamel(payload);
   },
 
   async (error) => {
+    clearTimeout(wakeUpTimer);
     const original = error.config;
     const status = error.response?.status;
 
@@ -103,7 +119,7 @@ apiClient.interceptors.response.use(
         if (!window.location.pathname.startsWith('/login')) {
             window.location.href = '/login';
         }
-          return Promise.reject({ message: 'Session expired, please login again' });
+          return Promise.reject({ message: 'Session expired, please login again',status,raw: error });
         }
     }
 
