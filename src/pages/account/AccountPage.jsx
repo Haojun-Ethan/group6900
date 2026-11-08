@@ -74,24 +74,15 @@ function AccountPage() {
               </Box>
 
                 {is2FaActive ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip label="Active" color="success" size="small" sx={{ fontWeight: 600 }} />
-                      <Tooltip title="Backend API is not available yet">
-                        <span>
-                          <Button variant="outlined" color="error" size="small" disabled>
-                            Disable
-                          </Button>
-                        </span>
-                      </Tooltip>
-                  </Box>
-                    ) : (
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate('/account/2fa/setup')}
-                >
-                  Enable
-                </Button>
-            )}
+                  <Chip label="Enabled" color="success" sx={{ fontWeight: 600, fontSize: '0.85rem', py: 1.5, px: 1 }} />
+                   ) : (
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigate('/account/2fa/setup')}
+                    >
+                      Enable
+                    </Button>
+                )}
           </Box>
         </Paper>
 
