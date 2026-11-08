@@ -170,7 +170,7 @@ function ManageUsersPage() {
                                     <TableCell>{u.username}</TableCell>
                                     <TableCell>{u.email}</TableCell>
                                     <TableCell>
-                                    <Tooltip title="Updates UI access. System-level privileges require Superuser approval." arrow>
+                                    <Tooltip title="Updates UI access. System-level privileges require Superuser approval." arrow placement='right' slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, -15] } }] } }} >
                                         <FormControl size="small" sx={{ minWidth: 110 }}>
                                             <Select
                                             value={u.role || 'USER'}
