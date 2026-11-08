@@ -65,6 +65,10 @@ function Setup2FAPage() {
     await authApi.verify2FA(otp);
     await refreshUser();
     setIsEnabled(true);
+
+        setTimeout(() => {
+        window.location.reload();
+    }, 1500); 
   };
 
 
