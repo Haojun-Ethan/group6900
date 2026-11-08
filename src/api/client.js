@@ -91,8 +91,6 @@ apiClient.interceptors.response.use(
     const payload = response.data;
     if (response.config?.skipTransform) { return payload; }
 
-    
-
     // auto change to Camel
     return adaptToCamel(payload);
   },

@@ -26,15 +26,9 @@ export const AuthProvider = ({ children }) => {
   
     /*add 08-01*/
     const getErrorStatus = (err) => err?.status || err?.response?.status;
-    
-    /*
     const syncUserSession = async () => {
         try {
             const fullUser = await authApi.getMe();
-
-            console.log("Current user 2FA status:", fullUser); 
-
-
             storage.setUser(fullUser);
             setUser(fullUser);
             setAuthState('AUTHENTICATED');
@@ -46,31 +40,6 @@ export const AuthProvider = ({ children }) => {
             throw err;
         }
     };
-    */
-   /* change syncUserSession to fetchAndSyncUser by  10-03.08 */ 
-    const fetchAndSyncUser = async () => {
-        try {
-            const fullUser = await authApi.getMe();
-            console.log("Current user data from backend:", fullUser); 
-
-
-            if (fullUser.is_2fa_enabled !== undefined) {
-                fullUser.is2FaEnabled = fullUser.is_2fa_enabled;
-            }
-
-            storage.setUser(fullUser);
-            setUser(fullUser);
-            setAuthState('AUTHENTICATED');
-            return fullUser;
-        } catch (err) {
-            console.error("Failed to fetch user profile:", err);
-            storage.clearAll();
-            setUser(null);
-            setAuthState('UNAUTHENTICATED');
-            throw err;
-        }
-    };
-
     /* Add 08-01  When the application is first mounted, verify the local credentials and pull the latest user Profile*/
     const initSession = useCallback(async () => {
         const access = storage.getAccess();
@@ -85,12 +54,10 @@ export const AuthProvider = ({ children }) => {
 
         if (access) {
             try {
-                /* const fullUser = await authApi.getMe();
+                const fullUser = await authApi.getMe();
                 storage.setUser(fullUser);
                 setUser(fullUser);
-                setAuthState('AUTHENTICATED');  change to use fetchAndSynUser by 10-03.08*/
-
-                await fetchAndSyncUser();
+                setAuthState('AUTHENTICATED');
             } catch (err) {
             // Token failed and auto-refresh failed
             const status = getErrorStatus(err);
@@ -115,7 +82,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  // app start, restore session 
+  // app start, restore session / 应用启动，恢复会话
     useEffect(() => {
         
         let ignore = false;
@@ -161,8 +128,8 @@ export const AuthProvider = ({ children }) => {
         return { mfaRequired:false };*/
 
         /* 08-01*/
-        //await syncUserSession();
-        await fetchAndSyncUser();
+        await syncUserSession();
+
         return { mfaRequired: false };
         }, []);
 
@@ -176,8 +143,7 @@ export const AuthProvider = ({ children }) => {
             storage.setAccess(access);
             storage.setRefresh(refresh);
 
-            //await syncUserSession();
-            await fetchAndSyncUser();
+            await syncUserSession();
 
         }, []);
         
@@ -197,7 +163,7 @@ export const AuthProvider = ({ children }) => {
         login,
         submitOTP,
         logout,
-        refreshUser:fetchAndSyncUser /* initSession   change it by 10-03.07*/
+        refreshUser:initSession,
        
     };
 
