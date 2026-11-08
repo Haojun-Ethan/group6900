@@ -16,7 +16,7 @@ https://mui.com/material-ui/react-list/
 function AccountPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const is2FaActive = Boolean(user?.is2FaEnabled);
+  const is2FaActive = Boolean(user?.is2FaEnabled ?? user?.is_2fa_enabled);
 
   return (
     <PageContainer className="account-page" maxWidth="md">

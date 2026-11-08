@@ -66,7 +66,7 @@ function Setup2FAPage() {
     await refreshUser();
     setIsEnabled(true);
 
-        setTimeout(() => {
+    setTimeout(() => {
         window.location.reload();
     }, 1500); 
   };
