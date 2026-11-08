@@ -27,6 +27,8 @@ import PathwayDetailPage from '../pages/modules/user/PathwayDetailPage';
 import ModuleEnrollmentsPage from '../pages/modules/owner/ModuleEnrollmentsPage';
 import PathwayEditorPage from '../pages/modules/owner/PathwayEditorPage';
 import NotificationsPage from '../pages/common/NotificationsPage';
+import GradebookPage from '../pages/quizzes/owner/GradebookPage';
+import AttemptReviewPage from '../pages/quizzes/owner/AttemptReviewPage';
 
 
 /* rewrite 5-01 */
@@ -61,6 +63,8 @@ function AppRouter() {
                     <Route path="/owner/modules/create" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />       {/* add by 08-01 */ }
                     <Route path="/owner/modules/:id/edit" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleFormPage /></PtcRoute>} />     {/* add by 08-01 */ }
                     <Route path="/owner/modules/:id/enrollments" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><ModuleEnrollmentsPage /></PtcRoute>} />
+                    <Route path="/owner/gradebook" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><GradebookPage /></PtcRoute>} />
+                    <Route path="/owner/attempts/:attemptId" element={<PtcRoute require="auth" roles={['OWNER', 'ADMIN']}><AttemptReviewPage /></PtcRoute>} />
 
                     <Route path="/admin/users" element={<PtcRoute require="auth" roles={['ADMIN']}><ManageUsersPage /></PtcRoute>} />                       {/* add by 08-01 */ }
 

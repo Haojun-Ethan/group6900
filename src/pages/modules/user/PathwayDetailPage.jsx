@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Paper, Typography, Stack, Box, Alert,Dialog,  DialogTitle,DialogContent, DialogActions, Autocomplete,TextField,Button, } from '@mui/material';
-import apiClient from '../../../api/client';
 import { PageContainer, PageTitle, ActionButton, Icon } from '../../../components/ui';
 /* added 10-01 */
 import * as pathwaysApi from '../../../api/pathways'; 
@@ -32,7 +31,7 @@ function PathwayDetailPage() {
             setIsLoading(true);
             setError('');
             try {
-                const data = await apiClient.get(`/pathways/${id}/`);
+                const data = await pathwaysApi.getPathway(id);
                 if (!ignore) setPathway(data || null);
             } catch (err) {
                 if (!ignore) setError(err.message || 'Failed to load pathways');
@@ -139,7 +138,7 @@ function PathwayDetailPage() {
                                     {index + 1}
                                 </Box>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant='h4'>{link.module_title}</Typography>
+                                    <Typography variant='h4'>{link.moduleTitle}</Typography>
                                 </Box>
                                 <ActionButton fullWidth={false} variant="secondary" onClick={() => navigate(`/modules/${link.module}`)}>View Module</ActionButton>
                             </Paper>

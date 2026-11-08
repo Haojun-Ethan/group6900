@@ -9,7 +9,8 @@ import { Stack, Paper, Typography, Checkbox } from '@mui/material';
  * @param {boolean} [props.disabled]
  */
 function MultipleChoiceQuestion({ question, value = [], onChange, disabled = false }) {
-    const sorted = [...(question.choices || [])].sort((a, b) => a.order - b.order);
+    // Learner choices from the backend have no `order`; they already arrive in order.
+    const sorted = [...(question.choices || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const toggle = (choiceId) => {
         if (disabled) return;

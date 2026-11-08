@@ -92,7 +92,7 @@ function MyModulesPage() {
             <PageTitle title="My Modules" subtitle={`${enrollments.length} enrolled course${enrollments.length === 1 ? '' : 's'}`} />
             <Grid container spacing={{ xs: 2, md: 3 }}>
             {[1, 2].map((n) => (
-                <Grid item xs={12} sm={6} md={4} key={n}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={n}>
                 <Skeleton variant="rounded" height={180} />
                 </Grid>
             ))}
@@ -145,7 +145,7 @@ function MyModulesPage() {
             const percent = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0;
 
             return (
-                <Grid item xs={12} sm={6} md={4} key={e.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={e.id}>
                     <Paper
                         elevation={0}
                         sx={{

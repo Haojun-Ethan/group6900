@@ -9,7 +9,8 @@ import { Stack, Paper, Typography, Radio } from '@mui/material';
  * @param {boolean} [props.disabled]
  */
 function SingleChoiceQuestion({ question, value, onChange, disabled = false }) {
-    const sorted = [...(question.choices || [])].sort((a, b) => a.order - b.order);
+    // Learner choices from the backend have no `order`; they already arrive in order.
+    const sorted = [...(question.choices || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     return (
         <Stack spacing={1}>

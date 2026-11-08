@@ -112,9 +112,18 @@ function ModuleFormPage() {
         setIsDirty(true);
 
     }
-    
-  
 
+    // camelCase like every other request; client.js converts it to snake_case for the backend.
+    const buildPayload = (extra = {}) => ({
+        title: form.title,
+        summary: form.summary,
+        description: form.description,
+        category: form.category,
+        passMark: form.passMark,
+        estimatedMinutes: form.estimatedMinutes,
+        selfEnrollAllowed: form.selfEnrollAllowed,
+        ...extra,
+    });
 
     const handleSaveBasic = async () => {       // save basic info
 
@@ -130,35 +139,18 @@ function ModuleFormPage() {
 
         setIsSaving(true);
 
-        const payload = {
-            title: form.title,
-            summary: form.summary,
-            description: form.description,
-            category: form.category,
-            pass_mark: form.passMark,
-            estimated_minutes: form.estimatedMinutes,
-            self_enroll_allowed: form.selfEnrollAllowed,
-        };
+        const payload = buildPayload();
 
         try {
             if (isEdit) {
-
-                // future: await modulesApi.updateModule(id, form);
-                //await new Promise((r) => setTimeout(r, 400));
-                await modulesApi.updateModule(id,payload, { skipTransform: true });
+                await modulesApi.updateModule(id, payload);
                 setSuccess('Module updated' );
 
                 setIsDirty(false);
 
             } else {
 
-                // future:      const created = await modulesApi.createModule(form);
-                // future ：     navigate(`/owner/modules/${created.id}/edit`);
-
-                const created = await modulesApi.createModule(payload, { skipTransform: true }); /*new Promise((r) =>
-                setTimeout(() => r({ id: 999  }),  400)
-                );
-                */
+                const created = await modulesApi.createModule(payload);
 
                 setIsDirty(false);
 
@@ -181,22 +173,9 @@ function ModuleFormPage() {
         setError('');
         setSuccess(''); // important - clear previous messages 
 
-        const payload = {
-            title: form.title,
-            summary: form.summary,
-            description: form.description,
-            category: form.category,
-            pass_mark: form.passMark,
-            estimated_minutes: form.estimatedMinutes,
-            self_enroll_allowed: form.selfEnrollAllowed,
-            status: 'PUBLISHED'
-        };
-
         try {
 
-        // future : await modulesApi.updateModule(id, { status: 'PUBLISHED' });
-        await modulesApi.updateModule(id, payload, { skipTransform: true });
-        //await new Promise((r) => setTimeout(r, 400));
+        await modulesApi.updateModule(id, buildPayload({ status: 'PUBLISHED' }));
 
         setModule((prev) => ({ ...prev, status: 'PUBLISHED' }));    // update local state to reflect published status
         
@@ -220,18 +199,7 @@ function ModuleFormPage() {
 
         try {
 
-            const payload = {
-                title: form.title,
-                summary: form.summary,
-                description: form.description,
-                category: form.category,
-                pass_mark: form.passMark,
-                estimated_minutes: form.estimatedMinutes,
-                self_enroll_allowed: form.selfEnrollAllowed,
-                status: 'DRAFT'
-            };
-
-            await modulesApi.updateModule(id, payload, { skipTransform: true });
+            await modulesApi.updateModule(id, buildPayload({ status: 'DRAFT' }));
 
             setModule((prev) => ({ ...prev, status: 'DRAFT' }));    
             setSuccess('Module reverted to DRAFT.');     

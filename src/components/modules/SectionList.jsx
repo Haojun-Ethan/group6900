@@ -1,6 +1,7 @@
 import {  Paper, Box, Typography, Stack, IconButton, Tooltip, Chip,} from '@mui/material';
 import { Icon } from '../ui';
 import CircularProgress from '@mui/material/CircularProgress';
+import { markdownPreview } from '../../utils/markdownPreview';
 /**
  * Section list for a module
  * MUI handbook - List
@@ -81,7 +82,7 @@ function SectionList({
                   overflow: 'hidden',
                 }}
               >
-                {section.body}
+                {markdownPreview(section.body)}
               </Typography>
             </Box>
 

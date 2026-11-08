@@ -1,19 +1,11 @@
-// The global state container enables all components to obtain the "current user". /全局状态，允许所有组件获取“当前用户”。
-import { createContext, useState, useEffect, useCallback } from 'react';
+// The global auth state: who is logged in, and the login / 2FA / logout actions.
+import { useState, useEffect, useCallback } from 'react';
 import * as storage from '../utils/storage';
 import * as authApi from '../api/auth';
+import { AuthContext } from './authContextObject';
 
+const getErrorStatus = (err) => err?.status || err?.response?.status;
 
-//Create context 
-export const AuthContext = createContext(null);
-
-/* delete 08-01
-const computeAuthState = ( ) => {
-    if (storage.getAccess() && storage.getRefresh()) return 'AUTHENTICATED';
-    if (storage.getChallengeId()) return 'MFA_PENDING';
-    return 'UNAUTHENTICATED';
-};
-*/
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(storage.getUser());
     const [authState, setAuthState] = useState(() => {
@@ -22,173 +14,129 @@ export const AuthProvider = ({ children }) => {
         return 'UNAUTHENTICATED';
     });
 
-    //const [isLoading, setIsLoading] = useState(true); // Loading state, when loading is running, the state is true, finished loading change to false
-  
-    /*add 08-01*/
-    const getErrorStatus = (err) => err?.status || err?.response?.status;
-    
-    /*
-    const syncUserSession = async () => {
+    const clearSession = useCallback(() => {
+        storage.clearAll();
+        setUser(null);
+        setAuthState('UNAUTHENTICATED');
+    }, []);
+
+    /** Load the profile (role, 2FA status) from /accounts/me/ and mark the session as logged in. */
+    const fetchAndSyncUser = useCallback(async () => {
+        // client.js turns is_2fa_enabled into is2faEnabled (lowercase "f").
+        const fullUser = await authApi.getMe();
+        storage.setUser(fullUser);
+        setUser(fullUser);
+        setAuthState('AUTHENTICATED');
+        return fullUser;
+    }, []);
+
+    /** After receiving tokens: load the profile, or undo the half-finished login if that fails. */
+    const completeLogin = useCallback(async (access, refresh) => {
+        storage.setAccess(access);
+        storage.setRefresh(refresh);
         try {
-            const fullUser = await authApi.getMe();
-
-            console.log("Current user 2FA status:", fullUser); 
-
-
-            storage.setUser(fullUser);
-            setUser(fullUser);
-            setAuthState('AUTHENTICATED');
-            return fullUser;
+            await fetchAndSyncUser();
         } catch (err) {
-            storage.clearAll();
-            setUser(null);
-            setAuthState('UNAUTHENTICATED');
+            clearSession();
             throw err;
         }
-    };
-    */
-   /* change syncUserSession to fetchAndSyncUser by  10-03.08 */ 
-    const fetchAndSyncUser = async () => {
-        try {
-            const fullUser = await authApi.getMe();
-            console.log("Current user data from backend:", fullUser); 
+    }, [fetchAndSyncUser, clearSession]);
 
-
-            if (fullUser.is_2fa_enabled !== undefined) {
-                fullUser.is2FaEnabled = fullUser.is_2fa_enabled;
+    // On app start, check the saved tokens still work and load the latest profile.
+    useEffect(() => {
+        const initSession = async () => {
+            if (storage.getChallengeId()) {
+                setUser(storage.getUser());
+                setAuthState('MFA_PENDING');
+                return;
             }
 
-            storage.setUser(fullUser);
-            setUser(fullUser);
-            setAuthState('AUTHENTICATED');
-            return fullUser;
-        } catch (err) {
-            console.error("Failed to fetch user profile:", err);
-            storage.clearAll();
-            setUser(null);
-            setAuthState('UNAUTHENTICATED');
-            throw err;
-        }
-    };
+            if (!storage.getAccess()) {
+                setAuthState('UNAUTHENTICATED');
+                return;
+            }
 
-    /* Add 08-01  When the application is first mounted, verify the local credentials and pull the latest user Profile*/
-    const initSession = useCallback(async () => {
-        const access = storage.getAccess();
-        const challengeId = storage.getChallengeId();
-
-        if (challengeId) {
-            setUser(storage.getUser());
-            setAuthState('MFA_PENDING');
-           
-            return;
-        }
-
-        if (access) {
             try {
-                /* const fullUser = await authApi.getMe();
-                storage.setUser(fullUser);
-                setUser(fullUser);
-                setAuthState('AUTHENTICATED');  change to use fetchAndSynUser by 10-03.08*/
-
                 await fetchAndSyncUser();
             } catch (err) {
-            // Token failed and auto-refresh failed
-            const status = getErrorStatus(err);
-                if (status === 401 || status === 403) {
-                    
-                    storage.clearAll();
-                    setUser(null);
-                    setAuthState('UNAUTHENTICATED');
+                const status = getErrorStatus(err);
+                const cachedUser = storage.getUser();
+
+                // Network trouble (e.g. the server is still waking up): keep the cached profile
+                // rather than logging the user out. A rejected token ends the session.
+                if (status !== 401 && status !== 403 && cachedUser && storage.getAccess()) {
+                    setUser(cachedUser);
+                    setAuthState('AUTHENTICATED');
                 } else {
-                    const cachedUser = storage.getUser();
-                    if (cachedUser) {
-                        setUser(cachedUser);
-                        setAuthState('AUTHENTICATED');
-                    } else {
-                        setAuthState('UNAUTHENTICATED');
-                    }
-                    }
-            }
-        }  else {
-            setAuthState('UNAUTHENTICATED');
-        }
-  }, []);
-
-
-  // app start, restore session 
-    useEffect(() => {
-        
-        let ignore = false;
-        const initialize = async () => {
-            if (storage.getAccess() || storage.getChallengeId()) {
-                await initSession();
+                    clearSession();
+                }
             }
         };
-        initialize();
-        return () => { ignore = true; };
-    }, [initSession]);
 
-  
+        initSession();
+    }, [fetchAndSyncUser, clearSession]);
 
-     // login function / 登录函数
+    // client.js fires this when a token refresh fails; the route guards then send the user to /login.
+    useEffect(() => {
+        window.addEventListener('session-expired', clearSession);
+        return () => window.removeEventListener('session-expired', clearSession);
+    }, [clearSession]);
 
-     /**
-      * login and handle 2fa requirement
-      * @param {{email:string, password:string}} credentials
-      * @returns {Promise<{mfaRequired:boolean}>}
-      */
+    /**
+     * Step 1 of login. With 2FA on, the backend returns a challenge instead of tokens.
+     * @param {{username: string, password: string}} credentials
+     * @returns {Promise<{mfaRequired: boolean}>}
+     */
     const login = useCallback(async (credentials) => {
         const result = await authApi.login(credentials);
-        /* 2FA ----3-01 */
+
         if (result.mfaRequired) {
-            storage.setChallengeId(result.challengeId);    /*rewrite 5-01 */
+            storage.setChallengeId(result.challengeId);
 
-            const  tempUser = { username: credentials.username }; /* add 08-01  */
-
-            storage.setUser(tempUser);  /*rewrite 5-01 */
+            const tempUser = { username: credentials.username };
+            storage.setUser(tempUser);
             setUser(tempUser);
-            setAuthState('MFA_PENDING')
-            return{ mfaRequired:true};
+            setAuthState('MFA_PENDING');
+            return { mfaRequired: true };
         }
-        storage.setAccess(result.access);   /*rewrite 5-01 */
 
-        storage.setRefresh(result.refresh);        /*rewrite 5-03 */
-        //storage.setUser({username: credentials.username});  /*rewrite 5-03 */
-        /*const user = result.user || { username: credentials.username };
-  storage.setUser(user);
-
-        refreshState(); rewrite 5-01 
-        return { mfaRequired:false };*/
-
-        /* 08-01*/
-        //await syncUserSession();
-        await fetchAndSyncUser();
+        await completeLogin(result.access, result.refresh);
         return { mfaRequired: false };
-        }, []);
+    }, [completeLogin]);
 
-    
-       const submitOTP = useCallback(async ({otp}) => {
-            const challengeId = storage.getChallengeId();
-            if(!challengeId) throw new Error('Please login again.');
+    /**
+     * Step 2 of a 2FA login: the authenticator code, or a one-time recovery code.
+     * @param {{otp?: string, recoveryCode?: string}} secondFactor
+     */
+    const submitOTP = useCallback(async ({ otp, recoveryCode }) => {
+        const challengeId = storage.getChallengeId();
+        if (!challengeId) throw new Error('Please log in again.');
 
-            const{access, refresh} = await authApi.submitOTP({challengeId, otp});
-            storage.removeChallengeId();
-            storage.setAccess(access);
-            storage.setRefresh(refresh);
+        const { access, refresh } = await authApi.submitOTP({ challengeId, otp, recoveryCode });
+        storage.removeChallengeId();
+        await completeLogin(access, refresh);
+    }, [completeLogin]);
 
-            //await syncUserSession();
-            await fetchAndSyncUser();
+    /** Leave the 2FA step and start again from the login form. */
+    const cancelMFA = useCallback(() => {
+        clearSession();
+    }, [clearSession]);
 
-        }, []);
-        
-        // logout  
-        const logout = useCallback(() => {
-            storage.clearAll();
-            setUser(null);
-            setAuthState('UNAUTHENTICATED');
-        }, []);
+    /** Revoke the refresh token on the server, then clear the local session. */
+    const logout = useCallback(async () => {
+        const refresh = storage.getRefresh();
 
-    // Provide context value 
+        if (refresh) {
+            try {
+                await authApi.logout(refresh);
+            } catch {
+                // Log out locally anyway; the token expires on its own within a day.
+            }
+        }
+
+        clearSession();
+    }, [clearSession]);
+
     const value = {
         user,
         authState,
@@ -196,12 +144,10 @@ export const AuthProvider = ({ children }) => {
         isMFAPending: authState === 'MFA_PENDING',
         login,
         submitOTP,
+        cancelMFA,
         logout,
-        refreshUser:fetchAndSyncUser /* initSession   change it by 10-03.07*/
-       
+        refreshUser: fetchAndSyncUser,
     };
 
-        
-    return <AuthContext.Provider value={value}> {children} </AuthContext.Provider>;
-
-}
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

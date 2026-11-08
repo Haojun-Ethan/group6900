@@ -6,11 +6,14 @@ export const ENDPOINTS ={
     login: '/accounts/login/',
     login2FA: '/accounts/login/2fa/',
     refresh: '/api/token/refresh/',
+    logout: '/accounts/logout/',
     me: '/accounts/me/',
 
     twoFASetup: '/accounts/2fa/setup/',
     twoFAQr: '/accounts/2fa/qr/',
     twoFAVerify: '/accounts/2fa/verify/',
+    twoFADisable: '/accounts/2fa/disable/',
+    twoFARecoveryCodes: '/accounts/2fa/recovery-codes/',
 
 
     /*  Courses List ----07-01   */

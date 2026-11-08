@@ -1,93 +1,89 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Stack, Skeleton, Alert } from '@mui/material';
-import * as quizzesApi from '../../../api/quizzes'; 
-//import { PageContainer, PageTitle, ActionButton, Icon } from '../../../components/ui';
+import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, PageTitle, ActionButton, Icon } from '../../../components/ui';
 import QuizViewer from '../../../components/quizzes/QuizViewer';
-//import { MOCK_QUIZ_QUESTIONS } from '../_mockQuizData';
 
-//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error'
+/**
+ * Turn QuizViewer's answers ({ [questionId]: choiceId | choiceId[] }) into the backend's format:
+ * [{ question, choices: [choiceId, ...] }], with an entry for every question served.
+ */
+const toSubmission = (questions, answers) =>
+    questions.map((q) => {
+        const answer = answers[q.id];
+        let choices = [];
 
+        if (Array.isArray(answer)) choices = answer;
+        else if (answer != null) choices = [answer];
+
+        return { question: q.id, choices: choices.map(Number) };
+    });
 
 function TakeQuizPage() {
     const { id: moduleId } = useParams();
     const navigate = useNavigate();
 
-    const [questions, setQuestions] = useState([]);
-    const [isLoading,  setIsLoading]=useState(true);
-    const [error,setError] =useState('');
+    const [attempt, setAttempt] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
 
+    // Starting the page starts (or resumes) an attempt. The backend picks and shuffles the questions,
+    // and never sends the correct answers.
     useEffect(() => {
         let ignore = false;
+
         const load = async () => {
-        setIsLoading(true);
-        setError('');
-        try {
+            setIsLoading(true);
+            setError('');
 
-            // future: const data = await quizzesApi.listQuestions(moduleId);
-            /*const data = await new Promise((r) =>
-            setTimeout(() => r(MOCK_QUIZ_QUESTIONS), 400)
-            );
-                */
-
-            const data = await quizzesApi.listQuestions(moduleId);
-            if (!ignore) { setQuestions(Array.isArray(data) ? data : []); }
-        } catch (err) {
-            if (!ignore) {setError(err.message || 'Failed to load quiz');}
-        } finally {
-            if (!ignore) {setIsLoading(false);}
-        }
+            try {
+                const data = await quizzesApi.startAttempt(moduleId);
+                if (!ignore) setAttempt(data);
+            } catch (err) {
+                // 403: not enrolled or no attempts left. 400: no questions yet. 404: module not published.
+                if (!ignore) setError(err.message || 'Failed to start the quiz');
+            } finally {
+                if (!ignore) setIsLoading(false);
+            }
         };
-        load();
 
+        load();
         return () => { ignore = true; };
     }, [moduleId]);
 
-    /*
-     * Submit handler - placeholder
-     * 提交处理 - 占位
-     *
-     * When backend is ready:
-     *   const attempt = await quizzesApi.startQuiz(moduleId);
-     *   const result = await quizzesApi.submitQuiz(attempt.id, answers);
-     *   navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`);
-     */
+    const questions = attempt?.questions || [];
+
+    // Errors are thrown so QuizViewer shows them next to the submit button.
     const handleSubmit = async (answers) => {
+        const result = await quizzesApi.submitAttempt(attempt.id, toSubmission(questions, answers));
+
+        // The results the backend returns don't include the choice texts, so keep the questions
+        // and answers for the review page.
+        const review = { questions, answers };
         try {
-        /*await new Promise((r) => setTimeout(r, 600)); */
+            sessionStorage.setItem(`quiz_review_${result.id}`, JSON.stringify(review));
+        } catch { /* storage full or blocked: the review just shows less detail */ }
 
-        // Create an attempt and submit answers
-        const attempt = await quizzesApi.startQuiz(moduleId);
-
-        const validAnswers = {};
-        questions.forEach(q => {
-            const qType = q.question_type || q.questionType;
-            if ((qType === 'SINGLE' || qType === 'MULTIPLE') && answers[q.id] !== undefined) {
-                validAnswers[q.id] = answers[q.id];
-            }
-
+        navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`, {
+            state: { attempt: result, ...review },
         });
-
-
-        const result = await quizzesApi.submitQuiz(attempt.id, validAnswers );
-        try {
-            sessionStorage.setItem(`quiz_result_${result.id}`, JSON.stringify(result));
-        } catch { /* ignore quota error */ }
-        
-        //templete
-        navigate(`/user/modules/${moduleId}/quiz/result/${result.id}`, { 
-            state: { attemptData: result } 
-        });
-        } catch (err) {
-            setError(err.message || 'Failed to submit quiz');
-        }
     };
 
-   /* const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
-
-    const effectiveError = DEMO_STATE === 'error' ? 'Failed to load quiz' : error;
-    */
+    const backToStudy = (
+        <Box>
+            <ActionButton
+                variant="ghost"
+                fullWidth={false}
+                onClick={() => navigate(`/user/modules/${moduleId}/study`)}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Icon.ArrowBack fontSize="small" />
+                    Back to Study
+                </Box>
+            </ActionButton>
+        </Box>
+    );
 
     if (isLoading) {
         return (
@@ -99,50 +95,42 @@ function TakeQuizPage() {
         );
     }
 
-    if (error && questions.length === 0) {
+    if (error || !attempt) {
         return (
             <PageContainer maxWidth="md">
-                <Alert severity="error">{error}</Alert>
+                <Stack spacing={3}>
+                    {backToStudy}
+                    <Alert severity="error">{error || 'Failed to start the quiz'}</Alert>
+                </Stack>
             </PageContainer>
         );
     }
 
     return (
         <PageContainer maxWidth="md">
-        <Stack spacing={3}>
-            {/* Back */}
-            <Box>
-                <ActionButton
-                    variant="ghost"
-                    fullWidth={false}
-                    onClick={() => navigate(`/user/modules/${moduleId}/study`)}
-                >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Icon.ArrowBack fontSize="small" />
-                        Back to Study
-                    </Box>
-                </ActionButton>
-            </Box>
+            <Stack spacing={3}>
+                {backToStudy}
 
-            <PageTitle title="Module Quiz"  subtitle={`${questions.length} question${questions.length === 1 ? '' : 's'}`}
-            />
+                <PageTitle
+                    title={attempt.moduleTitle ? `${attempt.moduleTitle} Quiz` : 'Module Quiz'}
+                    subtitle={`${questions.length} question${questions.length === 1 ? '' : 's'} · Pass mark ${attempt.passMark}%`}
+                />
 
-            {error && <Alert severity="error">{error}</Alert>}
-            
-            <Paper elevation={0} sx ={ { p: 2, borderRadius: 2,backgroundColor: 'rgba(192, 138, 62, 0.08)' }}>
-                <Typography variant="body2" color="text.secondary">
-                    Answer all questions, then click Submit. Your score will be shown on the next page.
-                </Typography>
-            </Paper>
+                <Paper elevation={0} sx={{ p: 2, borderRadius: 2, backgroundColor: 'rgba(192, 138, 62, 0.08)' }}>
+                    <Typography variant="body2" color="text.secondary">
+                        Answer all questions, then click Submit. Your score will be shown on the next page.
+                        {attempt.expiresAt && (
+                            <>
+                                {' '}Submit by <strong>{new Date(attempt.expiresAt).toLocaleTimeString()}</strong>.
+                                Late submissions are recorded as a fail.
+                            </>
+                        )}
+                    </Typography>
+                </Paper>
 
-            <QuizViewer
-                questions={questions}
-                onSubmit={handleSubmit}
-            />
-    </Stack>
+                <QuizViewer questions={questions} onSubmit={handleSubmit} />
+            </Stack>
         </PageContainer>
-
-
     );
 }
 

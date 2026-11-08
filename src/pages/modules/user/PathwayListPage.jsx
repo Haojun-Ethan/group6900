@@ -4,7 +4,7 @@ import { Paper, Typography, Grid, Chip, Alert, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageContainer, PageTitle, ActionButton } from "../../../components/ui";
-import apiClient from "../../../api/client";
+import * as pathwaysApi from "../../../api/pathways";
 import { useAuth } from "../../../hooks/useAuth";
 
 
@@ -25,7 +25,7 @@ function PathwayListPage() {
 
               
             try {
-                const data = await apiClient.get('/pathways/');
+                const data = await pathwaysApi.listPathways();
                 if (!ignore) setPathways(data || []);
             } catch (err) {
                 if (!ignore) setError(err.message || 'Failed to load pathways');
@@ -75,7 +75,7 @@ function PathwayListPage() {
             ) : (
                 <Grid container spacing={3}>
                     {pathways.map((p) => (
-                        <Grid item xs={12} sm={6} md={4} key={p.id}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={p.id}>
                             <Paper elevation={0} sx={{p: 3, height: '100%', display: 'flex', flexDirection: 'column'}}>
                                 <Typography variant="h3" sx={{ mb: 1 }}> {p.name} </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>{p.description}</Typography>

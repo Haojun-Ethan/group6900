@@ -22,9 +22,9 @@ function UserMenu(){
         navigate('/account');
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         handleClose();
-        logout();
+        await logout();   // revokes the refresh token on the server first
         navigate('/login', { replace: true });
     };
 

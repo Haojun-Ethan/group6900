@@ -31,6 +31,14 @@ const HOME_CARDS = [
         icon: 'Dashboard',
     },
     {
+        key: 'gradebook',
+        title: 'Gradebook',
+        description: "See learners' compliance and quiz results",
+        path: '/owner/gradebook',
+        roles: ['OWNER', 'ADMIN'],
+        icon: 'Quiz',
+    },
+    {
         key: 'pathways',
         title: 'Learning Pathways',
         description: 'Follow structured learning tracks',
@@ -63,6 +71,7 @@ const ICON_MAP = {
     Dashboard: Icon.Dashboard,
     Person: Icon.Person,
     Settings: Icon.Settings,
+    Quiz: Icon.Quiz,
 };
 
 /* Home page 

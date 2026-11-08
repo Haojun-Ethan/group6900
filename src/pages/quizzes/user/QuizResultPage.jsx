@@ -4,111 +4,59 @@ import { Box, Typography, Paper, Stack, Skeleton, Alert, Chip, Divider } from '@
 import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, ActionButton, Icon } from '../../../components/ui';
 import QuestionRenderer from '../../../components/quizzes/QuestionRenderer';
-//import { MOCK_QUIZ_QUESTIONS } from '../_mockQuizData';
 
-/*  delete 08-01
-const MOCK_RESULT = {
-  id: 999,
-  score_percent: 80,
-  passed: true,
+/** The questions and answers TakeQuizPage kept, so the review can show the choice texts. */
+const loadReview = (state, attemptId) => {
+  if (state?.questions) return { questions: state.questions, answers: state.answers || {} };
 
-  user_answers: {
-    1: 11,          
-    2: [21, 22],    
-    3: 'true',     
-    4: { 41: 41, 42: 42 }, 
+  try {
+    const raw = sessionStorage.getItem(`quiz_review_${attemptId}`);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
 
-  },
+  return { questions: [], answers: {} };
 };
-*/
 
 function QuizResultPage() {
   const { id: moduleId, attemptId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [result, setResult] = useState(null);
-  const [questions, setQuestions] = useState([]);
+  const [attempt, setAttempt] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const review = loadReview(location.state, attemptId);
+  const lateMessage = location.state?.attempt?.message;
+
   useEffect(() => {
     let ignore = false;
+
     const load = async () => {
       setIsLoading(true);
       setError('');
 
-      const passedState = location.state?.attemptData;
+      // Use the graded attempt passed from the quiz page; otherwise (refresh, shared link) fetch it.
+      const passed = location.state?.attempt;
+      if (passed && String(passed.id) === String(attemptId)) {
+        setAttempt(passed);
+        setIsLoading(false);
+        return;
+      }
 
       try {
-        // future:const r = await quizzesApi.getAttempt(attemptId);
-        // future: const qs = await quizzesApi.listQuestions(moduleId);
-        /*const r = await new Promise((resolve) =>
-          setTimeout(() => resolve(MOCK_RESULT), 400)
-        );
-        setResult(r);
-        setQuestions(MOCK_QUIZ_QUESTIONS);
-        08-01 */
-
-        const questionList = await quizzesApi.listQuestions(moduleId);
-
-        if (!ignore) {
-          setQuestions(Array.isArray(questionList) ? questionList : []);
-          
-          if (passedState) {
-            // result is passed from the previous page, use it directly
-            setResult(passedState);
-          } else {
-            // result is not passed, fetch it from the backend
-
-            let cached = null;
-            try {
-              const raw = sessionStorage.getItem(`quiz_result_${attemptId}`);
-              if (raw) cached = JSON.parse(raw);
-            } catch { /* ignore */ }
-
-            if (cached) {
-              setResult(cached);
-            } else {
-              setResult({
-                id: attemptId,
-                scorePercent: 0,
-                passed: false,
-                userAnswers: {},
-              });
-              setError('Result data is not available for this attempt. Please retake the quiz.');
-            }
-          }
-        }
+        const data = await quizzesApi.getAttempt(attemptId);
+        if (!ignore) setAttempt(data);
       } catch (err) {
-        if (!ignore) setError(err.message || 'Failed to load questions');
+        if (!ignore) setError(err.message || 'Failed to load the result');
       } finally {
         if (!ignore) setIsLoading(false);
       }
     };
+
     load();
-
     return () => { ignore = true; };
-  }, [moduleId, attemptId, location.state]);
-
- 
-  const gradeQuestion = (q, userAnswer) => {
-    const qType = q.question_type || q.questionType;
-    if (qType !== 'SINGLE' && qType !== 'MULTIPLE') return 'info'; 
-    if (userAnswer == null) return 'skipped';
-
-    const correctIds = (q.choices || [])
-      .filter((c) => c.isCorrect ?? c.is_correct)
-      .map((c) => Number(c.id));
-
-    if (qType === 'SINGLE') {
-      return correctIds.includes(Number(userAnswer)) ? 'correct' : 'wrong';
-    }
-    // MULTIPLE
-    const picked = Array.isArray(userAnswer) ? userAnswer.map(Number) : [Number(userAnswer)];
-    if (picked.length !== correctIds.length) return 'wrong';
-    return picked.every((id) => correctIds.includes(id)) ? 'correct' : 'wrong';
-  };
+  }, [attemptId, location.state]);
 
   if (isLoading) {
     return (
@@ -119,7 +67,7 @@ function QuizResultPage() {
     );
   }
 
-  if (error || !result) {
+  if (error || !attempt) {
     return (
       <PageContainer maxWidth="md">
         <Alert severity="error">{error || 'Attempt result not found'}</Alert>
@@ -127,12 +75,32 @@ function QuizResultPage() {
     );
   }
 
-  const {  scorePercent = 0, passed = false, userAnswers = {}  } = result;
+  if (!attempt.submittedAt) {
+    return (
+      <PageContainer maxWidth="md">
+        <Stack spacing={2}>
+          <Alert severity="info">This attempt hasn't been submitted yet.</Alert>
+          <ActionButton fullWidth={false} onClick={() => navigate(`/user/modules/${moduleId}/quiz`)}>
+            Continue Quiz
+          </ActionButton>
+        </Stack>
+      </PageContainer>
+    );
+  }
+
+  const { scorePercent = 0, passed = false, passMark, results = [] } = attempt;
+
+  // Results come back in the order the questions were served; check the text in case they don't match.
+  const questionFor = (result, index) => {
+    const byIndex = review.questions[index];
+    if (byIndex && byIndex.text === result.question) return byIndex;
+    return review.questions.find((q) => q.text === result.question);
+  };
 
   return (
     <PageContainer maxWidth="md">
       <Stack spacing={3}>
-  
+
         <Box>
           <ActionButton
             variant="ghost"
@@ -146,6 +114,7 @@ function QuizResultPage() {
           </ActionButton>
         </Box>
 
+        {lateMessage && <Alert severity="warning">{lateMessage}</Alert>}
 
         <Paper
           elevation={0}
@@ -167,8 +136,8 @@ function QuizResultPage() {
                 color: '#fff',
               }}
             >
-              <Typography variant="h1" sx={{ color: '#fff', fontSize: '2rem' }}>
-                {Number(scorePercent).toFixed(2)}%
+              <Typography variant="h1" sx={{ color: '#fff', fontSize: '1.75rem' }}>
+                {Math.round(Number(scorePercent))}%
               </Typography>
             </Box>
 
@@ -177,6 +146,7 @@ function QuizResultPage() {
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
+              {passMark != null && `Pass mark ${passMark}%. `}
               {passed
                 ? 'Congratulations! You have completed this module.'
                 : 'Review the sections and try again.'}
@@ -186,56 +156,54 @@ function QuizResultPage() {
 
         <Divider />
 
-   
         <Typography variant="h2">Review</Typography>
         <Stack spacing={3}>
-          {questions.map((q, idx) => (
-            <Box key={q.id}>
-              <Box sx={{ mb: 1 }}>
-                {(() => {
-                  const ua = userAnswers[q.id] ?? userAnswers[String(q.id)];  
-                  const status = gradeQuestion(q, ua);                        
-                  const labelMap = {
-                    correct: `Q${idx + 1} • Correct`,
-                    wrong:   `Q${idx + 1} • Wrong`,
-                    skipped: `Q${idx + 1} • Skipped`,
-                    info:    `Q${idx + 1} • Demo only`,
-                  };
-                  const colorMap = {
-                    correct: 'success',
-                    wrong:   'error',
-                    skipped: 'default',
-                    info:    'default',
-                  };
-                  return (
-                    <Chip
-                      label={labelMap[status]}
-                      size="small"
-                      color={colorMap[status]}
-                      variant="outlined"
-                    />
-                  );
-                })()}
+          {results.map((r, idx) => {
+            const question = questionFor(r, idx);
+            const selected = r.selectedChoices || [];
+            const answer = question?.questionType === 'SINGLE' ? selected[0] : selected;
+
+            return (
+              <Box key={idx}>
+                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                  <Chip
+                    label={`Q${idx + 1} • ${r.isCorrect ? 'Correct' : 'Wrong'}`}
+                    size="small"
+                    color={r.isCorrect ? 'success' : 'error'}
+                    variant="outlined"
+                  />
+                  <Chip label={`${r.pointsAwarded} pt${r.pointsAwarded === 1 ? '' : 's'}`} size="small" variant="outlined" />
+                </Stack>
+
+                {question ? (
+                  <QuestionRenderer question={question} answer={answer} onChange={() => {}} disabled index={idx} />
+                ) : (
+                  // No saved review data (e.g. opened in a new tab): show the question text only.
+                  <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h3" sx={{ lineHeight: 1.5 }}>{r.question}</Typography>
+                  </Paper>
+                )}
+
+                {r.explanation && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1, pl: 1 }}>
+                    {r.explanation}
+                  </Typography>
+                )}
               </Box>
-              <QuestionRenderer
-                question={q}
-                answer={userAnswers[q.id] ?? userAnswers[String(q.id)]}  
-                onChange={() => {}}
-                disabled
-                index={idx}
-              />
-            </Box>
-          ))}
+            );
+          })}
         </Stack>
 
         <Stack direction="row" spacing={2} justifyContent="center" sx={{ pt: 2 }}>
-          <ActionButton
-            fullWidth={false}
-            variant="secondary"
-            onClick={() => navigate(`/user/modules/${moduleId}/study`)}
-          >
-            Back to Study
-          </ActionButton>
+          {!passed && (
+            <ActionButton
+              fullWidth={false}
+              variant="secondary"
+              onClick={() => navigate(`/user/modules/${moduleId}/quiz`)}
+            >
+              Try Again
+            </ActionButton>
+          )}
           <ActionButton
             fullWidth={false}
             onClick={() => navigate('/user/modules')}

@@ -1,11 +1,50 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Paper, Stack, Box, Typography, IconButton, Button, Radio, Checkbox, Alert, Chip } from '@mui/material';
+import { Paper, Stack, Box, Typography, IconButton, Button, Radio, Checkbox, Alert, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import * as modulesApi from '../../../api/modules';
-import apiClient from '../../../api/client';
+import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, ActionButton, Icon, FormField } from '../../../components/ui';
+import QuizViewer from '../../../components/quizzes/QuizViewer';
 
+// Unsaved questions and choices get a string id; saved ones have the server's numeric id.
 const generateId = () => Math.random().toString(36).substring(2, 10);
+
+/*
+ * This page edits questions in a local shape (question_type, is_correct). The API sends and
+ * receives camelCase (client.js converts to and from the backend's snake_case), so convert at
+ * the edges with these two functions.
+ */
+const fromApi = (q) => ({
+  id: q.id,
+  text: q.text,
+  question_type: q.questionType,
+  explanation: q.explanation || '',
+  points: q.points,
+  order: q.order,
+  choices: (q.choices || []).map((c) => ({
+    id: c.id,
+    text: c.text,
+    is_correct: Boolean(c.isCorrect),
+    order: c.order,
+  })),
+});
+
+const toApi = (q, index, moduleId) => ({
+  module: Number(moduleId),
+  text: q.text,
+  questionType: q.question_type,
+  explanation: q.explanation || '',
+  points: Number(q.points) || 1,
+  order: index + 1,
+  isActive: true,
+  // The backend updates choices sent with an id, creates the rest, and deletes any left out.
+  choices: q.choices.map((c, j) => ({
+    ...(typeof c.id === 'number' ? { id: c.id } : {}),
+    text: c.text,
+    isCorrect: Boolean(c.is_correct),
+    order: j + 1,
+  })),
+});
 
 function ManageQuizPage() {
   const { id: moduleId } = useParams();
@@ -17,29 +56,26 @@ function ManageQuizPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
     let ignore = false;
     const load = async () => {
       setIsLoading(true);
       try {
-        const moduleData = await modulesApi.getModule(moduleId);
-        
-        let existingQuestions = [];
-        try {
-          const res = await apiClient.get(`/modules/${moduleId}/questions/`);
-          existingQuestions = res || [];
-        } catch {
-          console.log('There is no question data yet for this module, starting fresh.');
-        }
+        const [moduleData, existingQuestions] = await Promise.all([
+          modulesApi.getModule(moduleId),
+          quizzesApi.listQuestions(moduleId),
+        ]);
 
         if (!ignore) {
           setModule(moduleData);
-          const formattedQs = existingQuestions.map((q) => ({
-            ...q,
-            choices: q.choices || [],
-          }));
-          setQuestions(formattedQs);
+          // Questions deleted after being used in an attempt are kept on the server but deactivated.
+          setQuestions(
+            (existingQuestions || [])
+              .filter((q) => q.isActive !== false)
+              .map(fromApi)
+          );
         }
       } catch (err) {
         if (!ignore) setError(err.message || 'Failed to load module or questions');
@@ -78,7 +114,7 @@ function ManageQuizPage() {
 
     if (targetQ && typeof targetQ.id === 'number') {
       try {
-        await apiClient.delete(`/questions/${targetQ.id}/`);
+        await quizzesApi.deleteQuestion(targetQ.id);
       } catch (err) {
         setError(err.message || 'Failed to delete question from server');
         return;
@@ -110,18 +146,9 @@ function ManageQuizPage() {
   };
 
 
-  const handleRemoveChoice = async (qIndex, cIndex) => {
-    const targetChoice = questions[qIndex]?.choices?.[cIndex];
-
-    if (targetChoice && typeof targetChoice.id === 'number') {
-      try {
-        await apiClient.delete(`/choices/${targetChoice.id}/`);
-      } catch (err) {
-        setError(err.message || 'Failed to delete option from server');
-        return;
-      }
-    }
-
+  // Removed locally only: saving the question sends its remaining choices, and the backend
+  // deletes the ones left out.
+  const handleRemoveChoice = (qIndex, cIndex) => {
     const newQs = [...questions];
     newQs[qIndex].choices.splice(cIndex, 1);
     setQuestions(newQs);
@@ -151,89 +178,43 @@ function ManageQuizPage() {
     setSuccess('');
     setIsSaving(true);
 
+    // Updated as each question saves, so if a later one fails the earlier ones keep their new ids
+    // and saving again doesn't create duplicates.
+    const nextQuestions = [...questions];
+
     try {
 
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         if (!q.text.trim()) throw new Error(`Question ${i + 1} is missing question text.`);
-        if (!q.choices || q.choices.length === 0) throw new Error(`Question ${i + 1} must contain options.`);
-        if (!q.choices.some((c) => c.is_correct)) throw new Error(`Question ${i + 1} does not have a correct answer selected.`);
+        // Same rules the backend enforces, checked first for a clearer message.
+        if (!q.choices || q.choices.length < 2) throw new Error(`Question ${i + 1} needs at least two options.`);
+        const correctCount = q.choices.filter((c) => c.is_correct).length;
+        if (correctCount === 0) throw new Error(`Question ${i + 1} does not have a correct answer selected.`);
+        if (q.question_type === 'SINGLE' && correctCount !== 1) {
+          throw new Error(`Question ${i + 1} is single choice, so it needs exactly one correct answer.`);
+        }
         if (q.choices.some((c) => !c.text.trim())) throw new Error(`Question ${i + 1} has an empty option description.`);
       }
 
-      const nextQuestions = []; 
-
-      /*
-      const existingRemoteQuestions = await apiClient.get(`/modules/${moduleId}/questions/`);
-      if (Array.isArray(existingRemoteQuestions)) {
-        for (const eq of existingRemoteQuestions) {
-          await apiClient.delete(`/questions/${eq.id}/`);
-        }
-      }
-        */
-
-
+      // One request per question; its choices travel inside it.
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
-        const qPayload = {
-          module: Number(moduleId),
-          text: q.text,
-          question_type: q.question_type,
-          explanation: q.explanation || '',
-          points: Number(q.points) || 1,
-          order: i + 1,
-          is_active: true, 
-        };
+        const payload = toApi(q, i, moduleId);
 
+        const saved = typeof q.id === 'number'
+          ? await quizzesApi.updateQuestion(q.id, payload)
+          : await quizzesApi.createQuestion(payload);
 
-
-        let questionId;
-        if (typeof q.id === 'number') {        
-          await apiClient.patch(`/questions/${q.id}/`, qPayload);
-          questionId = q.id;
-        } else {                                 
-          const createdQ = await apiClient.post('/questions/', qPayload);
-          questionId = createdQ?.id;
-        }
-        if (!questionId) {
-          throw new Error('Failed to obtain Question ID from server.');
-        }
-
-        if (!questionId) {
-          throw new Error('Failed to obtain Question ID from server.');
-        }
-
-
-        const nextChoices = [];
-        for (let j = 0; j < q.choices.length; j++) {
-          const c = q.choices[j];
-          const cPayload = {
-            question: questionId,
-            text: c.text,
-            is_correct: Boolean(c.is_correct),
-            order: j + 1,
-          };
-
-          let choiceId;
-          if (typeof c.id === 'number') {        
-            await apiClient.patch(`/choices/${c.id}/`, cPayload);
-            choiceId = c.id;
-          } else {                               
-            const createdC = await apiClient.post('/choices/', cPayload);
-            choiceId = createdC?.id;
-          }
-          nextChoices.push({ ...c, ...cPayload, id: choiceId ?? c.id });
-        }
-
-        nextQuestions.push({ ...q, ...qPayload, id: questionId, choices: nextChoices });
+        nextQuestions[i] = fromApi(saved);
       }
 
-      setQuestions(nextQuestions);              
+      setQuestions(nextQuestions);
       setSuccess('The quiz questions have been saved successfully!');
       setTimeout(() => navigate(`/owner/modules/${moduleId}/edit`), 1200);
     } catch (err) {
-      const errorMsg = err.message || err.detail || 'Failed to save the quiz.';
-      setError(errorMsg);
+      setQuestions(nextQuestions);
+      setError(err.message || 'Failed to save the quiz.');
     } finally {
       setIsSaving(false);
     }
@@ -404,12 +385,13 @@ function ManageQuizPage() {
               >
                 Back to Edit Module
               </ActionButton>
+              {/* A real attempt needs an enrolled learner, so owners get a local preview instead. */}
               <ActionButton
                 fullWidth={false}
                 variant="ghost"
-                onClick={() => navigate(`/user/modules/${moduleId}/quiz`)}
+                onClick={() => setIsPreviewOpen(true)}
               >
-                Test Take Quiz
+                Preview Quiz
               </ActionButton>
             </Stack>
 
@@ -424,6 +406,28 @@ function ManageQuizPage() {
           </Box>
         )}
       </Stack>
+
+      <Dialog open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} fullWidth maxWidth="md">
+        <DialogTitle>Quiz preview</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            What learners see, including unsaved changes. Correct answers are hidden and nothing is submitted.
+            Learners may get the questions in a different order or a subset, depending on the module settings.
+          </Typography>
+          <QuizViewer
+            questions={questions.map((q) => ({
+              id: q.id,
+              text: q.text,
+              questionType: q.question_type,
+              points: Number(q.points) || 1,
+              choices: q.choices.map((c) => ({ id: c.id, text: c.text })),
+            }))}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsPreviewOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </PageContainer>
   );
 }

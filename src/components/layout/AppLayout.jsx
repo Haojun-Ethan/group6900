@@ -1,16 +1,47 @@
+import { useEffect, useState } from "react";
 import { AppBar, Box, Toolbar, Typography, Button, Stack, IconButton, Badge } from "@mui/material";
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import UserMenu from './UserMenu';
 import { useAuth  } from "../../hooks/useAuth";
+import * as notificationsApi from "../../api/notifications";
 
+// Re-check the bell count this often, besides on every page change.
+const UNREAD_POLL_MS = 60000;
 
 function AppLayout() {
 
   const { user } = useAuth();
   const location = useLocation();
-  
+
   const navigate = useNavigate();
+
+  const [unread, setUnread] = useState(0);
+
+  // Count unread notifications on each page change, every minute, and whenever the notifications
+  // page marks some as read.
+  useEffect(() => {
+    let ignore = false;
+
+    const refresh = async () => {
+      try {
+        const count = await notificationsApi.getUnreadCount();
+        if (!ignore) setUnread(count);
+      } catch { /* keep the last count; a failed badge shouldn't break the page */ }
+    };
+
+    refresh();
+    const timer = setInterval(refresh, UNREAD_POLL_MS);
+    window.addEventListener(notificationsApi.NOTIFICATIONS_CHANGED, refresh);
+
+    return () => {
+      ignore = true;
+      clearInterval(timer);
+      window.removeEventListener(notificationsApi.NOTIFICATIONS_CHANGED, refresh);
+    };
+  }, [location.pathname]);
+
+  const isOwner = user?.role === 'OWNER' || user?.role === 'ADMIN';
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -54,9 +85,16 @@ function AppLayout() {
                 </Button>
               )}
 
-              {(user?.role === 'OWNER' || user?.role === 'ADMIN') && (
-                <Button component={RouterLink} to="/owner/modules" color={location.pathname.includes('/owner/') ? 'primary' : 'inherit'}>
+              {isOwner && (
+                <Button component={RouterLink} to="/owner/modules" color={location.pathname.startsWith('/owner/modules') ? 'primary' : 'inherit'}>
                   Manage Modules
+                </Button>
+              )}
+
+              {isOwner && (
+                <Button component={RouterLink} to="/owner/gradebook"
+                  color={location.pathname.startsWith('/owner/gradebook') || location.pathname.startsWith('/owner/attempts') ? 'primary' : 'inherit'}>
+                  Gradebook
                 </Button>
               )}
 
@@ -67,12 +105,13 @@ function AppLayout() {
               )}
             </Stack>
 
-            <IconButton 
-              color="inherit" 
+            <IconButton
+              color="inherit"
               onClick={() => navigate('/notifications')}
               sx={{ mr: 1 }}
+              aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
             >
-              <Badge badgeContent={0} color="error">
+              <Badge badgeContent={unread} max={99} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

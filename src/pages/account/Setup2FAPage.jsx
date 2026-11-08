@@ -6,6 +6,7 @@ import * as authApi from '../../api/auth';
 import { useAuth } from '../../hooks/useAuth';
 import { PageContainer, PageTitle, ActionButton, AlertMessage, Icon } from '../../components/ui';
 import CodeInput from '../../components/auth/CodeInput';
+import RecoveryCodesPanel from '../../components/auth/RecoveryCodesPanel';
 import './Setup2FAPage.css';
 
 
@@ -22,8 +23,9 @@ function Setup2FAPage() {
   const [setupError,setSetupError] = useState('');
   const [isLoadingSetup,setIsLoadingSetup] = useState(true);
 
-  // Success state 
+  // Success state: the one-time recovery codes the backend returns when 2FA is turned on.
   const [isEnabled,setIsEnabled] = useState(false);
+  const [recoveryCodes, setRecoveryCodes] = useState([]);
 
   // generate secret + fetch QR
   useEffect(() => {
@@ -62,13 +64,12 @@ function Setup2FAPage() {
    * @param {string} otp
    */
   const handleSubmit = async (otp) => {
-    await authApi.verify2FA(otp);
-    await refreshUser();
+    const res = await authApi.verify2FA(otp);
+    setRecoveryCodes(res?.recoveryCodes || []);
     setIsEnabled(true);
 
-    setTimeout(() => {
-        window.location.reload();
-    }, 1500); 
+    // Update the cached profile so the Account page shows 2FA as on.
+    try { await refreshUser(); } catch { /* the Account page reloads it anyway */ }
   };
 
 
@@ -111,8 +112,11 @@ function Setup2FAPage() {
               title="2FA Enabled"
               subtitle="Two-factor authentication is now active for your account."
             />
+
+            {recoveryCodes.length > 0 && <RecoveryCodesPanel codes={recoveryCodes} />}
+
             <ActionButton onClick={() => navigate('/account')}>
-              Back to Account
+              {recoveryCodes.length > 0 ? "I've saved my codes" : 'Back to Account'}
             </ActionButton>
           </Stack>
         </Paper>
@@ -127,7 +131,7 @@ function Setup2FAPage() {
         <Stack spacing={3}>
           <PageTitle
             title="Set Up 2FA"
-            subtitle="Scan the QR code with your Okta Verify app."
+            subtitle="Scan the QR code with an authenticator app (e.g. Google Authenticator, Microsoft Authenticator, Okta Verify)."
           />
 
           {/* QR code */}

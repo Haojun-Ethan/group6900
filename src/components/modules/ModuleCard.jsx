@@ -1,4 +1,6 @@
-import { Box, Paper, Stack, Typography,Chip , Icon } from "@mui/material";
+import { Box, Paper, Stack, Typography, Chip } from "@mui/material";
+// The app's icon set (Icon.School etc.), not MUI's <Icon> font component.
+import { Icon } from "../ui";
 
 import { useNavigate } from "react-router-dom";
 
@@ -54,18 +56,18 @@ return (
 
       {/* Meta   */} 
       <Stack direction="row" spacing={2} sx={{ mt: 'auto',  pt:2, borderTop: '1px solid #eee' }}>
-          {module.estimated_minutes && (
+          {module.estimatedMinutes != null && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap:0.5}}>
                   <Icon.School fontSize="small" sx={{ color: 'text.disabled', fontSize: 16 }} />
                   <Typography variant="caption" color="text.secondary">
-                      {module.estimated_minutes} min
+                      {module.estimatedMinutes} min
                   </Typography>
               </Box>
           )}
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap:0.5}}>
               <Typography variant="caption" color="text.secondary">
-                  Pass: {module.pass_mark != null ? `${module.pass_mark}%` : 'N/A'}
+                  Pass: {module.passMark != null ? `${module.passMark}%` : 'N/A'}
               </Typography>
           </Box>
       </Stack>

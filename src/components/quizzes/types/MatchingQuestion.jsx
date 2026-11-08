@@ -90,7 +90,7 @@ function MatchingQuestion({ question, value = {}, onChange, disabled = false }) 
 
             {/* ******* Left */}
 
-            <Grid item xs={6}>
+            <Grid size={6}>
             <Typography variant="caption" sx={{ mb:1, display:  'block', fontWeight: 600 }}>
                 TERMS
             </Typography>
@@ -124,7 +124,7 @@ function MatchingQuestion({ question, value = {}, onChange, disabled = false }) 
             {/* ******* Right */}
 
             
-            <Grid item xs={6}>
+            <Grid size={6}>
             <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
                 DESCRIPTIONS
             </Typography>

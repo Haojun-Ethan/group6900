@@ -42,9 +42,12 @@ function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);   
     const [serverError, setServerError] = useState('');
 
-    const updateField = (name,value) => { 
+    const updateField = (name,value) => {
         setForm((prev) => ({...prev, [name]:value}));
      }
+
+    // The similarity rule compares the password with these.
+    const passwordContext = { username: form.username, email: form.email };
 
      const validate = ( ) => { 
         const newError = {};
@@ -60,15 +63,16 @@ function RegisterPage() {
             }
         }
 
-        const pwdErr = validatePassword(form.password)      // shared rules with -passwordrules
+        // Same rules as the backend's password validators (see utils/passwordRules.js).
+        const pwdErr = validatePassword(form.password, passwordContext);
         if(pwdErr) newError.password = pwdErr;
 
         //confirm password
         if(!form.confirmPassword) {
-            newError.confirmPassword = 'Please confirm your password!';
+            newError.confirmPassword = 'Please confirm your password';
 
         } else if (form.confirmPassword !== form.password) {
-            newError.confirmPassword = 'Password incorrect';
+            newError.confirmPassword = "Passwords don't match";
         }
 
         return newError;
@@ -93,9 +97,22 @@ function RegisterPage() {
                 email: form.email,
                 password: form.password
             });
-            navigate('/login', {replace:true});  
+            // The login page shows a "registered" message and fills in the username.
+            navigate('/login', { replace: true, state: { registered: true, username: form.username } });
         } catch (err) {
-            setServerError(err.message || 'Registration failed!');
+            // Show the backend's messages under the matching fields (e.g. "This password is too common.",
+            // "A user with that username already exists."); anything else goes in the banner.
+            const fieldErrors = {};
+            for (const name of ['username', 'email', 'password']) {
+                const messages = err.fieldErrors?.[name];
+                if (messages) fieldErrors[name] = [].concat(messages).join(' ');
+            }
+
+            if (Object.keys(fieldErrors).length > 0) {
+                setErrors(fieldErrors);
+            } else {
+                setServerError(err.message || 'Registration failed');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -121,7 +138,7 @@ function RegisterPage() {
                         {field.name ==="password" && form.password.length > 0 && (
                             <List dense sx={{mt:1,pl:1}}>
                                 {getActiveRules().map((rule) => {
-                                const passed = rule.test(form.password);
+                                const passed = rule.test(form.password, passwordContext);
                                 return (
                                 <ListItem key={rule.key} disableGutters sx={{ py: 0 }}>
                                     <ListItemIcon sx={{ minWidth: 28 }}>

@@ -17,10 +17,19 @@ export async function login(credentials) {
 }
 
 /**
- * step 2 - submit OTp
+ * step 2 - finish a 2FA login with either the 6-digit code or a one-time recovery code
+ * @param {{ challengeId: string, otp?: string, recoveryCode?: string }} data
  */
-export async function submitOTP({ challengeId, otp }) {
-  return apiClient.post(ENDPOINTS.login2FA, { challengeId, otp });
+export async function submitOTP({ challengeId, otp, recoveryCode }) {
+  return apiClient.post(ENDPOINTS.login2FA, recoveryCode ? { challengeId, recoveryCode } : { challengeId, otp });
+}
+
+/**
+ * Revoke the refresh token on the server, so it can't be used again after logout.
+ * @param {string} refresh
+ */
+export async function logout(refresh) {
+  return apiClient.post(ENDPOINTS.logout, { refresh });
 }
 
 /**
@@ -28,7 +37,7 @@ export async function submitOTP({ challengeId, otp }) {
  * RealWorld FullStack API Specs (Current User Endpoint)
  * https://realworld-docs.netlify.app/docs/specs/frontend-specs/api/
  *
- * @returns {Promise<{ id: number, username: string, email: string, role: 'USER'|'OWNER'|'ADMIN', is2FaEnabled: boolean }>}
+ * @returns {Promise<{ id: number, username: string, email: string, role: 'USER'|'OWNER'|'ADMIN', is2faEnabled: boolean }>}
  */
 export async function getMe() {
   return apiClient.get(ENDPOINTS.me);
@@ -44,4 +53,25 @@ export async function fetch2FAQR() {
 
 export async function verify2FA(otp) {
   return apiClient.post(ENDPOINTS.twoFAVerify, { otp });
+}
+
+/*
+ * Turning 2FA off and replacing recovery codes both re-check the user's identity:
+ * the password plus either a 6-digit code or one recovery code.
+ */
+const identity = ({ password, otp, recoveryCode }) =>
+  recoveryCode ? { password, recoveryCode } : { password, otp };
+
+/** @param {{password: string, otp?: string, recoveryCode?: string}} confirmation */
+export async function disable2FA(confirmation) {
+  return apiClient.post(ENDPOINTS.twoFADisable, identity(confirmation));
+}
+
+/**
+ * Replace all recovery codes; the old ones stop working.
+ * @param {{password: string, otp?: string, recoveryCode?: string}} confirmation
+ * @returns {Promise<{recoveryCodes: string[]}>}
+ */
+export async function regenerateRecoveryCodes(confirmation) {
+  return apiClient.post(ENDPOINTS.twoFARecoveryCodes, identity(confirmation));
 }

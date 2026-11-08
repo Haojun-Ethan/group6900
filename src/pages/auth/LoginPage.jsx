@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useAuth } from "../../hooks/useAuth";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Stack, Typography, Link as MuiLink } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import AuthLayout from "../../components/ui/AuthLayout";
@@ -36,8 +36,12 @@ function LoginPage() {
     //---router 2-02  rewrite, delete ->const [errors, setErrors] = useState({});
      const {login} = useAuth(); /* ---Router 2-02 add---- */
      const navigate = useNavigate();/* ---Router 2-02 add---- */
+     const location = useLocation();
 
-     const [form, setForm] = useState({username:'', password: ''});
+     // Coming straight from the register page: say so, and fill in the new username.
+     const justRegistered = Boolean(location.state?.registered);
+
+     const [form, setForm] = useState({username: location.state?.username || '', password: ''});
      const [errors, setErrors] = useState({});
     // Loading state / 加载状态
     const [isLoading, setIsLoading] = useState(false);
@@ -85,8 +89,7 @@ function LoginPage() {
             
             navigate(result.mfaRequired ? '/login/2fa' : '/', { replace: true }); /* ---Rewrite 5-01 ,Router 2-02 add  , 2FA 3-01 ---- */
         } catch (error) {
-            setServerError(error.message || 'An error occurred during login'); // Set server error 
-            console.error('Login failed:', error);
+            setServerError(error.message || 'An error occurred during login'); // Set server error
         } finally {
             setIsLoading(false); //stop Loading 
         }
@@ -100,6 +103,11 @@ function LoginPage() {
    
     <form onSubmit={handleSubmit}>
         <Stack spacing={2.5}>
+            {justRegistered && !serverError && (
+                <AlertMessage type="success">
+                    Your account has been created. Log in to get started.
+                </AlertMessage>
+            )}
             {serverError && <AlertMessage type="error">{serverError}</AlertMessage>}
 
   

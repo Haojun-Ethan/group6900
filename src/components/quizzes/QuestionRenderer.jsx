@@ -15,21 +15,13 @@ function QuestionRenderer({
     question, answer, onChange,  disabled =false,  showType=true, index,
     }) {
 
-        const type = question.question_type || question.questionType;
+        // API data is camelCase; the local demo data in _mockQuizData.js is still snake_case.
+        const type = question.questionType || question.question_type;
 
         const TypeComponent = QUESTION_TYPES[type];
 
         if (!TypeComponent) {
-            return <Paper sx={{ p: 3, bgcolor: 'warning.light' }}>Unsupported question types:{question.question_type}</Paper>;
-        }
-
-        if (!TypeComponent) {
-            return (
-                <Paper sx={{ p: 3 }}>
-
-                    <Typography color="error">  Unknown question type: {question.question_type}  </Typography>
-                </Paper>
-            );
+            return <Paper sx={{ p: 3, bgcolor: 'warning.light' }}>Unsupported question type: {type}</Paper>;
         }
 
         return (

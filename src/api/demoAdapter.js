@@ -4,7 +4,7 @@ import {
   MOCK_ENROLLED_MODULES,
   MOCK_USERS,
 } from '../pages/modules/_mockData';
-import { MOCK_QUIZ_QUESTIONS } from '../pages/quizzes/_mockQuizData';
+import * as quizMock from '../mocks/quizMock';
 
 const MOCK_ACCESS = 'demo_access_token';
 const MOCK_REFRESH = 'demo_refresh_token';
@@ -20,6 +20,26 @@ const DEMO_USERS = {
 };
 
 const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms));
+
+// Remember which demo user logged in, so /accounts/me/ still answers after a page reload.
+const DEMO_ROLE_KEY = 'demo_role';
+const currentDemoUser = () => {
+  try { return DEMO_USERS[localStorage.getItem(DEMO_ROLE_KEY)] || DEMO_USERS.user; } catch { return DEMO_USERS.user; }
+};
+
+// The numeric id in a URL such as /attempts/12/submit/
+const idFromUrl = (url) => Number(url.match(/\/(\d+)\//)?.[1]);
+
+const parseBody = (config) => (typeof config.data === 'string' ? JSON.parse(config.data) : config.data);
+
+/** Turn a quizMock { status, body } result into an axios response or error. */
+const fromMock = ({ status, body }) => {
+  if (status < 400) return buildResponse(body, status);
+
+  const error = new Error('Request failed');
+  error.response = { data: body, status, statusText: 'Error', headers: {}, config: {} };
+  return Promise.reject(error);
+};
 
 const buildResponse = (data, status = 200) => ({
   data,
@@ -54,17 +74,33 @@ const routeHandlers = [
       const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
       const username = body?.username || '';
 
-      let user = DEMO_USERS.user;
-      if (username.includes('owner')) user = DEMO_USERS.owner;
-      else if (username.includes('admin')) user = DEMO_USERS.admin;
+      let role = 'user';
+      if (username.includes('owner')) role = 'owner';
+      else if (username.includes('admin')) role = 'admin';
+      try { localStorage.setItem(DEMO_ROLE_KEY, role); } catch { /* ignore */ }
 
-      // 直接返回 token，不需要 2FA
+      // No 2FA in demo mode: tokens straight away.
       return buildResponse({
         mfa_required: false,
         access: MOCK_ACCESS,
         refresh: MOCK_REFRESH,
-        user,
       });
+    },
+  },
+
+  // ============ Current user / logout ============
+  {
+    match: (m, u) => m === 'get' && u.endsWith('/accounts/me/'),
+    handle: async () => {
+      await delay(100);
+      return buildResponse(currentDemoUser());
+    },
+  },
+  {
+    match: (m, u) => m === 'post' && u.endsWith('/accounts/logout/'),
+    handle: async () => {
+      await delay(100);
+      return buildResponse({ detail: 'Logged out.' });
     },
   },
 
@@ -73,7 +109,7 @@ const routeHandlers = [
     match: (m, u) => m === 'post' && u.endsWith('/api/token/refresh/'),
     handle: async () => {
       await delay(100);
-      return buildResponse({ access: MOCK_ACCESS });
+      return buildResponse({ access: MOCK_ACCESS, refresh: MOCK_REFRESH });
     },
   },
 
@@ -125,12 +161,62 @@ const routeHandlers = [
     },
   },
 
-  // ============ Quiz ============
+  // ============ Quiz (same paths as the backend; logic in src/mocks/quizMock.js) ============
   {
-    match: (m, u) => m === 'get' && /\/modules\/\d+\/questions\/$/.test(u),
+    match: (m, u) => m === 'get' && u.endsWith('/questions/'),
+    handle: async (config) => {
+      await delay();
+      return buildResponse(quizMock.listQuestions(config.params?.module));
+    },
+  },
+  {
+    match: (m, u) => m === 'post' && u.endsWith('/attempts/'),
+    handle: async (config) => {
+      await delay();
+      return fromMock(quizMock.startAttempt(parseBody(config)?.module));
+    },
+  },
+  {
+    match: (m, u) => m === 'post' && /\/attempts\/\d+\/submit\/$/.test(u),
+    handle: async (config) => {
+      await delay();
+      return fromMock(quizMock.submitAttempt(idFromUrl(config.url), parseBody(config)));
+    },
+  },
+  {
+    match: (m, u) => m === 'get' && /\/attempts\/\d+\/$/.test(u),
+    handle: async (config) => {
+      await delay();
+      return fromMock(quizMock.getAttempt(idFromUrl(config.url)));
+    },
+  },
+
+  // ============ Notifications (demo: a single welcome message, nothing persists) ============
+  {
+    match: (m, u) => m === 'get' && u.endsWith('/notifications/unread-count/'),
+    handle: async () => buildResponse({ count: 1 }),
+  },
+  {
+    match: (m, u) => m === 'get' && u.endsWith('/notifications/'),
     handle: async () => {
       await delay();
-      return buildResponse(MOCK_QUIZ_QUESTIONS);
+      return buildResponse([{
+        id: 1, title: 'Welcome to DefendEd', message: 'This is demo mode, so nothing you do here is saved.',
+        link: '/modules', is_read: false, created_at: new Date().toISOString(),
+      }]);
+    },
+  },
+  {
+    match: (m, u) => /\/notifications\//.test(u) && (m === 'post' || m === 'delete'),
+    handle: async () => buildResponse({ updated: 0 }),
+  },
+
+  // ============ Gradebook (demo: empty) ============
+  {
+    match: (m, u) => m === 'get' && u.endsWith('/gradebook/'),
+    handle: async () => {
+      await delay();
+      return buildResponse([]);
     },
   },
 
@@ -153,6 +239,7 @@ export const demoAdapter = async (config) => {
       try {
         return await route.handle(config);
       } catch (err) {
+        if (err.response) throw err;   // a deliberate mock error response (e.g. 404, 400)
         return buildError(err.message || 'Mock error', 500);
       }
     }

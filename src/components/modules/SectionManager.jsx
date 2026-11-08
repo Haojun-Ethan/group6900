@@ -5,6 +5,11 @@ import { Stack, Box, Typography, Paper, IconButton, Tooltip, Alert,  } from '@mu
 import { FormField, ActionButton, Icon } from '../ui';
 import EmptyState from '../ui/EmptyState';
 import * as sectionsApi from '../../api/sections';
+import { markdownPreview } from '../../utils/markdownPreview';
+
+const BODY_HELP = 'Markdown supported: ### sub-heading, **bold**, - lists, | tables |, [link](https://...), '
+    + '![image](https://...). A YouTube link on its own line becomes a video. '
+    + 'Put an exercise answer between ```answer and ``` lines to show it behind a "Show answer" button.';
 /**
  * Section manager - add/edit/delete sections inline  -> 新增/编辑/删除
  *
@@ -130,7 +135,7 @@ function SectionManager({ moduleId, initialSections = [] }) {
                 <Stack spacing={2}>
                     <FormField  label="Title"   value={draft.title} onChange={(e) => setDraft((d) => ({ ...d,  title:e.target.value }))}  multiline={true} rows={2} disabled={isSaving} />
                     <FormField  label="Body"    value={draft.body}  onChange={( e) => setDraft((d) => ({ ...d, body: e.target.value }))}  multiline={true} rows={8} disabled={isSaving}
-                        helperText="To add a YouTube video, please paste the YouTube link (e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ) on a new line. To add an image, paste a direct image URL."   />
+                        helperText={BODY_HELP} />
                     <FormField  label="Order"   type="number"   value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}    inputProps={{ min: 1 }}  disabled={isSaving} />
                     <Stack direction="row" spacing={1}>
                         <ActionButton fullWidth={false} onClick={handleSave} loading={isSaving}>Save</ActionButton>
@@ -159,7 +164,7 @@ function SectionManager({ moduleId, initialSections = [] }) {
                     
                     <FormField label="Title"    value={draft.title}     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} multiline={true} rows={2} disabled={isSaving}  />
                     <FormField label="Body"     value={draft.body}      onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))} multiline={true} rows={8}  disabled={isSaving} 
-                        helperText="To add a YouTube video, just paste the YouTube link on a new line. To add an image, paste a direct image URL."/>
+                        helperText={BODY_HELP} />
                     <FormField label="Order" type="number"  value={draft.order} onChange={(e) => setDraft((d) => ({ ...d, order: Number(e.target.value) }))}   inputProps={{ min:1}} disabled={isSaving}  />
 
 
@@ -189,7 +194,7 @@ function SectionManager({ moduleId, initialSections = [] }) {
                             color="text.secondary"
                             sx={{ display: '-webkit-box', WebkitLineClamp: 2 , WebkitBoxOrient:'vertical', overflow: 'hidden',  } } >
 
-                            {section.body}
+                            {markdownPreview(section.body)}
 
                         </Typography>
                     </Box>

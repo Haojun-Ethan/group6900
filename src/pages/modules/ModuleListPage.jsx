@@ -69,15 +69,14 @@ function ModuleListPage() {
   if (isLoading) {
     return (
       <PageContainer maxWidth='lg'>
-        <PageTitle title='Modules' subtitle='Browse available training modules.'>
-          <Grid container spacing={{xs:2, md:3}}>
-            {[123456].map((n)=> (
-              <Grid item xs={12} sm={6} md={4} key ={n}>
-                <Skeleton variant='rounded' height={220} sx={{borderRadius:2}} />
-              </Grid>
-            ))}
-          </Grid>
-        </PageTitle>
+        <PageTitle title='Modules' subtitle='Browse available training modules.' />
+        <Grid container spacing={{xs:2, md:3}}>
+          {[1, 2, 3, 4, 5, 6].map((n)=> (
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={n}>
+              <Skeleton variant='rounded' height={220} sx={{borderRadius:2}} />
+            </Grid>
+          ))}
+        </Grid>
       </PageContainer>
     );
   }
@@ -125,7 +124,7 @@ function ModuleListPage() {
       />
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {modules.map((m) => (
-          <Grid item xs={12} sm={6} md={4} key={m.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={m.id}>
             <ModuleCard module={m} />
           </Grid>
         ))}

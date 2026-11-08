@@ -23,14 +23,10 @@ function ManageUsersPage() {
             setIsLoading(true);
             setError('');
             try {
-                // future: const data = await usersApi.listUsers();
-               /* const data = await new Promise((r) =>
-                    setTimeout(() => r(MOCK_USERS), 400)
-                );*/
                 const data = await usersApi.listUsers();
                 if (!ignore) setUsers(data);
-            } catch   {
-                if (!ignore)  setError( 'The user management interface has not been fully developed yet and data cannot be loaded.');  // (err.message || 'Failed to load users');
+            } catch (err) {
+                if (!ignore) setError(err.message || 'Failed to load users');
             } finally {
                 if(!ignore)  setIsLoading(false);
             }
@@ -108,25 +104,25 @@ function ManageUsersPage() {
                 {/* 09-01 */}
             {!isLoading && !error && (
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                    <Grid item xs={6} sm={3}>
+                    <Grid size={{ xs: 6, sm: 3 }}>
                         <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="h4" color="primary.main">{totalUsers}</Typography>
                             <Typography variant="body2" color="text.secondary">Total Users</Typography>
                         </Paper>
                     </Grid>
-                    <Grid item xs={6} sm={3}>
+                    <Grid size={{ xs: 6, sm: 3 }}>
                         <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="h4" color="error.main">{adminCount}</Typography>
                             <Typography variant="body2" color="text.secondary">Admins</Typography>
                         </Paper>
                     </Grid>
-                    <Grid item xs={6} sm={3}>
+                    <Grid size={{ xs: 6, sm: 3 }}>
                         <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="h4" color="warning.main">{ownerCount}</Typography>
                             <Typography variant="body2" color="text.secondary">Owners</Typography>
                         </Paper>
                     </Grid>
-                    <Grid item xs={6} sm={3}>
+                    <Grid size={{ xs: 6, sm: 3 }}>
                         <Paper elevation={0} sx={{ p: 2, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="h4" color="success.main">{regularCount}</Typography>
                             <Typography variant="body2" color="text.secondary">Learners</Typography>
@@ -164,7 +160,7 @@ function ManageUsersPage() {
                     </TableHead>
                     <TableBody>
                         {users.map((u) => {
-                            const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
+                            const has2FA = Boolean(u.is2faEnabled);
                             return (
                                 <TableRow key={u.id}>
                                     <TableCell>{u.username}</TableCell>
