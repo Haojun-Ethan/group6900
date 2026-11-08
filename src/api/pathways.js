@@ -18,3 +18,7 @@ export async function createPathway(data) {
 export async function updatePathway(id, data) {
     return apiClient.patch('/pathways/' + id + '/', data);
 }
+
+export async function assignPathway(id, userIds) {
+    return apiClient.post(`/pathways/${id}/assign/`, { user_ids: userIds });
+}
