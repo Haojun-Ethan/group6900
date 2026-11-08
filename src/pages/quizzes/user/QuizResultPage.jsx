@@ -168,7 +168,7 @@ function QuizResultPage() {
               }}
             >
               <Typography variant="h1" sx={{ color: '#fff', fontSize: '2rem' }}>
-                {scorePercent}%
+                {Number(scorePercent).toFixed(2)}%
               </Typography>
             </Box>
 
