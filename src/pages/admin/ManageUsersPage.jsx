@@ -28,6 +28,12 @@ function ManageUsersPage() {
                     setTimeout(() => r(MOCK_USERS), 400)
                 );*/
                 const data = await usersApi.listUsers();
+
+                console.log("=== Data from /accounts/users/ ===");
+                console.log(data); 
+
+
+
                 if (!ignore) setUsers(data);
             } catch   {
                 if (!ignore)  setError( 'The user management interface has not been fully developed yet and data cannot be loaded.');  // (err.message || 'Failed to load users');
@@ -165,6 +171,14 @@ function ManageUsersPage() {
                     <TableBody>
                         {users.map((u) => {
                             const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
+
+                            console.log(`Checking User: ${u.username}`, {
+                                is2FaEnabled: u.is2FaEnabled,
+                                is_2fa_enabled: u.is_2fa_enabled,
+                                rawObject: u
+                            });
+
+
                             return (
                                 <TableRow key={u.id}>
                                     <TableCell>{u.username}</TableCell>
