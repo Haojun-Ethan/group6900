@@ -170,7 +170,10 @@ function ManageUsersPage() {
                     </TableHead>
                     <TableBody>
                         {users.map((u) => {
-                            const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
+                            //const has2FA = Boolean(u.is2FaEnabled ?? u.is_2fa_enabled);
+                            const has2FA = Object.keys(u).some(key => 
+                                key.toLowerCase().includes('2fa') && Boolean(u[key])
+                            );
 
                             console.log(`Checking User: ${u.username}`, {
                                 is2FaEnabled: u.is2FaEnabled,
