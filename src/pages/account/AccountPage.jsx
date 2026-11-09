@@ -1,10 +1,13 @@
 
-import { Paper, Stack, Typography, Box, Button } from '@mui/material';
+import { Paper, Stack, Typography, Box, Button , Chip, Tooltip} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+//import { PageContainer, PageTitle } from '../../components/ui';
 import { PageContainer, PageTitle } from '../../components/ui';
+
 import SecurityIcon from '@mui/icons-material/Security';
 import './AccountPage.css';
+
 
 /**
  MUI handbook
@@ -13,6 +16,7 @@ https://mui.com/material-ui/react-list/
 function AccountPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const is2FaActive = Boolean(user?.is2FaEnabled);
 
   return (
     <PageContainer className="account-page" maxWidth="md">
@@ -35,22 +39,59 @@ function AccountPage() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, mb: 3, pb: 3, borderBottom: '1px solid #e2e8f0' }}>
             <Box>
               <Typography variant="body1" fontWeight={500}>
-                Two-Factor Authentication
+                Password
               </Typography>
+
               <Typography variant="body2" color="text.secondary">
-                Add an extra layer of security to your account
+                Update your account password.
               </Typography>
             </Box>
 
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/account/2fa/setup')}
-            >
-              Enable
-            </Button>
+            <Tooltip title="Backend API is not available yet">
+              <span>
+                <Button variant="outlined" disabled>
+                  Change
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>   
+              <Box>           
+                <Typography variant="body1" fontWeight={500}>
+                  Two-Factor Authentication
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary">
+                  {is2FaActive 
+                    ? 'Two-factor authentication is currently protecting your account.'
+                    : 'Add an extra layer of security to your account.'}
+                </Typography>
+
+              </Box>
+
+                {is2FaActive ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Chip label="Active" color="success" size="small" sx={{ fontWeight: 600 }} />
+                      <Tooltip title="Backend API is not available yet">
+                        <span>
+                          <Button variant="outlined" color="error" size="small" disabled>
+                            Disable
+                          </Button>
+                        </span>
+                      </Tooltip>
+                  </Box>
+                    ) : (
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/account/2fa/setup')}
+                >
+                  Enable
+                </Button>
+            )}
           </Box>
         </Paper>
 

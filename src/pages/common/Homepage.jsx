@@ -31,6 +31,14 @@ const HOME_CARDS = [
         icon: 'Dashboard',
     },
     {
+        key: 'pathways',
+        title: 'Learning Pathways',
+        description: 'Follow structured learning tracks',
+        path: '/pathways',
+        roles: ['USER', 'OWNER', 'ADMIN'],
+        icon: 'School',
+    },
+    {
         key: 'manage-users',
         title: 'Manage Users',
         description: 'Manage user accounts and roles',
@@ -64,13 +72,12 @@ function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Backend does not return user.role yet
 
     const userRole = user?.role;
     // Filter cards for different role
     const visibleCards = userRole
     ? HOME_CARDS.filter((card) => card.roles.includes(userRole))
-    : HOME_CARDS;
+    : HOME_CARDS.filter((card) => card.roles.includes('USER'));
 
     return (
     <PageContainer className="home-page" maxWidth="lg">

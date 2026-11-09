@@ -1,26 +1,58 @@
 /* Rewrite ---- 4-01  and  debug ---6-02*/
-
+/* updata ----8-01----  */
 // src/api/client.js
 import axios from 'axios';
-import {
-  getAccess, getRefresh, setAccess, clearAll,
-} from '../utils/storage';
+import {  getAccess, getRefresh, setAccess, clearAll,} from '../utils/storage';
 import { ENDPOINTS, REQ } from '../config/apiContract';
 
 
+import { demoAdapter } from './demoAdapter';
+import { adaptToSnake, adaptToCamel } from './adapter';
+
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';  // DEMO
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
+  timeout: 40000,
   headers: { 'Content-Type': 'application/json' },
+  ...(DEMO_MODE ? { adapter: demoAdapter } : {}),  //DEMO
 });
+
+let wakeUpTimer = null; /* 10 - 02 */
+
+  /*
+    https://axios.rest/pages/advanced/interceptors
+    https://render.com/docs/free#spinning-down-on-idle  // 15 minutes -> spins down
+    https://www.npmjs.com/package/@dpsys/axios-loader
+  */
 
 // Request interceptor 
 apiClient.interceptors.request.use((config) => {
+    /* 10 - 02 */
+    if (!DEMO_MODE) {
+    clearTimeout(wakeUpTimer);
+    wakeUpTimer = setTimeout(() => {
+      window.dispatchEvent(new Event('server-waking-up'));
+    }, 3000);
+  }
   const access = getAccess();
-  if (access) config.headers.Authorization = `Bearer ${access}`;
+  if (access && !config.headers.Authorization) {         // 08-01  automount JWT Bearer Token
+    config.headers.Authorization = `Bearer ${access}`;
+  }
+
+  if (config.data && !(config.data instanceof FormData) && !config.skipTransform) {
+
+    config.data = adaptToSnake(config.data)
+  }
+
+  if ( config.params && typeof config.params === 'object' && !config.skipTransform) {
+    config.params = adaptToSnake(config.params);
+    
+  }
   //config.headers['X-API-Version'] = API_VERSION;
   return config;
-});
+}, 
+(error)=> Promise.reject(error));
 
 // Singleton refresh promise 
 let refreshPromise = null;
@@ -29,9 +61,11 @@ const doRefresh = async () => {
   const refresh = getRefresh();
   if (!refresh) throw new Error('No refresh token');
   const { data } = await axios.post(
-    `${import.meta.env.VITE_API_BASE_URL}${ENDPOINTS.refresh}`,
+    `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}${ENDPOINTS.refresh}`,
     { [REQ.refresh]: refresh }
   );
+
+  
   setAccess(data.access);
   return data.access;
 };
@@ -41,11 +75,28 @@ const AUTH_ENDPOINTS = [
   ENDPOINTS.login,
   ENDPOINTS.register,
   ENDPOINTS.login2FA,
+  ENDPOINTS.refresh,
 ];
 
 apiClient.interceptors.response.use(
-  (res) => res.data,
+  /*(res) => res.data,      change 08-01*/
+(response) => {
+
+
+  clearTimeout(wakeUpTimer);    
+
+    // 204 No Content retrun null
+    if (response.status === 204) { return null; }
+
+    const payload = response.data;
+    if (response.config?.skipTransform) { return payload; }
+
+    // auto change to Camel
+    return adaptToCamel(payload);
+  },
+
   async (error) => {
+    clearTimeout(wakeUpTimer);
     const original = error.config;
     const status = error.response?.status;
 
@@ -65,24 +116,38 @@ apiClient.interceptors.response.use(
         return apiClient(original);
       } catch {
         clearAll();
-        window.location.href = '/login';
-        return Promise.reject({ message: 'Session expired' });
-      }
+        if (!window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login';
+        }
+          return Promise.reject({ message: 'Session expired, please login again',status,raw: error });
+        }
     }
 
     // ★ Extract error message 
     const data = error.response?.data;
     let message = 'Network error';
-    if (data?.message) message = data.message;
-    else if (data?.detail) message = data.detail;
-    else if (data && typeof data === 'object') {
-      const firstKey = Object.keys(data)[0];
-      if (firstKey && Array.isArray(data[firstKey])) {
-        message = `${firstKey}: ${data[firstKey][0]}`;
+      if (data) {     /* 08-01 */
+        if (typeof data === 'string') {
+          message = data;
+        } else if (data.message) {
+          message = data.message;
+        } else if (data.detail) {
+          message = data.detail;
+        } else if (typeof data === 'object') {
+          
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const fieldError = data[firstKey];
+            message = Array.isArray(fieldError)
+              ? `${firstKey}: ${fieldError[0]}`
+              : `${firstKey}: ${fieldError}`;
+          }
+        }
+      } else if (error.message) {
+        message = error.message;
       }
-    }
 
-    return Promise.reject({ message });
+    return Promise.reject({ message, status, raw: error });
   }
 );
 

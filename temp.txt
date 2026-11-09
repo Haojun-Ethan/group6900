@@ -1,0 +1,46 @@
+//Please Synchronize before working. Every times!!!!
+git checkout main
+git pull origin main
+
+// building a branch
+git checkout -b *   //  branch name ex: feature/register
+
+git add .
+git commit -m "ex: feat-add register page"
+
+//Push to your branch
+git push --set-upstream origin *   // branch name
+
+// Local cleaning
+git checkout main
+git pull origin main
+git branch -d * //branch name
+
+
+------------------------------------
+
+
+//Marge to main
+
+# 1. 同步 main
+git checkout main
+git pull origin main
+
+# 2. 开分支
+git checkout -b feature/login
+
+# 3. 写代码 → 提交
+git add .
+git commit -m "feat: add login page"
+
+# 4. push 分支
+git push --set-upstream origin feature/login
+
+# 5. 【去 GitHub 网页】
+#    Compare & pull request → Create pull request
+#    → Merge pull request → Confirm merge → Delete branch
+
+# 6. 本地清理
+git checkout main
+git pull origin main
+git branch -d feature/login
