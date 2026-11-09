@@ -77,6 +77,14 @@ export const AuthProvider = ({ children }) => {
             refreshState();
         }, [refreshState]);
 
+
+        // Clear id and info.
+        const cancelMFA = useCallback(() => {
+            storage.clearAll(); 
+            setUser(null);
+            setAuthState('UNAUTHENTICATED');
+        }, []);
+
     // Provide context value 
     const value = {
         user,
@@ -86,6 +94,8 @@ export const AuthProvider = ({ children }) => {
         login,
         submitOTP,
         logout,
+        cancelMFA,
+
        
     };
 
