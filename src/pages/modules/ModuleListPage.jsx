@@ -6,27 +6,14 @@ import * as modulesApi from '../../api/modules';
 import { PageContainer,PageTitle } from '../../components/ui';
    
 import ModuleCard from '../../components/modules/ModuleCard';
-//import { MOCK_QUIZ_QUESTIONS } from '../quizzes/_mockQuizData';
-//import { MOCK_MODULES } from './mockData';
-//import { MOCK_MODULES } from './_mockData';
 
-
-/**
- * Demo state. Delete this when API is ready.
- */
-
-//const DEMO_STATE = 'loading'; // 'normal' | 'loading' | 'empty' | 'error'
 
 function ModuleListPage() {
   const [modules, setModules] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ★ TODO:  API ---Switch to a real API call
-
-  /*
-    https://react.dev/learn/synchronizing-with-effects#fetching-data
-  */
+  //  TODO:  API ---Switch to a real API call
 
   useEffect(() => {
 
@@ -38,10 +25,7 @@ function ModuleListPage() {
 
       try {
 
-        // future：const data = await modulesApi.listModules();
-        /*const data = await new Promise((resolve) => {
-          setTimeout(() => resolve(MOCK_QUIZ_QUESTIONS) , 400); // simulate network delay
-        });*/
+
 
         const data = await modulesApi.listModules();
         if(!ignore){
@@ -82,12 +66,7 @@ function ModuleListPage() {
   }
 
 
-  // ★ DEMO_STATE 
-/* delete 08-01
-  const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
-  const effectiveError = DEMO_STATE === 'error' ? 'Failed to load modules (demo)' : error;
-  const effectiveModules = DEMO_STATE === 'empty' ? [] : modules;
-*/
+
   // ===== Render  =====
 
 

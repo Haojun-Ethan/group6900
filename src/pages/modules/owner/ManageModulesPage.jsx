@@ -5,9 +5,7 @@ import * as modulesApi from '../../../api/modules';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageContainer, PageTitle, ActionButton, EmptyState, Icon, } from '../../../components/ui';
 import ModuleCard from '../../../components/modules/ModuleCard';
-//import { MOCK_MODULES } from '../_mockData';
 
-//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'empty' | 'error'
 
 /*  Owner's module management page    */
 function ManageModulesPage() {
@@ -29,10 +27,7 @@ function ManageModulesPage() {
 
                 // future : const data = await modulesApi.listMyCreatedModules(user.username);
 
-                const allModules = await modulesApi.listModules();    /*await new Promise((r) =>
-                setTimeout(() => r(MOCK_MODULES.filter((m) => m.created_by?.username === 'owner_test')),400)
-                );
-                */
+                const allModules = await modulesApi.listModules(); 
                 const myModules = (allModules || []).filter((m) => {
                         if (user?.role === 'ADMIN' || !m.createdBy) return true;
                         return m.createdBy?.username === user?.username;
@@ -65,9 +60,7 @@ function ManageModulesPage() {
         }
     };
 
-   // const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
-    //const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
-    //const effectiveModules = DEMO_STATE === 'empty' ? [] : modules;
+
 
     if (isLoading) {
         return (

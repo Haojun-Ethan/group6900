@@ -7,10 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import * as quizzesApi from '../../../api/quizzes';
 import { PageContainer, PageTitle, ActionButton, Icon } from '../../../components/ui';
 
-/**
- * Owners: one learner's quiz attempt, question by question. The attempt's results give the learner's
- * choice ids; the owner's question bank supplies the choice texts and which ones are correct.
- */
+
 function AttemptReviewPage() {
   const { attemptId } = useParams();
   const navigate = useNavigate();

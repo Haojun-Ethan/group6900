@@ -45,23 +45,3 @@ function PtcRoute({ children, require = 'auth',roles }) {
 export default PtcRoute;
 
 
-/* MUI---- 6-01
-function PtcRoute({ children, require = 'auth' }) {
-  const { authState } = useAuth();
- if(authState === 'LOADING')  return <p>Loading...</p>; // waitting resolution
-
-  if (require === 'auth' && authState !== 'AUTHENTICATED') {
-    return <Navigate to="/login" replace />;
-  }
-  if (require === 'guest' && authState === 'AUTHENTICATED') {
-    return <Navigate to="/" replace />;
-  }
-
-  if (require === 'guest' && authState === 'MFA_PENDING') {
-    return <Navigate to="/login/2fa" replace />;
-  }
-
-  if (require === 'mfa' && authState !== 'MFA_PENDING') {
-    return <Navigate to={ authState === 'AUTHENTICATED' ? '/' : '/login'} replace />;
-  }   
-*/

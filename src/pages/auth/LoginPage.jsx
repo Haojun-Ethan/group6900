@@ -43,9 +43,9 @@ function LoginPage() {
 
      const [form, setForm] = useState({username: location.state?.username || '', password: ''});
      const [errors, setErrors] = useState({});
-    // Loading state / 加载状态
+    // Loading state 
     const [isLoading, setIsLoading] = useState(false);
-    //Server error state / 服务器错误状态
+    //Server error state 
     const [serverError, setServerError] = useState('');
 
     const updateField = (name, value) => { 
@@ -63,13 +63,13 @@ function LoginPage() {
         return err;
     };
 
-  // Handle form submit  / 处理表单提交
+  // Handle form submit  
   const handleSubmit = async (e) => {       /* must use async */
     // Prevent page reload 
     e.preventDefault();    /* Read from Fullstackopen,  this is important */
-    if (isLoading) return; // Prevent duplicate submission /防重复提交
+    if (isLoading) return; // Prevent duplicate submission 
 
-    setServerError(''); // Reset server error  /    重置服务器错误
+    setServerError(''); // Reset server error 
 
 
     const err = validate();

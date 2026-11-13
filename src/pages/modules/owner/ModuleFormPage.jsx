@@ -8,10 +8,7 @@ import * as modulesApi from '../../../api/modules';
 import {   PageContainer, PageTitle, FormField, ActionButton, Icon , } from '../../../components/ui';
 import SectionManager from '../../../components/modules/SectionManager';
 import ScheduleEditor from '../../../components/modules/ScheduleEditor';
-//import { useBlocker } from 'react-router-dom';
-//import { MOCK_MODULE_DETAIL } from '../_mockData';
 
-//const DEMO_STATE = 'normal';    // 'normal' | 'loading'
 
 /**
  * create/edit module form page
@@ -77,12 +74,9 @@ function ModuleFormPage() {
 
             try {
                 // temporary
-                // const data = await modulesApi.getModule(id);
 
-                const data = await modulesApi.getModule(id); /* new Promise((r) =>
-                setTimeout(() => r(MOCK_MODULE_DETAIL), 400)
-                );
-                */
+
+                const data = await modulesApi.getModule(id); 
 
                 if (!ignore) {
                 setModule(data);

@@ -16,10 +16,7 @@ const formatDate = (iso) => (iso ? new Date(iso).toLocaleDateString() : '—');
 /** Quote a value for CSV. */
 const csvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
 
-/**
- * Owners: every learner enrolled in the modules they manage, with compliance status, progress and
- * quiz results. Admins see every module. ?module=<id> preselects a module.
- */
+
 function GradebookPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();

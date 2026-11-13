@@ -1,9 +1,5 @@
 // src/App.jsx
-/* 10-02 
-    https://axios.rest/pages/advanced/interceptors
-    https://render.com/docs/free#spinning-down-on-idle  // 15 minutes -> spins down
-    https://www.npmjs.com/package/@dpsys/axios-loader
-*/
+
 import { useState, useEffect } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import AppRouter from "./routes/AppRouter";

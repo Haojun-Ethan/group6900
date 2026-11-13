@@ -34,9 +34,9 @@ const theme = createTheme (
   // Breakpoints / 断点
   breakpoints: {
     values: {
-      xs: 0,       // Phone / 手机
+      xs: 0,       // Phone 
       sm: 600,     // Large phone 
-      md: 900,     // Tablet / 平板
+      md: 900,     // Tablet 
       lg: 1200,    // Desktop 
       xl: 1536,    // Large desktop 
     },
@@ -85,7 +85,7 @@ const theme = createTheme (
       },
     },
 
-    // Prevent iOS zoom on focus / 防 iOS 焦点自动缩放
+    // Prevent iOS zoom on focus 
     MuiInputBase: {
       styleOverrides: {
         input: {

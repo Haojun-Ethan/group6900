@@ -8,12 +8,6 @@ import StatusBadge from '../../components/modules/StatusBadge';
 import SectionList from '../../components/modules/SectionList';
 
 
-
-//import { MOCK_MODULE_DETAIL, MOCK_MY_ENROLLMENTS } from './_mockData';
-
-/*  用于静态设计阶段快速切换三态  */
-//const DEMO_STATE = 'normal'; // 'normal' | 'loading' | 'error' | 'notfound'
-
 /* Module detail page  */
 function ModuleDetailPage() {
   const { id } = useParams();
@@ -65,38 +59,6 @@ function ModuleDetailPage() {
       ignore = true; 
     };
   }, [id]);
-    /* delete 08-01
-    {const load = async () => {
-      setIsLoading(true);
-      setError('');
-      try {
-    
-        // future: const data = await modulesApi.getModule(id);
-        //       const enrollments = await enrollmentsApi.listMyEnrollments();
-
-        const data = await new Promise((r) =>
-          setTimeout(() => r(MOCK_MODULE_DETAIL), 400)
-        );
-        const enrollments = MOCK_MY_ENROLLMENTS;
-
-        setModule(data);
-        setEnrollment(
-          enrollments.find((e) => String(e.module) === String(id)) || null
-        );
-      } catch (err) {
-        setError(err.message || 'Failed to load module');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    load();
-  }, [id]);
-
-  // ★ DEMO_STATE 强制切换
-  const effectiveLoading = DEMO_STATE === 'loading' ? true : isLoading;
-  const effectiveError = DEMO_STATE === 'error' ? 'Failed to load' : error;
-  const effectiveNotFound = DEMO_STATE === 'notfound' ? true : false;
-*/
 
   // handleEnroll
   const handleEnroll = async () => {
